@@ -1,3 +1,29 @@
 {
-  "recommendations": ["johnsoncodehk.volar", "johnsoncodehk.vscode-typescript-vue-plugin"]
+  "recommendations": [
+    "johnsoncodehk.volar",
+    "johnsoncodehk.vscode-typescript-vue-plugin",
+
+    //by antFu
+    "antfu.iconify",
+    "antfu.slidev",
+    "antfu.unocss",
+    "antfu.vite",
+    "antfu.where-am-i",
+    "lokalise.i18n-ally",
+
+    // themes & icons
+    "antfu.icons-carbon",
+    "antfu.theme-vitesse",
+    "file-icons.file-icons",
+    "sainnhe.gruvbox-material",
+
+    // life savers!
+    "dbaeumer.vscode-eslint",
+    "johnsoncodehk.volar",
+    "GitHub.copilot",
+    "usernamehw.errorlens",
+    "streetsidesoftware.code-spell-checker",
+
+  
+  ]
 }
