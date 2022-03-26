@@ -1,7 +1,8 @@
 
 <script setup lang="ts">
 import HomeView from './views/HomeView.vue'
-import { h } from 'vue'
+import { defineComponent, h, ref } from 'vue'
+import type { Component } from 'vue'
 import { NSpace,NLayout,NLayoutSider,NMenu,NIcon,NLayoutFooter,NLayoutHeader,
   NScrollbar} from 'naive-ui'
 import { RouterLink, RouterView } from 'vue-router'
