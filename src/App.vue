@@ -46,7 +46,7 @@ const menuOptions: MenuOption[] = [
 <template>
 <n-layout bordered position="absolute">
   <n-layout-header style="height: 60px; padding: 10px " bordered >
-    <img class="logo" src="/logo/atom.svg" width="40" height="40" />
+    <img class="logo" src="@/assets/logo.svg" width="40" height="40" />
   </n-layout-header>
   <n-layout has-sider position="absolute" style="top: 60px; bottom: 30px" bordered > 
         <n-layout-sider bordered

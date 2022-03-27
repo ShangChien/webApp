@@ -1,14 +1,18 @@
 <script setup lang='ts'>
 import { NButton,NInput,NInputGroup,NSpace } from 'naive-ui'
-import { ref, onMounted, onBeforeUnmount} from 'vue'
+import { ref,onMounted, onBeforeUnmount} from 'vue'
 
-const src = ref('/standalone/index.html')
-const smiles = ref(null)
-const refketcher = ref(null)
-const iframeWin = ref(null)
-const showketcher = ref(true)
+const src = ref<string>('/ketcher/standalone/index.html')
+const smiles = ref<string|any>()
+const refketcher = ref<HTMLIFrameElement|any>()
+const iframeWin = ref<any>(null)
+const showketcher = ref<boolean>(true)
 
-const handleMessage = event => {
+onMounted(()=>{
+  window.addEventListener("message", handleMessage)
+  iframeWin.value=refketcher.value.contentWindow
+})
+const handleMessage = (event: { data: { cmd: any; params: { data: null; }; }; }) => {
   switch (event.data.cmd) {
     case 'postSmiles':
       smiles.value= event.data.params.data
@@ -17,10 +21,10 @@ const handleMessage = event => {
 };
 
 function sendMessage() {
-  iframeWin.value.postMessage({
+  iframeWin.value?.postMessage({
     cmd: 'setMole',
     params: {
-      mole:smiles.value
+      smiles:smiles.value
     }
   },'*')
 }
@@ -30,10 +34,7 @@ function getMessage() {
     params: void 0
     },'*')
 }
-onMounted(()=>{
-  window.addEventListener("message", handleMessage)
-  iframeWin.value=refketcher.value.contentWindow
-})
+
 
 onBeforeUnmount(() => {
 	window.removeEventListener("message", handleMessage);

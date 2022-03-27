@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NCol,NRow,NStatistic,NIcon } from 'naive-ui'
+import { NCol,NRow,NStatistic } from 'naive-ui'
 </script>
 
 <template>
