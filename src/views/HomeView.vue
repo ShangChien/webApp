@@ -38,8 +38,13 @@ import { NCol,NRow,NStatistic } from 'naive-ui'
       </n-statistic>
     </n-col>
   </n-row>
+  <hr>
   <br>
-  开源协议的通俗解释<br>
-  <img class="logo" src="/logo/opensource.png"  />
+  开源协议的主流类型:<br>
+  <img src="/picture/openclass.png"  />
+  <hr>
+  <br>
+  开源协议的通俗解释:<br>
+  <img src="/picture/openbranch.png"  />
 </template>
 

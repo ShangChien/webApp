@@ -1,13 +1,11 @@
 
 <script setup lang="ts">
-import HomeView from './views/HomeView.vue'
-import { defineComponent, h, ref } from 'vue'
+import { h } from 'vue'
 import type { Component } from 'vue'
-import { NSpace,NLayout,NLayoutSider,NMenu,NIcon,NLayoutFooter,NLayoutHeader,
-  NScrollbar} from 'naive-ui'
+import { NLayout,NLayoutSider,NMenu,NIcon,NLayoutFooter,NLayoutHeader } from 'naive-ui'
 import { RouterLink, RouterView } from 'vue-router'
 import type { MenuOption } from 'naive-ui'
-import {LaptopOutline,LogOutOutline,LogoElectron } from '@vicons/ionicons5'
+import { LogoElectron } from '@vicons/ionicons5'
 import { Home,Tabler3DCubeSphere } from '@vicons/tabler'
 import { Carbon,Workspace } from '@vicons/carbon'
 
@@ -45,8 +43,8 @@ const menuOptions: MenuOption[] = [
 
 <template>
 <n-layout bordered position="absolute">
-  <n-layout-header style="height: 60px; padding: 10px " bordered >
-    <img class="logo" src="@/assets/logo.svg" width="40" height="40" />
+  <n-layout-header style="height: 60px; padding: 1px " bordered >
+    <img class="logo" src="/picture/colorlogo.svg" width="55"  />
   </n-layout-header>
   <n-layout has-sider position="absolute" style="top: 60px; bottom: 30px" bordered > 
         <n-layout-sider bordered
@@ -70,8 +68,8 @@ const menuOptions: MenuOption[] = [
 </template>
 
 <style>
-.logo {
-  position:relative;
-  left:10px;
+.logo{
+  position: relative;
+  left: 10px;
 }
 </style>
