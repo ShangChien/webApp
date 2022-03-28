@@ -3,7 +3,7 @@ import { NButton,NInput,NInputGroup,NSpace } from 'naive-ui'
 import { ref,onMounted, onBeforeUnmount} from 'vue'
 
 const src = ref<string>('/ketcher/standalone/index.html')
-const smiles = ref<string>('')
+const smiles = ref<string|any>('')
 const refketcher = ref<HTMLIFrameElement|any>()
 const iframeWin = ref<any>(null)
 const showketcher = ref<boolean>(true)
