@@ -13,15 +13,15 @@ onMounted(()=>{
       success: function(data) {
         let v = viewer;
         v.addModel( data, "pdb" );                       /* load data */
-        v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
+        v.setStyle({}, {stick: {}});  /* style all atoms */
         v.zoomTo();                                      /* set camera */
         v.render();                                      /* render scene */
-        v.spin('y',0.2);
+        v.spin('y',0.5);
         //悬停事件
         $(".mol-container").hover(function(){
           v.spin('y',0);
         },function(){
-          v.spin('y',0.2);
+          v.spin('y',0.5);
         });
       },
       error: function(hdr, status, err) {
@@ -38,7 +38,7 @@ onMounted(()=>{
 </template>
 <style>
 .mol-container {
-  width: 100%;
+  width: 400px;
   height: 400px;
   position: relative;
 }

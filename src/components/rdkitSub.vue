@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue';
 import type { molData } from '@/components/types'
 import  initRDKitModule from "@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js"
 const props = defineProps<molData>()
-const rdkitdiv=ref<HTMLDivElement>()
+const rdkitdiv=ref<HTMLDivElement|any>()
 //const p=initRdkit()
 //function initRdkit(){
 //  return new Promise((resolve) =>{
@@ -67,14 +67,13 @@ function renderMol(props:molData){
   mDetail['explicitMethyl']=props.explicitMethyl ?? false
   mDetail=JSON.stringify(mDetail)
   let svg=mol.get_svg_with_highlights(mDetail)
-  let svgDiv:HTMLDivElement|any=rdkitdiv.value
-  svgDiv.innerHTML=svg
+  //let svgDiv:HTMLDivElement|any=rdkitdiv.value
+  //svgDiv.innerHTML=svg
+  rdkitdiv.value.innerHTML=svg
   mol.delete()
   qmol.delete()
   })
 }
-
-
 
 watch(
   props,
@@ -82,7 +81,6 @@ watch(
     renderMol(newVal)
   }
 )
-
 
 </script>
 
