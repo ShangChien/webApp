@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import jquery from 'jquery'
-Object.assign(window, { $: jquery})
+import jQuery from 'jquery'
+Object.assign(window, { $: jQuery, jQuery })
 
 import App from './App.vue'
 import router from './router'

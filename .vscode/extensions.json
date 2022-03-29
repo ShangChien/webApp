@@ -4,6 +4,7 @@
     "johnsoncodehk.vscode-typescript-vue-plugin",
 
     //by antFu
+    "antfu.browse-lite",
     "antfu.iconify",
     "antfu.slidev",
     "antfu.unocss",
