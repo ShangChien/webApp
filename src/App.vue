@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { h } from 'vue'
 import type { Component } from 'vue'
-import { NLayout,NLayoutSider,NMenu,NIcon,NLayoutFooter,NLayoutHeader } from 'naive-ui'
+import { NLayout,NLayoutSider,NMenu,NIcon,NLayoutFooter,NLayoutHeader,NMessageProvider} from 'naive-ui'
 import { RouterLink, RouterView } from 'vue-router'
 import type { MenuOption } from 'naive-ui'
 import { LogoElectron } from '@vicons/ionicons5'
@@ -57,8 +57,7 @@ const menuOptions: MenuOption[] = [
                   :options="menuOptions"/>
         </n-layout-sider>
         <n-layout content-style="padding: 20px" :native-scrollbar="false" bordered>
-            <router-view>
-            </router-view>
+            <n-message-provider><router-view/></n-message-provider>
         </n-layout>
   </n-layout> 
   <n-layout-footer position="absolute" style="padding: 10px" bordered>

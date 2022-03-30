@@ -8,7 +8,6 @@ const mol1:molData=reactive({
     qsmiles:'CO.OC=O.c1ccccc1',
     width:200,
     height:200,
-    highlightColor:[]
 })
 
 const mol2:molData=reactive({
@@ -39,7 +38,7 @@ function change(){
     mol1.highlightColor=color.value
 }
 onMounted(()=>{
-    mol1.highlightColor=[0.94,0.475,0.8]
+    
 })
 
 

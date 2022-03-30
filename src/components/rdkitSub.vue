@@ -51,6 +51,7 @@ function renderMol(props:molData){
   const RDKit= instance
   let mol= RDKit.get_mol(props.smiles ?? '')
   let qmol=RDKit.get_qmol(props.qsmiles ?? '')
+  console.log(props.smiles)
   let mDetail= JSON.parse(mol.get_substruct_match(qmol))
   mDetail['atoms']=mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms
   mDetail['bonds']=mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds
@@ -67,8 +68,6 @@ function renderMol(props:molData){
   mDetail['explicitMethyl']=props.explicitMethyl ?? false
   mDetail=JSON.stringify(mDetail)
   let svg=mol.get_svg_with_highlights(mDetail)
-  //let svgDiv:HTMLDivElement|any=rdkitdiv.value
-  //svgDiv.innerHTML=svg
   rdkitdiv.value.innerHTML=svg
   mol.delete()
   qmol.delete()

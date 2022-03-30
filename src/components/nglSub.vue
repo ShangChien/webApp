@@ -8,7 +8,7 @@ function initViewer(viewport:any){
   stage.loadFile("/moleculeData/1ycr.pdb")
     .then(function(o:any) {
       o.addRepresentation("cartoon");
-      //o.addRepresentation( "licorice" );
+      o.addRepresentation("licorice", { sele: "/0", multipleBond: "symmetric" })
       o.stage.setSpin(true);
       o.autoView();
       console.log(o);
