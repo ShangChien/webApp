@@ -5,7 +5,7 @@ export interface molData{
     bonds?:Number[]
     addAtomIndices?:Boolean
     addBondIndices?:Boolean
-    lenged?:String
+    legend?:String
     width?:Number
     height?:Number
     highlightColor?:Number[]
