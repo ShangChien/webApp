@@ -5,7 +5,7 @@ import rdkitSub from '@/components/rdkitSub.vue'
 import { NSpace,NButton }   from 'naive-ui'
 const mol1:molData=reactive({
     smiles:'CC(=O)Oc1ccccc1C(=O)O',
-    qsmiles:'CO.OC=O.c1ccccc1',
+    qsmiles:'CC(=O)Oc1ccccc1C(=O)O',
     width:200,
     height:200,
 })

@@ -46,7 +46,7 @@ onBeforeUnmount(() => {
     <n-input-group class="inputG" >
       <n-button size="large" 
                 style="font-size:20px"
-                color="#3fada8"
+                color="#6190E8"
                 @click="getMessage">
         Get
       </n-button>
