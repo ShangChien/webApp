@@ -32,10 +32,17 @@ const mol4:molData=reactive({
     height:200,
     highlightColor:[0.94,0.475,0.8]
 })
-const color=ref<number[]>([0.24,0.675,0.8])
+const colorNum=ref<number>(0)
 
 function change(){
-    mol1.highlightColor=color.value
+    let color1=[0.94,0.475,0.8]
+    let color2=[0.24,0.675,0.8]
+    colorNum.value++
+    if (colorNum.value%2==0){
+        mol1.highlightColor=color1
+    }else{
+        mol1.highlightColor=color2
+    }
 }
 onMounted(()=>{
     
@@ -46,7 +53,7 @@ onMounted(()=>{
 
 <template>
 <NButton @click="change">
-    切换颜色{{mol1.highlightColor}}
+    切换颜色
 </NButton>
 <n-space>
   <rdkit-sub v-bind="mol1"></rdkit-sub>

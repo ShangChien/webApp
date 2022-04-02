@@ -49,7 +49,7 @@ function getSvgData(svg:string){
     for (var attrs of ['cx','cy','rx','ry']){
       svgitem.ellipse[svgitem.ellipse.length-1].ellipse[attrs]=item.getAttribute(attrs)
     }
-    svgitem.ellipse[svgitem.ellipse.length-1].ellipse['style']=item.getAttribute('style').concat(';opacity: 0.8')
+    svgitem.ellipse[svgitem.ellipse.length-1].ellipse['style']=item.getAttribute('style').concat(';opacity: 0.6')
   }
   //获取svgPath内容
   let svgPath:any=xmlDoc.value.getElementsByTagName('path')
@@ -59,7 +59,7 @@ function getSvgData(svg:string){
       for (var attrs of ['d','style','fill']){
         svgitem.path.hightBonds[svgitem.path.hightBonds.length-1].path[attrs]=item.getAttribute(attrs)
       }
-      svgitem.path.hightBonds[svgitem.path.hightBonds.length-1].path['style']=item.getAttribute('style').concat(';opacity: 0.4')
+      svgitem.path.hightBonds[svgitem.path.hightBonds.length-1].path['style']=item.getAttribute('style').concat(';opacity: 0.2')
     } else if (item.getAttribute('style')==null){
       svgitem.path.symble.push({path:{}})
       for (var attrs of ['class','d','fill']){
@@ -159,12 +159,12 @@ function siteMatch(x:number,y:number): any {
     let distance2 = Math.sqrt(Math.pow(bondMap.value[item][1][0]-x,2)+Math.pow(bondMap.value[item][1][1]-y,2))
     if (distance2>distance1){
      if (distance1<(bondLengthRange.value[0]*0.2)){
-       console.log(item.split(' ')[1].split('-')[1])
+       console.log(item.split(' ')[1].split('-')[1],[x,y])
       return item.split(' ')[1].split('-')[1]
       } 
     } else { 
       if (distance2<(bondLengthRange.value[1]*0.2)){
-         console.log(item.split(' ')[2].split('-')[1])
+         console.log(item.split(' ')[2].split('-')[1],[x,y])
         return item.split(' ')[2].split('-')[1]
       } 
     }
@@ -173,7 +173,7 @@ function siteMatch(x:number,y:number): any {
     let distance1 = Math.sqrt(Math.pow(bondMap.value[item][0][0]-x,2)+Math.pow(bondMap.value[item][0][1]-y,2))
     let distance2 = Math.sqrt(Math.pow(bondMap.value[item][1][0]-x,2)+Math.pow(bondMap.value[item][1][1]-y,2))
       if (distance2<(bondLengthRange.value[1]*0.4)){
-         console.log(item.split(' ')[2].split('-')[1])
+         console.log(item.split(' ')[2].split('-')[1],[x,y])
         return item.split(' ')[2].split('-')[1]
       } 
   }
@@ -197,21 +197,27 @@ function bondSiteMatch(x1:number,y1:number,x2:number,y2:number): any {
 }
 
 function domClick($event:any){
-  //改颜色
-  $event.target.style.stroke='#3fada8'
-  $event.target.style.fill='#3fada8'
-  //添加index到数组
   let atomIndex=siteMatch($event.target.getAttribute('cx')/1,$event.target.getAttribute('cy')/1)/1
-  if (atomIndex){//如果点击atom
+  if (!isNaN(atomIndex)){//如果点击atom
+    //改颜色
+    $event.target.style.stroke='#3fada8'
+    $event.target.style.fill='#3fada8'
+    $event.target.style.opacity=0.8
+    //添加index到数组
     highlightMap.highlightAtoms.push(atomIndex)
     highlightMap.highlightAtoms=Array.from(new Set(highlightMap.highlightAtoms))
-    console.log(highlightMap.highlightAtoms)
+    console.log(highlightMap.highlightAtoms,)
   } else {//如果点击bond
     let line =$event.target.getAttribute('d')?.split(' ')
     console.log(line)
     let bondIndex=bondSiteMatch(line[1].split(',')[0]/1,line[1].split(',')[1]/1,
                                 line[3].split(',')[0]/1,line[3].split(',')[1]/1)/1
-    if (bondIndex){
+    if (!isNaN(bondIndex)){
+      //改颜色
+      $event.target.style.stroke='#3fada8'
+      $event.target.style.fill='#3fada8'
+      $event.target.style.opacity=0.4
+      //添加index到数组
       highlightMap.highlightBonds.push(bondIndex)
       highlightMap.highlightBonds=Array.from(new Set(highlightMap.highlightBonds))
       console.log(highlightMap.highlightBonds)
@@ -220,13 +226,14 @@ function domClick($event:any){
   
 }
 function domDblClick($event:any){
-  //恢复颜色
-  $event.target.style.stroke='#9FACE6'
-  $event.target.style.fill='#9FACE6'
-  //删除index
   let atomIndex=siteMatch($event.target.getAttribute('cx')/1,$event.target.getAttribute('cy')/1)/1
-  if (atomIndex){
+  if (!isNaN(atomIndex)){
     if (highlightMap.highlightAtoms.indexOf(atomIndex)!=-1){
+      //恢复颜色
+      $event.target.style.stroke='#9FACE6'
+      $event.target.style.fill='#9FACE6'
+      $event.target.style.opacity=0.6
+      //删除index
       highlightMap.highlightAtoms.splice(highlightMap.highlightAtoms.indexOf(atomIndex),1)
       console.log(highlightMap.highlightAtoms)
     }
@@ -235,6 +242,11 @@ function domDblClick($event:any){
     let bondIndex=bondSiteMatch(line[1].split(',')[0]/1,line[1].split(',')[1]/1,
                                   line[3].split(',')[0]/1,line[3].split(',')[1]/1)/1
     if (highlightMap.highlightBonds.indexOf(bondIndex)!=-1){
+      //恢复颜色
+      $event.target.style.stroke='#9FACE6'
+      $event.target.style.fill='#9FACE6'
+      $event.target.style.opacity=0.2
+      //删除index
       highlightMap.highlightBonds.splice(highlightMap.highlightBonds.indexOf(bondIndex),1)
       console.log(highlightMap.highlightBonds)
     }
