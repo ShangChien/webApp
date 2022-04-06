@@ -5,35 +5,88 @@ NCollapseItem,NInputGroup,NInput,NDivider} from 'naive-ui'
 import { ColorPaletteOutline } from '@vicons/ionicons5'
 import initKetcher from '../components/initKetcher.vue';
 import editableRdkit from '@/components/editableRdkit.vue'
+import rdkitSub from '@/components/rdkitSub.vue'
 import { reactive,onMounted,ref } from 'vue';
 import type { molData } from '@/components/types'
+
+const inputText=ref('')
+const showAbout=ref(false)
+const active = ref(true)
+const options=[{label: 'Ketcher: 2.4.0'},{label: 'RDKit: 2021.9.5'}]
+
+function drawMol(){
+  initMol.smiles=inputText.value
+  initMol.qsmiles=inputText.value
+  //console.log(initMol)
+}
+
 const initSmile=ref('CC(=O)Oc1ccccc1C(=O)O')
 const initMol:molData=reactive({
     smiles:initSmile.value,
     qsmiles:initSmile.value,
     width:500,
     height:500,
+    addAtomIndices:true,
 })
-const inputText=ref('')
-const showAbout=ref(false)
-const active = ref(true)
-const options=[{label: 'Ketcher: 2.4.0'},{label: 'RDKit: 2021.9.5'}]
-const message = useMessage()
-function createMessage(){
-  message.warning("I never needed anybody's help in any way")
+
+const tmpSmile=reactive({
+  smiles:'' as any,
+  atoms:[] as any,
+  bonds:[] as any,
+})
+function acceptMol(mol:molData){
+  tmpSmile.smiles=mol.smiles
+  tmpSmile.atoms=mol.atoms
+  tmpSmile.bonds=mol.bonds
+  console.log(tmpSmile)
 }
-function toggleShowAbout(){
-  showAbout.value=!showAbout.value
+
+const mol4enum=reactive({
+  core:[] as Array<molData>,
+  ligand:[] as Array<molData>
+})
+//addcore
+function addCore(){
+  const mol={
+    smiles:'',
+    atoms:[],
+    bonds:[],
+  }
+  //判断存在形式
+  if((tmpSmile.smiles!='')&&((JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile.smiles))==-1)
+  ||(JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile.atoms))==-1)
+  ||(JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile.bonds))==-1))){
+    mol.smiles=tmpSmile.smiles
+    mol.atoms=tmpSmile.atoms
+    mol.bonds=tmpSmile.bonds
+    mol4enum.core.push(JSON.parse(JSON.stringify(mol)))
+    tmpSmile.smiles=''
+    tmpSmile.atoms=[]
+    tmpSmile.bonds=[]
+  }
+  console.log(mol4enum.core)
 }
-function updateSmiles(smiles:string){
-  initSmile.value=smiles
-  console.log(initSmile.value)
+//addLigand
+function addLigand(){
+  const mol={
+    smiles:'',
+    atoms:[],
+    bonds:[],
+  }
+  //判断存在形式
+  if((tmpSmile.smiles!='')&&((JSON.stringify(mol4enum.ligand).indexOf(JSON.stringify(tmpSmile.smiles))==-1)
+  ||(JSON.stringify(mol4enum.ligand).indexOf(JSON.stringify(tmpSmile.atoms))==-1)
+  ||(JSON.stringify(mol4enum.ligand).indexOf(JSON.stringify(tmpSmile.bonds))==-1))){
+    mol.smiles=tmpSmile.smiles
+    mol.bonds=tmpSmile.bonds
+    mol4enum.ligand.push(JSON.parse(JSON.stringify(mol)))
+    tmpSmile.smiles=''
+    tmpSmile.atoms=[]
+    tmpSmile.bonds=[]
+  }
+  console.log(mol4enum.ligand)
 }
-function drawMol(){
-  initMol.smiles=inputText.value
-  initMol.qsmiles=inputText.value
-  console.log(initMol)
-}
+
 
 onMounted(()=>{
 })
@@ -64,7 +117,7 @@ onMounted(()=>{
       </n-space>
     </template>
     <template #avatar>
-      <n-avatar @click='toggleShowAbout'
+      <n-avatar @click='showAbout=!showAbout'
        color=" white" src="/picture/enum.svg"/>
     </template>
     <template #extra>
@@ -97,11 +150,10 @@ onMounted(()=>{
             </n-input-group>
             <n-space justify="space-around">
               <!--rdkit-sub v-bind="initMol"/-->
-              <editable-rdkit v-bind="initMol" />
-              <n-space align="stretch" vertical :size="60">
-                <br>
-                <n-button size="medium" strong secondary round type="info">添加主核</n-button>
-                <n-button size="medium" strong secondary round type="info">添加配体</n-button>
+              <editable-rdkit v-bind="initMol" @update-mol="acceptMol"/>
+              <n-space align="stretch" :size="60">
+                <n-button size="medium" strong secondary round type="info" @click="addCore" >添加主核</n-button>
+                <n-button size="medium" strong secondary round type="info" @click="addLigand" >添加配体</n-button>
                 <n-button szie="large" round color="#ff69b4" >开始枚举</n-button>
               </n-space>  
             </n-space>
@@ -118,24 +170,26 @@ onMounted(()=>{
     <n-grid-item>
       <n-collapse :default-expanded-names="['1']">
         <n-collapse-item title="主核结构" display-directive="show" name="1">
-          <svg version='1.1' baseProfile='full'
-                          xmlns='http://www.w3.org/2000/svg'
-                                  xmlns:rdkit='http://www.rdkit.org/xml'
-                                  xmlns:xlink='http://www.w3.org/1999/xlink'
-                              xml:space='preserve'
-            width='400px' height='400px' viewBox='0 0 400 400'>
-            <!-- END OF HEADER -->
-            <rect style='opacity:1.0;fill:#FFFFFF;stroke:none' width='400.0' height='400.0' x='0.0' y='0.0'> </rect>
-
-            <path  d="M 52.3,242.5 L 200.0,157.3" style="fill:none;fill-rule:evenodd;stroke:#9FACE6;stroke-width:45.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"></path>
-          </svg>
+          <n-grid :cols="4">
+            <n-grid-item
+              v-for="item in mol4enum.core"
+              :key="mol4enum.core.indexOf(item)">
+              <rdkit-sub v-bind="item"/>
+            </n-grid-item>
+          </n-grid>
         </n-collapse-item>
       </n-collapse>
     </n-grid-item>
     <n-grid-item>
       <n-collapse :default-expanded-names="['1']">
         <n-collapse-item title="配体结构" display-directive="show" name="1">
-          none
+          <n-grid :cols="4">
+            <n-grid-item
+              v-for="item in mol4enum.ligand"
+              :key="mol4enum.ligand.indexOf(item)">
+              <rdkit-sub v-bind="item"/>
+            </n-grid-item>
+          </n-grid>
         </n-collapse-item>
       </n-collapse>
     </n-grid-item>
@@ -154,4 +208,3 @@ onMounted(()=>{
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
 }
 </style>
-background-image: linear-gradient(25deg, #d24d53, #b78563, #8daf75, #27d587)

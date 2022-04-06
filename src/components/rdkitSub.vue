@@ -20,15 +20,16 @@ function renderMol(props:molData){
   mDetail['lenged']=props.legend
   mDetail['width']=props.width ?? 100
   mDetail['height']=props.height ?? 100
-  mDetail['highlightColour']=props.highlightColor ?? [0.624,0.675,0.902]
+  mDetail['highlightColour']=props.highlightColor ?? [255,20,147].map((i)=>(i/255))
   mDetail['bondLineWidth']=props.bondLineWidth ?? 1
-  mDetail['highlightBondWidthMultiplier']=props.highlightBondWidthMultiplier ?? 15
-  mDetail['highlightRadius']=props.highlightRadius ?? 0.3
+  mDetail['highlightBondWidthMultiplier']=props.highlightBondWidthMultiplier ?? 28
+  mDetail['highlightRadius']=props.highlightRadius ?? 0.4
   mDetail['minFontSize']=props.minFontSize ?? 10
   mDetail['explicitMethyl']=props.explicitMethyl ?? false
   mDetail=JSON.stringify(mDetail)
   let svg=mol.get_svg_with_highlights(mDetail)
   rdkitdiv.value.innerHTML=svg
+  //节省内存
   mol.delete()
   qmol.delete()
   })

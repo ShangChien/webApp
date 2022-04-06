@@ -3,10 +3,11 @@ import { ref, onMounted, watch, reactive } from 'vue';
 import type { molData } from '@/components/types'
 import  initRDKitModule from "@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js"
 const props = defineProps<molData>()
-const highlightMap=reactive({
-  smiles:'',
-  highlightAtoms:[] as Array<number>,
-  highlightBonds:[] as Array<number>,
+const emit = defineEmits(['update-mol'])
+const highlightMap:molData=reactive({
+  smiles:props.smiles,
+  atoms:[],
+  bonds:[],
 })
 const bondLengthRange=ref([0,0])
 const svgitem=reactive<HTMLDivElement|any>({
@@ -159,12 +160,12 @@ function siteMatch(x:number,y:number): any {
     let distance2 = Math.sqrt(Math.pow(bondMap.value[item][1][0]-x,2)+Math.pow(bondMap.value[item][1][1]-y,2))
     if (distance2>distance1){
      if (distance1<(bondLengthRange.value[0]*0.2)){
-       console.log(item.split(' ')[1].split('-')[1],[x,y])
+       //console.log(item.split(' ')[1].split('-')[1],[x,y])
       return item.split(' ')[1].split('-')[1]
       } 
     } else { 
       if (distance2<(bondLengthRange.value[1]*0.2)){
-         console.log(item.split(' ')[2].split('-')[1],[x,y])
+         //console.log(item.split(' ')[2].split('-')[1],[x,y])
         return item.split(' ')[2].split('-')[1]
       } 
     }
@@ -173,7 +174,7 @@ function siteMatch(x:number,y:number): any {
     let distance1 = Math.sqrt(Math.pow(bondMap.value[item][0][0]-x,2)+Math.pow(bondMap.value[item][0][1]-y,2))
     let distance2 = Math.sqrt(Math.pow(bondMap.value[item][1][0]-x,2)+Math.pow(bondMap.value[item][1][1]-y,2))
       if (distance2<(bondLengthRange.value[1]*0.4)){
-         console.log(item.split(' ')[2].split('-')[1],[x,y])
+         //console.log(item.split(' ')[2].split('-')[1],[x,y])
         return item.split(' ')[2].split('-')[1]
       } 
   }
@@ -204,12 +205,14 @@ function domClick($event:any){
     $event.target.style.fill='#3fada8'
     $event.target.style.opacity=0.8
     //添加index到数组
-    highlightMap.highlightAtoms.push(atomIndex)
-    highlightMap.highlightAtoms=Array.from(new Set(highlightMap.highlightAtoms))
-    console.log(highlightMap.highlightAtoms,)
+    highlightMap.atoms?.push(atomIndex)
+    highlightMap.atoms=Array.from(new Set(highlightMap.atoms)).sort()
+    emit('update-mol', highlightMap)
+    //console.log(highlightMap.highlightAtoms)
+
   } else {//如果点击bond
     let line =$event.target.getAttribute('d')?.split(' ')
-    console.log(line)
+    //console.log(line)
     let bondIndex=bondSiteMatch(line[1].split(',')[0]/1,line[1].split(',')[1]/1,
                                 line[3].split(',')[0]/1,line[3].split(',')[1]/1)/1
     if (!isNaN(bondIndex)){
@@ -218,9 +221,10 @@ function domClick($event:any){
       $event.target.style.fill='#3fada8'
       $event.target.style.opacity=0.4
       //添加index到数组
-      highlightMap.highlightBonds.push(bondIndex)
-      highlightMap.highlightBonds=Array.from(new Set(highlightMap.highlightBonds))
-      console.log(highlightMap.highlightBonds)
+      highlightMap.bonds?.push(bondIndex)
+      highlightMap.bonds=Array.from(new Set(highlightMap.bonds)).sort()
+      emit('update-mol', highlightMap)
+      //console.log(highlightMap.highlightBonds)
     }
   }
   
@@ -228,27 +232,31 @@ function domClick($event:any){
 function domDblClick($event:any){
   let atomIndex=siteMatch($event.target.getAttribute('cx')/1,$event.target.getAttribute('cy')/1)/1
   if (!isNaN(atomIndex)){
-    if (highlightMap.highlightAtoms.indexOf(atomIndex)!=-1){
+    if (highlightMap.atoms?.indexOf(atomIndex)!=-1){
       //恢复颜色
       $event.target.style.stroke='#9FACE6'
       $event.target.style.fill='#9FACE6'
       $event.target.style.opacity=0.6
       //删除index
-      highlightMap.highlightAtoms.splice(highlightMap.highlightAtoms.indexOf(atomIndex),1)
-      console.log(highlightMap.highlightAtoms)
+      highlightMap.atoms?.splice(highlightMap.atoms?.indexOf(atomIndex),1)
+      highlightMap.atoms=Array.from(new Set(highlightMap.atoms)).sort()
+      emit('update-mol', highlightMap)
+      //console.log(highlightMap.highlightAtoms)
     }
   }else {
     let line =$event.target.getAttribute('d')?.split(' ')
     let bondIndex=bondSiteMatch(line[1].split(',')[0]/1,line[1].split(',')[1]/1,
                                   line[3].split(',')[0]/1,line[3].split(',')[1]/1)/1
-    if (highlightMap.highlightBonds.indexOf(bondIndex)!=-1){
+    if (highlightMap.bonds?.indexOf(bondIndex)!=-1){
       //恢复颜色
       $event.target.style.stroke='#9FACE6'
       $event.target.style.fill='#9FACE6'
       $event.target.style.opacity=0.2
       //删除index
-      highlightMap.highlightBonds.splice(highlightMap.highlightBonds.indexOf(bondIndex),1)
-      console.log(highlightMap.highlightBonds)
+      highlightMap.bonds?.splice(highlightMap.bonds.indexOf(bondIndex),1)
+      highlightMap.atoms=Array.from(new Set(highlightMap.atoms)).sort()
+      emit('update-mol', highlightMap)
+      //console.log(highlightMap.highlightBonds)
     }
   }
 }
@@ -261,8 +269,11 @@ onMounted(()=>{
 
 watch(
   props,
-  (newVal,oldVal)=>{
+  (newVal)=>{
     renderMol(newVal)
+    highlightMap.smiles=newVal.smiles
+    highlightMap.atoms=[]
+    highlightMap.bonds=[]
   }
 )
 

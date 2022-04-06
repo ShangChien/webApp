@@ -40,8 +40,14 @@ function change(){
     colorNum.value++
     if (colorNum.value%2==0){
         mol1.highlightColor=color1
+        mol2.highlightColor=color1
+        mol3.highlightColor=color1
+        mol4.highlightColor=color1
     }else{
         mol1.highlightColor=color2
+        mol2.highlightColor=color2
+        mol3.highlightColor=color2
+        mol4.highlightColor=color2
     }
 }
 onMounted(()=>{
@@ -56,12 +62,12 @@ onMounted(()=>{
     切换颜色
 </NButton>
 <n-space>
-  <rdkit-sub v-bind="mol1"></rdkit-sub>
+  <rdkit-sub v-bind="mol3"></rdkit-sub>
   <rdkit-sub v-bind="mol4"></rdkit-sub>
 </n-space>
 <n-space>
   <rdkit-sub v-bind="mol2"></rdkit-sub>
-  <rdkit-sub v-bind="mol3"></rdkit-sub>
+  <rdkit-sub v-bind="mol1"></rdkit-sub>
 </n-space>
 
 </template>
