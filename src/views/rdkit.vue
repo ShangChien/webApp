@@ -2,6 +2,7 @@
 import { reactive,onMounted,ref } from 'vue';
 import type { molData } from '@/components/types'
 import rdkitSub from '@/components/rdkitSub.vue'
+import cardRdkit from '@/components/svgRdkit.vue'
 import { NSpace,NButton }   from 'naive-ui'
 const mol1:molData=reactive({
     smiles:'CC(=O)Oc1ccccc1C(=O)O',
@@ -62,8 +63,8 @@ onMounted(()=>{
     切换颜色
 </NButton>
 <n-space>
-  <rdkit-sub v-bind="mol3"></rdkit-sub>
-  <rdkit-sub v-bind="mol4"></rdkit-sub>
+  <card-rdkit v-bind="mol3" ></card-rdkit>
+  <rdkit-sub v-bind="mol4" ></rdkit-sub>
 </n-space>
 <n-space>
   <rdkit-sub v-bind="mol2"></rdkit-sub>

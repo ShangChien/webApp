@@ -5,32 +5,33 @@ NCollapseItem,NInputGroup,NInput,NDivider} from 'naive-ui'
 import { ColorPaletteOutline } from '@vicons/ionicons5'
 import initKetcher from '../components/initKetcher.vue';
 import editableRdkit from '@/components/editableRdkit.vue'
-import rdkitSub from '@/components/rdkitSub.vue'
-import { reactive,onMounted,ref } from 'vue';
+import svgRdkit from '@/components/svgRdkit.vue'
+import cardRdkit from '@/components/cardRdkit.vue'
+import { reactive,onMounted,ref, nextTick, watch } from 'vue';
 import type { molData } from '@/components/types'
 
 const inputText=ref('')
 const showAbout=ref(false)
+const editRdkitKey=ref(1)
 const active = ref(true)
 const options=[{label: 'Ketcher: 2.4.0'},{label: 'RDKit: 2021.9.5'}]
 
 function drawMol(){
   initMol.smiles=inputText.value
-  initMol.qsmiles=inputText.value
   //console.log(initMol)
 }
 
-const initSmile=ref('CC(=O)Oc1ccccc1C(=O)O')
+const initSmile=ref<any>('CC(=O)Oc1ccccc1C(=O)O')
 const initMol:molData=reactive({
     smiles:initSmile.value,
-    qsmiles:initSmile.value,
+    qsmiles:'*~*',
     width:500,
     height:500,
     addAtomIndices:true,
 })
 
 const tmpSmile=reactive({
-  smiles:'' as any,
+  smiles:initMol.smiles as any,
   atoms:[] as any,
   bonds:[] as any,
 })
@@ -47,27 +48,27 @@ const mol4enum=reactive({
 })
 //addcore
 function addCore(){
+  editRdkitKey.value++
   const mol={
     smiles:'',
     atoms:[],
     bonds:[],
   }
   //判断存在形式
-  if((tmpSmile.smiles!='')&&((JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile.smiles))==-1)
-  ||(JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile.atoms))==-1)
-  ||(JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile.bonds))==-1))){
+  if((tmpSmile.smiles!='')&&((JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile))==-1))){
     mol.smiles=tmpSmile.smiles
     mol.atoms=tmpSmile.atoms
     mol.bonds=tmpSmile.bonds
     mol4enum.core.push(JSON.parse(JSON.stringify(mol)))
-    tmpSmile.smiles=''
-    tmpSmile.atoms=[]
-    tmpSmile.bonds=[]
+    //tmpSmile.smiles=''
+    //tmpSmile.atoms=[]
+    //tmpSmile.bonds=[]
   }
   console.log(mol4enum.core)
 }
 //addLigand
 function addLigand(){
+  editRdkitKey.value++
   const mol={
     smiles:'',
     atoms:[],
@@ -75,20 +76,27 @@ function addLigand(){
   }
   //判断存在形式
   if((tmpSmile.smiles!='')&&((JSON.stringify(mol4enum.ligand).indexOf(JSON.stringify(tmpSmile.smiles))==-1)
-  ||(JSON.stringify(mol4enum.ligand).indexOf(JSON.stringify(tmpSmile.atoms))==-1)
-  ||(JSON.stringify(mol4enum.ligand).indexOf(JSON.stringify(tmpSmile.bonds))==-1))){
+  ||(JSON.stringify(mol4enum.ligand).indexOf(JSON.stringify(tmpSmile.bonds))==-1)
+  ||(JSON.stringify(mol4enum.ligand).indexOf(JSON.stringify(tmpSmile.atoms))==-1))){
     mol.smiles=tmpSmile.smiles
+    mol.atoms=tmpSmile.atoms
     mol.bonds=tmpSmile.bonds
     mol4enum.ligand.push(JSON.parse(JSON.stringify(mol)))
-    tmpSmile.smiles=''
-    tmpSmile.atoms=[]
-    tmpSmile.bonds=[]
+    //tmpSmile.smiles=''
+    //tmpSmile.atoms=[]
+    //tmpSmile.bonds=[]
   }
   console.log(mol4enum.ligand)
 }
 
 
 onMounted(()=>{
+})
+
+watch(
+  ()=>initMol.smiles,
+  (val)=>{
+  tmpSmile.smiles=val
 })
 </script>
 
@@ -150,7 +158,9 @@ onMounted(()=>{
             </n-input-group>
             <n-space justify="space-around">
               <!--rdkit-sub v-bind="initMol"/-->
-              <editable-rdkit v-bind="initMol" @update-mol="acceptMol"/>
+              <div style="width:500px ;height:500px">
+              <editable-rdkit :key="editRdkitKey" v-bind="initMol" @update-mol="acceptMol"/>
+              </div>
               <n-space align="stretch" :size="60">
                 <n-button size="medium" strong secondary round type="info" @click="addCore" >添加主核</n-button>
                 <n-button size="medium" strong secondary round type="info" @click="addLigand" >添加配体</n-button>
@@ -170,11 +180,11 @@ onMounted(()=>{
     <n-grid-item>
       <n-collapse :default-expanded-names="['1']">
         <n-collapse-item title="主核结构" display-directive="show" name="1">
-          <n-grid :cols="4">
+          <n-grid :cols="4" x-gap="8" y-gap="8">
             <n-grid-item
               v-for="item in mol4enum.core"
               :key="mol4enum.core.indexOf(item)">
-              <rdkit-sub v-bind="item"/>
+              <card-rdkit v-bind="item" style="width:100%;"/>
             </n-grid-item>
           </n-grid>
         </n-collapse-item>
@@ -183,11 +193,11 @@ onMounted(()=>{
     <n-grid-item>
       <n-collapse :default-expanded-names="['1']">
         <n-collapse-item title="配体结构" display-directive="show" name="1">
-          <n-grid :cols="4">
+          <n-grid :cols="6" x-gap="8" y-gap="8">
             <n-grid-item
               v-for="item in mol4enum.ligand"
               :key="mol4enum.ligand.indexOf(item)">
-              <rdkit-sub v-bind="item"/>
+              <card-rdkit v-bind="item"/>
             </n-grid-item>
           </n-grid>
         </n-collapse-item>

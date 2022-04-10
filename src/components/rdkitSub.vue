@@ -1,26 +1,28 @@
 <script setup lang="ts">
+import { Card as ACard} from 'ant-design-vue';
+import { Checkbox as ACheckbox } from 'ant-design-vue';
+import { EllipsisOutlined } from '@ant-design/icons-vue'
 import { ref, onMounted, watch } from 'vue';
 import type { molData } from '@/components/types'
 import  initRDKitModule from "@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js"
 const props = defineProps<molData>()
 const rdkitdiv=ref<HTMLDivElement|any>()
 
-
 function renderMol(props:molData){
   initRDKitModule().then((instance:any)=>{
   const RDKit= instance
+  RDKit.prefer_coordgen(true)
   let mol= RDKit.get_mol(props.smiles ?? '')
   let qmol=RDKit.get_qmol(props.qsmiles ?? '')
-  console.log(props.smiles)
   let mDetail= JSON.parse(mol.get_substruct_match(qmol))
   mDetail['atoms']=mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms
   mDetail['bonds']=mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds
   mDetail['addAtomIndices']=props.addAtomIndices
   mDetail['addBondIndices']=props.addBondIndices
   mDetail['lenged']=props.legend
-  mDetail['width']=props.width ?? 100
-  mDetail['height']=props.height ?? 100
-  mDetail['highlightColour']=props.highlightColor ?? [255,20,147].map((i)=>(i/255))
+  mDetail['width']=props.width ?? 200
+  mDetail['height']=props.height ?? 200
+  mDetail['highlightColour']=props.highlightColor ?? [208,78,214].map((i)=>(i/255))
   mDetail['bondLineWidth']=props.bondLineWidth ?? 1
   mDetail['highlightBondWidthMultiplier']=props.highlightBondWidthMultiplier ?? 28
   mDetail['highlightRadius']=props.highlightRadius ?? 0.4
@@ -45,7 +47,21 @@ watch(
 )
 
 </script>
+<script lang="ts">
+import 'ant-design-vue/es/card/style/css'
+import 'ant-design-vue/es/checkbox/style/css'
+</script>
 
 <template>
-<div ref="rdkitdiv"></div>
+  <div ref="rdkitdiv" class="svg"></div>
 </template>
+<style>
+.svg { 
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; 
+    vertical-align: middle; 
+    overflow: hidden; 
+}
+</style>

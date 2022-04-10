@@ -1,0 +1,140 @@
+<script setup lang="ts">
+import { ref, onMounted, watch, reactive } from 'vue';
+import type { molData } from '@/components/types'
+import  initRDKitModule from "@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js"
+const props = defineProps<molData>()
+const svgitem=reactive<HTMLDivElement|any>({
+  svg:{},
+  rect:{},
+  ellipse:[],
+  path:{
+    hightBonds:[],
+    symble:[],
+    bond:[]
+  },
+})
+const parser = new DOMParser();
+const xmlDoc=ref<Document>()
+function getSvgData(svg:string){
+  svgitem.svg={}
+  svgitem.rect={}
+  svgitem.ellipse=[]
+  svgitem.path={
+    hightBonds:[],
+    symble:[],
+    bond:[]
+  }
+  xmlDoc.value = parser.parseFromString(svg,"text/xml")
+  //获取svgRoot内容
+  let svgRoot=xmlDoc.value.getElementsByTagName('svg')[0]
+  for (var attrs of ['xmlns','xmlns:rdkit','xmlns:xlink','version','baseProfile','xml:space','width','height','viewBox']){
+     svgitem.svg[attrs]=svgRoot.getAttribute(attrs)
+  }
+   //获取svgRect内容
+  let svgRect=xmlDoc.value.getElementsByTagName('rect')[0]
+  for (var attrs of ['style','width','height','x','y']){
+     svgitem.rect[attrs]=svgRect.getAttribute(attrs)
+  }
+  //获取svgEllipse内容（高亮无符号的原子）
+  let svgEllipse:any=xmlDoc.value.getElementsByTagName('ellipse')
+  for (var item of svgEllipse){
+    svgitem.ellipse.push({ellipse:{}})
+    for (var attrs of ['cx','cy','rx','ry']){
+      svgitem.ellipse[svgitem.ellipse.length-1].ellipse[attrs]=item.getAttribute(attrs)
+    }
+    svgitem.ellipse[svgitem.ellipse.length-1].ellipse['style']=item.getAttribute('style').concat(';opacity: 1')
+  }
+  //获取svgPath内容
+  let svgPath:any=xmlDoc.value.getElementsByTagName('path')
+  for (var item of svgPath){
+    if (item.getAttribute('class')==null){
+      svgitem.path.hightBonds.push({path:{}})
+      for (var attrs of ['d','style','fill']){
+        svgitem.path.hightBonds[svgitem.path.hightBonds.length-1].path[attrs]=item.getAttribute(attrs)
+      }
+      svgitem.path.hightBonds[svgitem.path.hightBonds.length-1].path['style']=item.getAttribute('style').concat(';opacity: 0.8')
+    } else if (item.getAttribute('style')==null){
+      svgitem.path.symble.push({path:{}})
+      for (var attrs of ['class','d','fill']){
+        svgitem.path.symble[svgitem.path.symble.length-1].path[attrs]=item.getAttribute(attrs)
+      }
+    }else {
+      svgitem.path.bond.push({path:{}})
+      for (var attrs of ['class','d','style']){
+        svgitem.path.bond[svgitem.path.bond.length-1].path[attrs]=item.getAttribute(attrs)
+      }
+    }
+  }
+}
+
+function renderMol(props:molData){
+ initRDKitModule().then((instance:any)=>{
+    const RDKit= instance
+    RDKit.prefer_coordgen(true)
+    let mol= RDKit.get_mol(props.smiles ?? '')
+    let qmol=RDKit.get_qmol(props.qsmiles ?? '')
+    //let mDetail = JSON.parse(mol.get_substruct_match(qmol))
+    let mdetailsRaw = mol.get_substruct_matches(qmol)
+    let mDetail = mdetailsRaw.length > 2 ? JSON.parse(mdetailsRaw) : []
+    mDetail = mDetail.reduce((acc:any, { atoms, bonds }:any) => ({atoms: [...acc.atoms, ...atoms],bonds: [...acc.bonds, ...bonds]}),{ bonds: [], atoms: [] })
+    mDetail['atoms']=mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms
+    mDetail['bonds']=mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds
+    mDetail['addAtomIndices']=props.addAtomIndices
+    mDetail['addBondIndices']=props.addBondIndices
+    mDetail['lenged']=props.legend
+    mDetail['width']=props.width ?? 200
+    mDetail['height']=props.height ?? 200
+    mDetail['highlightColour']=props.highlightColor ?? [208,78,214].map((i)=>(i/255))
+    mDetail['bondLineWidth']=props.bondLineWidth ?? 1
+    mDetail['highlightBondWidthMultiplier']=props.highlightBondWidthMultiplier ?? 15
+    mDetail['highlightRadius']=props.highlightRadius ?? 0.25
+    mDetail['minFontSize']=props.minFontSize ?? 10
+    mDetail['explicitMethyl']=props.explicitMethyl ?? false
+    console.log(mDetail)
+    mDetail=JSON.stringify(mDetail)
+    let svg=mol.get_svg_with_highlights(mDetail)
+    console.log(mDetail)
+    mol.delete()
+    qmol.delete()
+    getSvgData(svg)
+    //console.log(bondMap.value)
+    //console.log(svgitem)
+    //rdkitdiv.value.innerHTML=svg
+  })
+}
+
+onMounted(()=>{
+
+ renderMol(props)
+ console.log(svgitem)
+ 
+})
+
+watch(
+  props,
+  (newVal)=>{
+    renderMol(newVal)
+  }
+)
+
+</script>
+
+<template class="svg">
+	<svg v-bind="svgitem.svg" >
+	  <rect v-bind="svgitem.rect" />
+	  <path v-for="item in svgitem.path.hightBonds" v-bind="item.path"  />
+	  <ellipse v-for="item in svgitem.ellipse" v-bind="item.ellipse"  />
+		<path v-for="item in svgitem.path.symble" v-bind="item.path" />
+	  <path v-for="item in svgitem.path.bond" v-bind="item.path"  />
+	</svg>
+</template>
+<style>
+.svg { 
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; 
+    vertical-align: middle; 
+    overflow: hidden; 
+}
+</style>

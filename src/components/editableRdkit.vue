@@ -126,11 +126,15 @@ function getBondList(){
 function renderMol(props:molData){
  initRDKitModule().then((instance:any)=>{
     const RDKit= instance
+    RDKit.prefer_coordgen(true)
     let mol= RDKit.get_mol(props.smiles ?? '')
     let qmol=RDKit.get_qmol(props.qsmiles ?? '')
-    let mDetail= JSON.parse(mol.get_substruct_match(qmol))
-    mDetail['atoms']=mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms
-    mDetail['bonds']=mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds
+    //let mDetail = JSON.parse(mol.get_substruct_match(qmol))
+    let mdetailsRaw = mol.get_substruct_matches(qmol)
+    let mDetail = mdetailsRaw.length > 2 ? JSON.parse(mdetailsRaw) : []
+    mDetail = mDetail.reduce((acc:any, { atoms, bonds }:any) => ({atoms: [...acc.atoms, ...atoms],bonds: [...acc.bonds, ...bonds]}),{ bonds: [], atoms: [] })
+    //mDetail['atoms']=mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms
+    //mDetail['bonds']=mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds
     mDetail['addAtomIndices']=props.addAtomIndices
     mDetail['addBondIndices']=props.addBondIndices
     mDetail['lenged']=props.legend
@@ -138,12 +142,14 @@ function renderMol(props:molData){
     mDetail['height']=props.height ?? 100
     mDetail['highlightColour']=props.highlightColor ?? [0.624,0.675,0.902]
     mDetail['bondLineWidth']=props.bondLineWidth ?? 1
-    mDetail['highlightBondWidthMultiplier']=props.highlightBondWidthMultiplier ?? 30
-    mDetail['highlightRadius']=props.highlightRadius ?? 0.4
+    mDetail['highlightBondWidthMultiplier']=props.highlightBondWidthMultiplier ?? 20
+    mDetail['highlightRadius']=props.highlightRadius ?? 0.3
     mDetail['minFontSize']=props.minFontSize ?? 10
     mDetail['explicitMethyl']=props.explicitMethyl ?? false
+    console.log(mDetail)
     mDetail=JSON.stringify(mDetail)
     let svg=mol.get_svg_with_highlights(mDetail)
+    console.log(mDetail)
     mol.delete()
     qmol.delete()
     getSvgData(svg)

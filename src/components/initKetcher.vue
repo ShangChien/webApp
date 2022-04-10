@@ -10,6 +10,7 @@ const emit = defineEmits(['updateSmiles'])
 onMounted(()=>{
   window.addEventListener("message", handleMessage)
   iframeWin.value=refketcher.value.contentWindow
+  //console.log(iframeWin.value)
 })
 const handleMessage = (event: { data: { cmd: any; params: { data: null; }; }; }) => {
   switch (event.data.cmd) {
@@ -42,7 +43,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <n-space vertical >
+  <n-space vertical style="position: relative;" >
     <n-input-group class="inputG" >
       <n-button size="large" 
                 style="font-size:20px"
@@ -90,7 +91,7 @@ onBeforeUnmount(() => {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 1px 2px 2px 1px  rgba(0, 0, 0, 0.1);
 }
 .ketcher>iframe {
-  position: relative;
+  position: absolute;
   width:129%;
   height:129%;;
   transform:scale(0.78);left: -118px;top: -85px;
