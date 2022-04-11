@@ -14,4 +14,5 @@ export interface molData{
     highlightRadius?:Number
     minFontSize?:Number
     explicitMethyl?:Boolean
+    editable?:Boolean
 }

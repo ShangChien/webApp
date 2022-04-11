@@ -133,8 +133,8 @@ function renderMol(props:molData){
     let mdetailsRaw = mol.get_substruct_matches(qmol)
     let mDetail = mdetailsRaw.length > 2 ? JSON.parse(mdetailsRaw) : []
     mDetail = mDetail.reduce((acc:any, { atoms, bonds }:any) => ({atoms: [...acc.atoms, ...atoms],bonds: [...acc.bonds, ...bonds]}),{ bonds: [], atoms: [] })
-    //mDetail['atoms']=mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms
-    //mDetail['bonds']=mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds
+    mDetail['atoms']=mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms
+    mDetail['bonds']=mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds
     mDetail['addAtomIndices']=props.addAtomIndices
     mDetail['addBondIndices']=props.addBondIndices
     mDetail['lenged']=props.legend
@@ -286,7 +286,7 @@ watch(
 </script>
 
 <template>
-<svg v-bind="svgitem.svg" >
+<svg v-bind="svgitem.svg" class="sv">
   <rect v-bind="svgitem.rect" />
   <path v-for="item in svgitem.path.symble" v-bind="item.path" />
   <path v-for="item in svgitem.path.bond" v-bind="item.path"  />
@@ -294,3 +294,13 @@ watch(
   <ellipse v-for="item in svgitem.ellipse" v-bind="item.ellipse" @click="domClick($event)" @dblclick="domDblClick($event)" />
 </svg>
 </template>
+<style>
+.svg { 
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; 
+    vertical-align: middle; 
+    overflow: hidden; 
+}
+</style>

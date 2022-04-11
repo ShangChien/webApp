@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { NSpace,NPageHeader,NGrid,NGridItem,NStatistic,NBreadcrumb,NMessageProvider,
-NBreadcrumbItem,NButton,NDropdown,NAvatar,useMessage,NIcon,NSwitch,NCollapse,NCard,
-NCollapseItem,NInputGroup,NInput,NDivider} from 'naive-ui'
+NBreadcrumbItem,NButton,NDropdown,NAvatar,useMessage,NIcon,NSwitch,NCollapse,NThing,
+NCollapseItem,NInputGroup,NInput,NDivider,NModal,NCard,NGradientText} from 'naive-ui'
 import { ColorPaletteOutline } from '@vicons/ionicons5'
+import { CloudSatellite  } from '@vicons/carbon'
 import initKetcher from '../components/initKetcher.vue';
 import editableRdkit from '@/components/editableRdkit.vue'
 import svgRdkit from '@/components/svgRdkit.vue'
@@ -12,6 +13,7 @@ import type { molData } from '@/components/types'
 
 const inputText=ref('')
 const showAbout=ref(false)
+const showModal=ref(false)
 const editRdkitKey=ref(1)
 const active = ref(true)
 const options=[{label: 'Ketcher: 2.4.0'},{label: 'RDKit: 2021.9.5'}]
@@ -25,8 +27,8 @@ const initSmile=ref<any>('CC(=O)Oc1ccccc1C(=O)O')
 const initMol:molData=reactive({
     smiles:initSmile.value,
     qsmiles:'*~*',
-    width:500,
-    height:500,
+    width:600,
+    height:600,
     addAtomIndices:true,
 })
 
@@ -48,7 +50,7 @@ const mol4enum=reactive({
 })
 //addcore
 function addCore(){
-  editRdkitKey.value++
+  //editRdkitKey.value++
   const mol={
     smiles:'',
     atoms:[],
@@ -68,7 +70,7 @@ function addCore(){
 }
 //addLigand
 function addLigand(){
-  editRdkitKey.value++
+  //editRdkitKey.value++
   const mol={
     smiles:'',
     atoms:[],
@@ -136,17 +138,44 @@ watch(
       </n-space>
     </template>
   </n-page-header>
-  <n-grid x-gap="40" y-gap="20" :cols="2" v-show="active" >
-    <n-grid-item>
-      <n-collapse :default-expanded-names="['1']">
+  <n-collapse :default-expanded-names="['1']" style="width:60%">
         <n-collapse-item title=" RDKit位点标注" display-directive="show"  class="collapse" name="1">
-            <n-input-group class="inputG" >
+          <n-card>
+          <n-thing style="width:100% ;height:100%">
+          <template #description>
+            <n-input-group class="inputG">
                 <n-input v-model:value="inputText"
                          style="font-size:20px"
                          type="text"
                          size="large"
                          clearable
-                         placeholder="type smiles here"/>
+                         placeholder="type smiles here">
+                  <template #suffix>
+                    <n-button @click="showModal=true" color="#E29587" circle size="medium" quaternary>
+                      <n-icon color="#D66D75" size="30" :component="CloudSatellite" />
+                    </n-button>
+                    <!--modal画板区域-->
+                      <n-modal v-model:show="showModal" display-directive="show"> 
+                        <n-card
+                            style="width:1300px; height: 900px;"
+                            :bordered="false"
+                            size="huge"
+                            role="dialog"
+                            aria-modal="true">
+                            <template #default>
+                              <init-ketcher  @update-smiles="(smiles)=> inputText=smiles"></init-ketcher>
+                            </template>
+                            <template #footer>
+                              <n-space justify="center">
+                                <n-button @Click="showModal=false">取消</n-button>
+                                <n-button @Click="showModal=false">确定</n-button>
+                              </n-space>
+                            </template>
+                        </n-card>
+                      </n-modal>
+                    <!--modal画板区域结束-->
+                  </template>
+                </n-input>
                 <n-button size="large" style="font-size:20px" color="#c471ed" @click="drawMol">
                           <template #icon>
                             <n-icon>
@@ -156,27 +185,32 @@ watch(
                    绘制
                 </n-button>
             </n-input-group>
+          </template>
+          <template #default>
             <n-space justify="space-around">
               <!--rdkit-sub v-bind="initMol"/-->
-              <div style="width:500px ;height:500px">
               <editable-rdkit :key="editRdkitKey" v-bind="initMol" @update-mol="acceptMol"/>
-              </div>
-              <n-space align="stretch" :size="60">
+            </n-space>
+          </template>
+          <template #footer>
+            <n-space justify="space-between">
+            <n-gradient-text gradient="linear-gradient(90deg, red 0%, green 50%, blue 100%)" >
+               Smiles: {{initMol.smiles}}
+            </n-gradient-text>
+            <n-space justify="end">
                 <n-button size="medium" strong secondary round type="info" @click="addCore" >添加主核</n-button>
                 <n-button size="medium" strong secondary round type="info" @click="addLigand" >添加配体</n-button>
                 <n-button szie="large" round color="#ff69b4" >开始枚举</n-button>
               </n-space>  
             </n-space>
+          </template>
+          </n-thing>
+          </n-card>
         </n-collapse-item>
       </n-collapse>
-    </n-grid-item>
-    <n-grid-item>
-      <n-collapse :default-expanded-names="['1']">
-        <n-collapse-item title="Ketcher画板" display-directive="show" name="1">
-          <init-ketcher class="collapse" @update-smiles="(smiles)=> inputText=smiles"></init-ketcher>
-        </n-collapse-item>
-      </n-collapse>
-    </n-grid-item>
+  <n-divider />
+<!--core and ligand-->
+  <n-grid x-gap="40" y-gap="20" :cols="2" v-show="active" >
     <n-grid-item>
       <n-collapse :default-expanded-names="['1']">
         <n-collapse-item title="主核结构" display-directive="show" name="1">

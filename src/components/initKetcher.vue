@@ -81,7 +81,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .ketcher{
     width: 100%;
-    height: 65vh;
+    height: 80vh;
     position: relative;
     padding: 5px 5px;
     box-sizing: border-box; 
@@ -92,9 +92,11 @@ onBeforeUnmount(() => {
 }
 .ketcher>iframe {
   position: absolute;
-  width:129%;
-  height:129%;;
-  transform:scale(0.78);left: -118px;top: -85px;
+  width:103.8%;
+  height:83vh;
+  left: -24px;
+  top:-13px;
+  transform: scale(0.96);
 }
 .inputG{
     width: 100%;

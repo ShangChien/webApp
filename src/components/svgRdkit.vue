@@ -120,7 +120,7 @@ watch(
 </script>
 
 <template class="svg">
-	<svg v-bind="svgitem.svg" >
+  <svg v-bind="svgitem.svg">
 	  <rect v-bind="svgitem.rect" />
 	  <path v-for="item in svgitem.path.hightBonds" v-bind="item.path"  />
 	  <ellipse v-for="item in svgitem.ellipse" v-bind="item.ellipse"  />
