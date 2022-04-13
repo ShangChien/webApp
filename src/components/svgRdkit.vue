@@ -39,33 +39,37 @@ function getSvgData(svg:string){
   let svgEllipse:any=xmlDoc.value.getElementsByTagName('ellipse')
   for (var item of svgEllipse){
     svgitem.ellipse.push({ellipse:{}})
-    for (var attrs of ['cx','cy','rx','ry']){
+    for (var attrs of ['cx','cy','rx','ry','class']){
       svgitem.ellipse[svgitem.ellipse.length-1].ellipse[attrs]=item.getAttribute(attrs)
     }
-    svgitem.ellipse[svgitem.ellipse.length-1].ellipse['style']=item.getAttribute('style').concat(';opacity: 1')
+    svgitem.ellipse[svgitem.ellipse.length-1].ellipse['style']=item.getAttribute('style')//.concat(';opacity: 0.6')
   }
   //获取svgPath内容
   let svgPath:any=xmlDoc.value.getElementsByTagName('path')
   for (var item of svgPath){
-    if (item.getAttribute('class')==null){
-      svgitem.path.hightBonds.push({path:{}})
-      for (var attrs of ['d','style','fill']){
-        svgitem.path.hightBonds[svgitem.path.hightBonds.length-1].path[attrs]=item.getAttribute(attrs)
-      }
-      svgitem.path.hightBonds[svgitem.path.hightBonds.length-1].path['style']=item.getAttribute('style').concat(';opacity: 0.8')
-    } else if (item.getAttribute('style')==null){
+    //字符匹配
+    if (item.getAttribute('style')==null){
       svgitem.path.symble.push({path:{}})
       for (var attrs of ['class','d','fill']){
         svgitem.path.symble[svgitem.path.symble.length-1].path[attrs]=item.getAttribute(attrs)
       }
-    }else {
+    //化学键匹配
+    } else if (item.getAttribute('style')?.split(";")[3]=='stroke-width:1.0px'){
       svgitem.path.bond.push({path:{}})
       for (var attrs of ['class','d','style']){
         svgitem.path.bond[svgitem.path.bond.length-1].path[attrs]=item.getAttribute(attrs)
       }
+    //高亮化学键
+    } else {
+      svgitem.path.hightBonds.push({path:{}})
+      for (var attrs of ['class','d','style']){
+        svgitem.path.hightBonds[svgitem.path.hightBonds.length-1].path[attrs]=item.getAttribute(attrs)
+      }
+      svgitem.path.hightBonds[svgitem.path.hightBonds.length-1].path['style']=item.getAttribute('style')//.concat(';opacity: 0.2') 
     }
   }
 }
+
 
 function renderMol(props:molData){
  initRDKitModule().then((instance:any)=>{
@@ -90,10 +94,9 @@ function renderMol(props:molData){
     mDetail['highlightRadius']=props.highlightRadius ?? 0.25
     mDetail['minFontSize']=props.minFontSize ?? 10
     mDetail['explicitMethyl']=props.explicitMethyl ?? false
-    console.log(mDetail)
     mDetail=JSON.stringify(mDetail)
     let svg=mol.get_svg_with_highlights(mDetail)
-    console.log(mDetail)
+    console.log(svg)
     mol.delete()
     qmol.delete()
     getSvgData(svg)

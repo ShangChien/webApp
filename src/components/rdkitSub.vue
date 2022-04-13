@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { Card as ACard} from 'ant-design-vue';
-import { Checkbox as ACheckbox } from 'ant-design-vue';
-import { EllipsisOutlined } from '@ant-design/icons-vue'
 import { ref, onMounted, watch } from 'vue';
 import type { molData } from '@/components/types'
 import  initRDKitModule from "@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js"
@@ -30,6 +27,7 @@ function renderMol(props:molData){
   mDetail['explicitMethyl']=props.explicitMethyl ?? false
   mDetail=JSON.stringify(mDetail)
   let svg=mol.get_svg_with_highlights(mDetail)
+  console.log(svg)
   rdkitdiv.value.innerHTML=svg
   //节省内存
   mol.delete()

@@ -29,7 +29,8 @@ const initMol:molData=reactive({
     qsmiles:'*~*',
     width:600,
     height:600,
-    addAtomIndices:true,
+    //addAtomIndices:true,
+    //addBondIndices:true,
 })
 
 const tmpSmile=reactive({
@@ -157,7 +158,7 @@ watch(
                     <!--modal画板区域-->
                       <n-modal v-model:show="showModal" display-directive="show"> 
                         <n-card
-                            style="width:1300px; height: 900px;"
+                            style="width:1300px; height: 96vh;"
                             :bordered="false"
                             size="huge"
                             role="dialog"

@@ -9,6 +9,7 @@ const mol1:molData=reactive({
     qsmiles:'CC(=O)Oc1ccccc1C(=O)O',
     width:200,
     height:200,
+    addAtomIndices:true,
 })
 
 const mol2:molData=reactive({
@@ -16,7 +17,10 @@ const mol2:molData=reactive({
     qsmiles:'CS.c1ccccc1.c1ccccc1',
     width:400,
     height:400,
-    highlightColor:[0.624,0.675,0.2]
+    highlightColor:[0.624,0.675,0.2],
+    addAtomIndices:true,
+    addBondIndices:true,
+    
 })
 
 const mol3:molData=reactive({
@@ -24,6 +28,8 @@ const mol3:molData=reactive({
     qsmiles:'[B].c1ccccc1',
     width:400,
     height:400,
+    addAtomIndices:true,
+    addBondIndices:true,
     highlightColor:[0.24,0.675,0.8]
 })
 const mol4:molData=reactive({
@@ -31,6 +37,8 @@ const mol4:molData=reactive({
     qsmiles:'[O].[O]',
     width:200,
     height:200,
+    addBondIndices:true,
+    addAtomIndices:true,
     highlightColor:[0.94,0.475,0.8]
 })
 const colorNum=ref<number>(0)
