@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import type { molData } from '@/components/types'
-import  initRDKitModule from "@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js"
+import  initRDKit  from  '@/components/RDKit'
 const props = defineProps<molData>()
 const rdkitdiv=ref<HTMLDivElement|any>()
 
 function renderMol(props:molData){
-  initRDKitModule().then((instance:any)=>{
-  const RDKit= instance
-  RDKit.prefer_coordgen(true)
-  let mol= RDKit.get_mol(props.smiles ?? '')
-  let qmol=RDKit.get_qmol(props.qsmiles ?? '')
+  window.RDKit.prefer_coordgen(true)
+  let mol= window.RDKit.get_mol(props.smiles ?? '')
+  let qmol= window.RDKit.get_qmol(props.qsmiles ?? '')
   let mDetail= JSON.parse(mol.get_substruct_match(qmol))
   mDetail['atoms']=mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms
   mDetail['bonds']=mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds
@@ -27,16 +25,21 @@ function renderMol(props:molData){
   mDetail['explicitMethyl']=props.explicitMethyl ?? false
   mDetail=JSON.stringify(mDetail)
   let svg=mol.get_svg_with_highlights(mDetail)
-  console.log(svg)
+  //console.log(svg)
   rdkitdiv.value.innerHTML=svg
   //节省内存
   mol.delete()
   qmol.delete()
-  })
+  
 }
-onMounted(()=>{
- renderMol(props)
-})
+onMounted(
+  async()=>{
+    await initRDKit.then((res)=>{
+      window.RDKit=res
+    })
+    renderMol(props)
+  }
+)
 watch(
   props,
   (newVal,oldVal)=>{
@@ -45,11 +48,6 @@ watch(
 )
 
 </script>
-<script lang="ts">
-import 'ant-design-vue/es/card/style/css'
-import 'ant-design-vue/es/checkbox/style/css'
-</script>
-
 <template>
   <div ref="rdkitdiv" class="svg"></div>
 </template>

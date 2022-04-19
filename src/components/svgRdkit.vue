@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, reactive } from 'vue';
 import type { molData } from '@/components/types'
-import  initRDKitModule from "@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js"
+import  initRDKit  from  '@/components/RDKit'
 const props = defineProps<molData>()
 const svgitem=reactive<HTMLDivElement|any>({
   svg:{},
@@ -72,46 +72,44 @@ function getSvgData(svg:string){
 
 
 function renderMol(props:molData){
- initRDKitModule().then((instance:any)=>{
-    const RDKit= instance
-    RDKit.prefer_coordgen(true)
-    let mol= RDKit.get_mol(props.smiles ?? '')
-    let qmol=RDKit.get_qmol(props.qsmiles ?? '')
-    //let mDetail = JSON.parse(mol.get_substruct_match(qmol))
-    let mdetailsRaw = mol.get_substruct_matches(qmol)
-    let mDetail = mdetailsRaw.length > 2 ? JSON.parse(mdetailsRaw) : []
-    mDetail = mDetail.reduce((acc:any, { atoms, bonds }:any) => ({atoms: [...acc.atoms, ...atoms],bonds: [...acc.bonds, ...bonds]}),{ bonds: [], atoms: [] })
-    mDetail['atoms']=mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms
-    mDetail['bonds']=mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds
-    mDetail['addAtomIndices']=props.addAtomIndices
-    mDetail['addBondIndices']=props.addBondIndices
-    mDetail['lenged']=props.legend
-    mDetail['width']=props.width ?? 200
-    mDetail['height']=props.height ?? 200
-    mDetail['highlightColour']=props.highlightColor ?? [208,78,214].map((i)=>(i/255))
-    mDetail['bondLineWidth']=props.bondLineWidth ?? 1
-    mDetail['highlightBondWidthMultiplier']=props.highlightBondWidthMultiplier ?? 15
-    mDetail['highlightRadius']=props.highlightRadius ?? 0.25
-    mDetail['minFontSize']=props.minFontSize ?? 10
-    mDetail['explicitMethyl']=props.explicitMethyl ?? false
-    mDetail=JSON.stringify(mDetail)
-    let svg=mol.get_svg_with_highlights(mDetail)
-    console.log(svg)
-    mol.delete()
-    qmol.delete()
-    getSvgData(svg)
-    //console.log(bondMap.value)
-    //console.log(svgitem)
-    //rdkitdiv.value.innerHTML=svg
-  })
+  window.RDKit.prefer_coordgen(true)
+  let mol= window.RDKit.get_mol(props.smiles ?? '')
+  let qmol=window.RDKit.get_qmol(props.qsmiles ?? '')
+  //let mDetail = JSON.parse(mol.get_substruct_match(qmol))
+  let mdetailsRaw = mol.get_substruct_matches(qmol)
+  let mDetail = mdetailsRaw.length > 2 ? JSON.parse(mdetailsRaw) : []
+  mDetail = mDetail.reduce((acc:any, { atoms, bonds }:any) => ({atoms: [...acc.atoms, ...atoms],bonds: [...acc.bonds, ...bonds]}),{ bonds: [], atoms: [] })
+  mDetail['atoms']=mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms
+  mDetail['bonds']=mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds
+  mDetail['addAtomIndices']=props.addAtomIndices
+  mDetail['addBondIndices']=props.addBondIndices
+  mDetail['lenged']=props.legend
+  mDetail['width']=props.width ?? 200
+  mDetail['height']=props.height ?? 200
+  mDetail['highlightColour']=props.highlightColor ?? [208,78,214].map((i)=>(i/255))
+  mDetail['bondLineWidth']=props.bondLineWidth ?? 1
+  mDetail['highlightBondWidthMultiplier']=props.highlightBondWidthMultiplier ?? 15
+  mDetail['highlightRadius']=props.highlightRadius ?? 0.25
+  mDetail['minFontSize']=props.minFontSize ?? 10
+  mDetail['explicitMethyl']=props.explicitMethyl ?? false
+  mDetail=JSON.stringify(mDetail)
+  let svg=mol.get_svg_with_highlights(mDetail)
+  mol.delete()
+  qmol.delete()
+  getSvgData(svg)
+  //console.log(bondMap.value)
+  //console.log(svgitem)
+  //rdkitdiv.value.innerHTML=svg
 }
 
-onMounted(()=>{
-
- renderMol(props)
- console.log(svgitem)
- 
-})
+onMounted(
+  async()=>{
+    await initRDKit.then((res)=>{
+      window.RDKit=res
+    })
+    renderMol(props)
+  }
+)
 
 watch(
   props,

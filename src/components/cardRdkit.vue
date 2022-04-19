@@ -57,10 +57,6 @@ function visible(){
   }
   
 }
-onMounted(()=>{
-
-
-})
 </script>
 <template>
 <n-card hoverable class="card"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, reactive } from 'vue';
 import type { molData } from '@/components/types'
-import  initRDKitModule from "@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js"
+import  initRDKit  from  '@/components/RDKit'
 const props = defineProps<molData>()
 const emit = defineEmits(['update-mol'])
 const highlightMap:molData=reactive({
@@ -77,12 +77,9 @@ function getSvgData(svg:string){
 }
 
 function renderMol(props:molData){
- initRDKitModule().then((instance:any)=>{
-    const RDKit= instance
-    console.log(RDKit)
-    RDKit.prefer_coordgen(true)
-    let mol= RDKit.get_mol(props.smiles ?? '')
-    let qmol=RDKit.get_qmol(props.qsmiles ?? '')
+    window.RDKit.prefer_coordgen(true)
+    let mol= window.RDKit.get_mol(props.smiles ?? '')
+    let qmol=window.RDKit.get_qmol(props.qsmiles ?? '')
     //let mDetail = JSON.parse(mol.get_substruct_match(qmol))
     let mdetailsRaw = mol.get_substruct_matches(qmol)
     let mDetail = mdetailsRaw.length > 2 ? JSON.parse(mdetailsRaw) : []
@@ -110,7 +107,6 @@ function renderMol(props:molData){
     //console.log(bondMap.value)
     console.log(svgitem)
     //rdkitdiv.value.innerHTML=svg
-  })
 }
 
 function domClick($event:any){
@@ -166,11 +162,14 @@ function domDblClick($event:any){
   }
 }
 
-onMounted(()=>{
-
- renderMol(props)
- 
-})
+onMounted(
+  async()=>{
+    await initRDKit.then((res)=>{
+      window.RDKit=res
+    })
+    renderMol(props)
+  }
+)
 
 watch(
   props,

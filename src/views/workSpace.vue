@@ -8,7 +8,7 @@ import initKetcher from '../components/initKetcher.vue';
 import editableRdkit from '@/components/editableRdkit.vue'
 import svgRdkit from '@/components/svgRdkit.vue'
 import cardRdkit from '@/components/cardRdkit.vue'
-import { reactive,onMounted,ref, nextTick, watch } from 'vue';
+import { reactive,onMounted,ref,watch } from 'vue';
 import type { molData } from '@/components/types'
 
 const inputText=ref('')
