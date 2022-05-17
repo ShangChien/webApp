@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { NSpace,NPageHeader,NGrid,NGridItem,NStatistic,NBreadcrumb,NMessageProvider,
-NBreadcrumbItem,NButton,NDropdown,NAvatar,useMessage,NIcon,NSwitch,NCollapse,NThing,
-NCollapseItem,NInputGroup,NInput,NDivider,NModal,NCard,NGradientText} from 'naive-ui'
+import { NSpace,NPageHeader,NGrid,NGridItem,NStatistic,NButton,NDropdown,NAvatar,NIcon,NSwitch,NCollapse,NThing,
+NCollapseItem,NInputGroup,NInput,NDivider,NModal,NCard,NGradientText,NEllipsis,NPopover} from 'naive-ui'
 import { ColorPaletteOutline } from '@vicons/ionicons5'
 import { CloudSatellite  } from '@vicons/carbon'
 import initKetcher from '../components/initKetcher.vue';
 import editableRdkit from '@/components/editableRdkit.vue'
-import svgRdkit from '@/components/svgRdkit.vue'
 import cardRdkit from '@/components/cardRdkit.vue'
 import { reactive,onMounted,ref,watch } from 'vue';
 import type { molData } from '@/components/types'
@@ -144,9 +142,9 @@ watch(
           <n-card>
           <n-thing style="width:100% ;height:100%">
           <template #description>
-            <n-input-group class="inputG">
+            <n-input-group class="inputG" >
                 <n-input v-model:value="inputText"
-                         style="font-size:20px"
+                         style="font-size:20px;min-width: 90%;max-width: 90%"
                          type="text"
                          size="large"
                          clearable
@@ -177,7 +175,7 @@ watch(
                     <!--modal画板区域结束-->
                   </template>
                 </n-input>
-                <n-button size="large" style="font-size:20px" color="#c471ed" @click="drawMol">
+                <n-button size="large" style="font-size:20px;min-width: 10%" color="#c471ed" @click="drawMol">
                           <template #icon>
                             <n-icon>
                               <ColorPaletteOutline />
@@ -193,12 +191,18 @@ watch(
               <editable-rdkit :key="editRdkitKey" v-bind="initMol" @update-mol="acceptMol"/>
             </n-space>
           </template>
-          <template #footer>
-            <n-space justify="space-between">
-            <n-gradient-text gradient="linear-gradient(90deg, red 0%, green 50%, blue 100%)" >
-               Smiles: {{initMol.smiles}}
-            </n-gradient-text>
-            <n-space justify="end">
+          <template #footer >
+            <n-space justify="space-between" style="width: 100%">
+              <n-popover trigger="hover" >
+                <template #trigger>
+                  <n-gradient-text word-break="normal" style="max-width:600px"
+                    gradient="linear-gradient(90deg, red 0%, green 50%, blue 100%)" >
+                    Smiles: {{initMol.smiles}}
+                  </n-gradient-text>
+                </template>
+                <span>{{initMol.smiles}}</span>
+              </n-popover>
+              <n-space justify="end">
                 <n-button size="medium" strong secondary round type="info" @click="addCore" >添加主核</n-button>
                 <n-button size="medium" strong secondary round type="info" @click="addLigand" >添加配体</n-button>
                 <n-button szie="large" round color="#ff69b4" >开始枚举</n-button>

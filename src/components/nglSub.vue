@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref,onMounted, onUpdated, onBeforeMount} from 'vue';
+import { ref,onMounted} from 'vue';
 import  * as NGL from 'ngl/dist/ngl.js';
 const viewport = ref(null);
 
@@ -9,18 +9,13 @@ function initViewer(viewport:any){
     .then(function(o:any) {
       o.addRepresentation("cartoon");
       o.addRepresentation("licorice", { sele: "/0", multipleBond: "symmetric" })
-      o.stage.setSpin(true);
+      //o.stage.setSpin(true);
       o.autoView();
       console.log(o);
       //悬停事件
-      $(".nglView").hover(function(){
-        o.stage.setSpin(false);
-      },function(){
-        o.stage.setSpin(true);
-      });
+      
      
-      
-      
+     
   });
 }
 onMounted(()=>{
