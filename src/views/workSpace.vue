@@ -2,7 +2,8 @@
 import { NSpace,NPageHeader,NGrid,NGridItem,NStatistic,NButton,NDropdown,NAvatar,NIcon,NSwitch,NCollapse,NThing,
 NCollapseItem,NInputGroup,NInput,NDivider,NModal,NCard,NGradientText,NEllipsis,NPopover} from 'naive-ui'
 import { ColorPaletteOutline } from '@vicons/ionicons5'
-import { CloudSatellite  } from '@vicons/carbon'
+import { CloudSatellite,CopyFile  } from '@vicons/carbon'
+import { useClipboard } from '@vueuse/core'
 import initKetcher from '../components/initKetcher.vue';
 import editableRdkit from '@/components/editableRdkit.vue'
 import cardRdkit from '@/components/cardRdkit.vue'
@@ -21,9 +22,10 @@ function drawMol(){
   //console.log(initMol)
 }
 
-const initSmile=ref<any>('CC(=O)Oc1ccccc1C(=O)O')
+const { copy } = useClipboard()
+
 const initMol:molData=reactive({
-    smiles:initSmile.value,
+    smiles:'CC(=O)Oc1ccccc1C(=O)O',
     qsmiles:'*~*',
     width:600,
     height:600,
@@ -193,15 +195,17 @@ watch(
           </template>
           <template #footer >
             <n-space justify="space-between" style="width: 100%">
-              <n-popover trigger="hover" >
-                <template #trigger>
-                  <n-gradient-text word-break="normal" style="max-width:600px"
+              <n-button quaternary :focusable=false @click="copy(initMol.smiles)">
+               <template #icon>
+                 <n-icon>
+                   <CopyFile/>
+                 </n-icon>
+               </template>
+               <n-gradient-text word-break="normal" style="max-width:600px"
                     gradient="linear-gradient(90deg, red 0%, green 50%, blue 100%)" >
-                    Smiles: {{initMol.smiles}}
-                  </n-gradient-text>
-                </template>
-                <span>{{initMol.smiles}}</span>
-              </n-popover>
+                  {{initMol.smiles}}
+                </n-gradient-text>
+              </n-button>
               <n-space justify="end">
                 <n-button size="medium" strong secondary round type="info" @click="addCore" >添加主核</n-button>
                 <n-button size="medium" strong secondary round type="info" @click="addLigand" >添加配体</n-button>
