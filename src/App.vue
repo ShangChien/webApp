@@ -6,7 +6,7 @@ import { RouterLink, RouterView } from 'vue-router'
 import type { MenuOption } from 'naive-ui'
 import { LogoElectron } from '@vicons/ionicons5'
 import { Home,Tabler3DCubeSphere } from '@vicons/tabler'
-import { Carbon,Workspace } from '@vicons/carbon'
+import { Carbon,Workspace,Data1 } from '@vicons/carbon'
 
 function renderIcon (icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
@@ -28,9 +28,14 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(LogoElectron)
   },
   {
-    label: () =>h(RouterLink,{to: {name: '3dmol',}},{ default: () => '3Dmol' }),
-    key: 'view-3Dmol',
+    label: () =>h(RouterLink,{to: {name: '3d',}},{ default: () => '3D' }),
+    key: 'view-3D',
     icon: renderIcon(Tabler3DCubeSphere)
+  },
+  {
+    label: () =>h(RouterLink,{to: {name: 'task',}},{ default: () => 'Task' }),
+    key: 'view-task',
+    icon: renderIcon(Data1)
   },
   {
     label: () =>h(RouterLink,{to: {name: 'workspace',}},{ default: () => 'WorkSpace' }),
@@ -57,10 +62,16 @@ const menuOptions: MenuOption[] = [
                   :options="menuOptions"/>
         </n-layout-sider>
         <n-layout content-style="padding: 20px" :native-scrollbar="false" bordered>
-            <n-message-provider><router-view/></n-message-provider>
+            <n-message-provider>
+              <router-view v-slot="{ Component }">
+                <keep-alive>
+                  <component :is="Component" />
+                </keep-alive>
+              </router-view>
+            </n-message-provider>
         </n-layout>
   </n-layout> 
-  <n-layout-footer position="absolute" style="padding: 10px" bordered>
+  <n-layout-footer position="absolute" style="padding: 5px" bordered>
   </n-layout-footer>
 </n-layout>
 </template>

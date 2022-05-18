@@ -12,8 +12,6 @@ export function usepost(title:string,core:object,ligand:object){
 		ligand:ligand
   })
 }
-
-
 // 修改操作，需要从实例中传入需要修改的数据
 export function useput(id:number,core:object,ligand:object){
   return ins().put('mol_design/enum_mol/?format=api'+String(id),{

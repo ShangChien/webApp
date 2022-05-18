@@ -1,6 +1,6 @@
 export interface molData{
-    smiles?:String
-    qsmiles?:String
+    smiles?:string
+    qsmiles?:string
     atoms?:Number[]
     bonds?:Number[]
     addAtomIndices?:Boolean

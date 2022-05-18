@@ -23,9 +23,14 @@ const router = createRouter({
       component: ()=>(import('../views/rdkit.vue'))
     },
     {
-      path: '/3dmol',
-      name: '3dmol',
+      path: '/3d',
+      name: '3d',
       component: ()=>(import('../views/threeDmol.vue')),
+    },
+    {
+      path: '/task',
+      name: 'task',
+      component: ()=>(import('../views/task.vue')),
     },
     {
       path: '/workspace',

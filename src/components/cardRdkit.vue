@@ -1,12 +1,14 @@
 <script setup lang="ts">	
-import { onMounted,ref,h,reactive,toRefs,watch } from 'vue';	
+import { ref,h } from 'vue';	
 import type { Component } from 'vue'
 import type { molData } from '@/components/types';
 import svgRdkit from '@/components/svgRdkit.vue';
 import editableRdkit from '@/components/editableRdkit.vue'
 import { NCard,NCheckbox,NSpace,NDropdown,NButton,NIcon,NPopover,NEllipsis,NModal } from 'naive-ui';
+import { useClipboard } from '@vueuse/core'
 import { Dots } from '@vicons/tabler';
-import { Edit,Delete } from '@vicons/carbon';
+import { Edit,Delete,CopyFile } from '@vicons/carbon';
+
 const props = defineProps<molData>()
 const emit = defineEmits(['itemChecked','changeItem','itemDeleted'])
 //handle Modal
@@ -17,17 +19,20 @@ function onNegativeClick () {
 function onPositiveClick () {
   showModal.value = false
 }
+
+const { copy } = useClipboard()
+const copytext=ref<string|any>(props.smiles)
 function handleDropOption(key:string,value:any){
   if (key=='edit'){
     showModal.value = true
-  }else if (key=='delete'){
-    //
+  }else if (key=='copy'){
+    copy(copytext.value)
   }else{
     //
   }
 }
 
-const show=ref(false)
+const showOptions=ref(false)
 
 const renderIcon = (icon: Component) => {
   return () => {
@@ -41,6 +46,10 @@ const options=[
           key: 'edit',
           icon: renderIcon(Edit)
         },
+        {label: 'copy',
+          key: 'copy',
+          icon: renderIcon(CopyFile)
+        },
         {label: 'delete',
           key: 'delete',
           icon: renderIcon(Delete)
@@ -49,12 +58,11 @@ const options=[
 const checked = ref(false)      
 function visible(){
   if (checked.value==true){
-    show.value=true
+    showOptions.value=true
   }
   else{
-    show.value=!show.value
-  }
-  
+    showOptions.value=!showOptions.value
+  } 
 }
 </script>
 <template>
@@ -63,9 +71,9 @@ function visible(){
 				@mouseout="visible">
 	<template #cover  >
 		<n-space justify="space-between" style="padding-left: 2%;padding-top: 1%;padding-right: 1%;" >
-			<n-checkbox v-model:checked="checked" v-show='show' />
+			<n-checkbox v-model:checked="checked" v-show='showOptions' />
       &nbsp
-			<div v-show='show'>
+			<div v-show='showOptions'>
         <n-dropdown :options="options" placement="bottom-end" @select="handleDropOption">
           <n-button tertiary circle size="tiny" >
             <template #icon>
@@ -90,21 +98,20 @@ function visible(){
               </template>
           </n-card>
         </n-modal>
-
       </div> 
-	  	</n-space>
-      <n-popover trigger="hover" width="trigger" placement="right-end" >
-        <template #trigger>
-          <svg-rdkit v-bind="props" style="width:100%; height:100%;"/>
-        </template>
-        <span>
-          <n-ellipsis style="max-width: 100%">
-            {{props.smiles}}
-          </n-ellipsis>
-		      atoms:{{props.atoms}}<br>
-		      bonds:{{props.bonds}}
-        </span>
-      </n-popover>
+	  </n-space>
+    <n-popover trigger="hover" width="trigger" placement="right-end" >
+      <template #trigger>
+        <svg-rdkit v-bind="props" style="width:100%; height:100%;"/>
+      </template>
+      <span>
+        <n-ellipsis style="max-width: 100%">
+          {{props.smiles}}
+        </n-ellipsis>
+		    atoms:{{props.atoms}}<br>
+		    bonds:{{props.bonds}}
+      </span>
+    </n-popover>
   </template>
 </n-card>
 
