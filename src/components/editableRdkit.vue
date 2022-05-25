@@ -89,8 +89,8 @@ function renderMol(props:molData){
     mDetail['addAtomIndices']=props.addAtomIndices
     mDetail['addBondIndices']=props.addBondIndices
     mDetail['lenged']=props.legend
-    mDetail['width']=props.width ?? 100
-    mDetail['height']=props.height ?? 100
+    mDetail['width']=props.width ?? 200
+    mDetail['height']=props.height ?? 200
     mDetail['highlightColour']=props.highlightColor ?? [0.624,0.675,0.902]
     mDetail['bondLineWidth']=props.bondLineWidth ?? 1
     mDetail['highlightBondWidthMultiplier']=props.highlightBondWidthMultiplier ?? 20
@@ -183,8 +183,8 @@ watch(
 
 </script>
 
-<template>
-<svg v-bind="svgitem.svg" class="sv">
+<template class="svg">
+<svg v-bind="svgitem.svg" style="width:100%; height:100%">
   <rect v-bind="svgitem.rect" />
   <path v-for="item in svgitem.path.symble" v-bind="item.path" />
   <path v-for="item in svgitem.path.bond" v-bind="item.path"  />

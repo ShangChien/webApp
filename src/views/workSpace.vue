@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { NSpace,NPageHeader,NGrid,NGridItem,NStatistic,NButton,NDropdown,NAvatar,NIcon,NSwitch,NCollapse,NThing,
-NCollapseItem,NInputGroup,NInput,NDivider,NModal,NCard,NGradientText,NEllipsis,NPopover} from 'naive-ui'
+NCollapseItem,NInputGroup,NInput,NDivider,NModal,NCard,NGradientText } from 'naive-ui'
 import { ColorPaletteOutline } from '@vicons/ionicons5'
 import { CloudSatellite,CopyFile  } from '@vicons/carbon'
 import { useClipboard } from '@vueuse/core'
@@ -14,8 +14,8 @@ const inputText=ref('')
 const showAbout=ref(false)
 const showModal=ref(false)
 const editRdkitKey=ref(1)
-const active = ref(true)
-const options=[{label: 'Ketcher: 2.4.0'},{label: 'RDKit: 2021.9.5'}]
+const showLigandCore = ref(true)
+const options=[{label: 'Ketcher: 2.4.0'},{label: 'RDKit: 2022.3.2'}]
 
 function drawMol(){
   initMol.smiles=inputText.value
@@ -27,10 +27,6 @@ const { copy } = useClipboard()
 const initMol:molData=reactive({
     smiles:'CC(=O)Oc1ccccc1C(=O)O',
     qsmiles:'*~*',
-    width:600,
-    height:600,
-    //addAtomIndices:true,
-    //addBondIndices:true,
 })
 
 const tmpSmile=reactive({
@@ -50,15 +46,19 @@ const mol4enum=reactive({
   ligand:[] as Array<molData>
 })
 //addcore
+let id_core:number=1
 function addCore(){
-  //editRdkitKey.value++
-  const mol={
+  //editRdkitKey.value++ 是否刷新画板
+  const mol:molData={
+    id:id_core++,
     smiles:'',
     atoms:[],
     bonds:[],
   }
   //判断存在形式
-  if((tmpSmile.smiles!='')&&((JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile))==-1))){
+  if((tmpSmile.smiles!='')&&((JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile.smiles))==-1)
+  ||(JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile.bonds))==-1)
+  ||(JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile.atoms))==-1))){
     mol.smiles=tmpSmile.smiles
     mol.atoms=tmpSmile.atoms
     mol.bonds=tmpSmile.bonds
@@ -70,9 +70,11 @@ function addCore(){
   console.log(mol4enum.core)
 }
 //addLigand
+let id_ligand:number=1
 function addLigand(){
   //editRdkitKey.value++
-  const mol={
+  const mol:molData={
+    id:id_ligand++,
     smiles:'',
     atoms:[],
     bonds:[],
@@ -94,6 +96,7 @@ function addLigand(){
 
 
 onMounted(()=>{
+
 })
 
 watch(
@@ -124,7 +127,7 @@ watch(
       <n-space>
         <a style="text-decoration: none; color: inherit"
           >分子生成器</a>
-        <n-switch v-model:value="active" size="medium"  />
+        <n-switch v-model:value="showLigandCore" size="medium"  />
       </n-space>
     </template>
     <template #avatar>
@@ -140,13 +143,13 @@ watch(
     </template>
   </n-page-header>
   <n-collapse :default-expanded-names="['1']" style="width:60%">
-        <n-collapse-item title=" RDKit位点标注" display-directive="show"  class="collapse" name="1">
-          <n-card>
-          <n-thing style="width:100% ;height:100%">
+        <n-collapse-item title=" RDKit位点标注" display-directive="show"  class="collapse" name="1" style="width:100%;height:100%">
+          <n-card style="width:100%;height:100%">
+          <n-thing style="width:100%;height:100%">
           <template #description>
             <n-input-group class="inputG" >
                 <n-input v-model:value="inputText"
-                         style="font-size:20px;min-width: 90%;max-width: 90%"
+                         style="font-size:20px;max-width: 90%"
                          type="text"
                          size="large"
                          clearable
@@ -188,10 +191,10 @@ watch(
             </n-input-group>
           </template>
           <template #default>
-            <n-space justify="space-around">
+            <div style="display:flex;align-items:center;justify-content:center">
               <!--rdkit-sub v-bind="initMol"/-->
-              <editable-rdkit :key="editRdkitKey" v-bind="initMol" @update-mol="acceptMol"/>
-            </n-space>
+              <editable-rdkit :key="editRdkitKey" v-bind="initMol" @update-mol="acceptMol" style="width:60%"/>
+            </div>
           </template>
           <template #footer >
             <n-space justify="space-between" style="width: 100%">
@@ -219,15 +222,15 @@ watch(
       </n-collapse>
   <n-divider />
 <!--core and ligand-->
-  <n-grid x-gap="40" y-gap="20" :cols="2" v-show="active" >
+  <n-grid x-gap="40" y-gap="20" :cols="2" v-show="showLigandCore" >
     <n-grid-item>
       <n-collapse :default-expanded-names="['1']">
         <n-collapse-item title="主核结构" display-directive="show" name="1">
           <n-grid :cols="4" x-gap="8" y-gap="8">
             <n-grid-item
-              v-for="item in mol4enum.core"
-              :key="mol4enum.core.indexOf(item)">
-              <card-rdkit v-bind="item" style="width:100%;"/>
+              v-for="(item,index) in mol4enum.core"
+              :key="item.id">
+              <card-rdkit v-bind="item" @item-deleted="mol4enum.core.splice(index,1)"/>
             </n-grid-item>
           </n-grid>
         </n-collapse-item>
@@ -238,9 +241,9 @@ watch(
         <n-collapse-item title="配体结构" display-directive="show" name="1">
           <n-grid :cols="6" x-gap="8" y-gap="8">
             <n-grid-item
-              v-for="item in mol4enum.ligand"
-              :key="mol4enum.ligand.indexOf(item)">
-              <card-rdkit v-bind="item"/>
+              v-for="(item,index) in mol4enum.ligand"
+              :key="item.id">
+              <card-rdkit v-bind="item" @item-deleted="mol4enum.ligand.splice(index,1)"/>
             </n-grid-item>
           </n-grid>
         </n-collapse-item>

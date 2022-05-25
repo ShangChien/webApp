@@ -27,6 +27,8 @@ function handleDropOption(key:string,value:any){
     showModal.value = true
   }else if (key=='copy'){
     copy(copytext.value)
+  }else if (key=='delete'){
+    emit('itemDeleted')
   }else{
     //
   }
@@ -83,13 +85,13 @@ function visible(){
 			  </n-dropdown>
         <n-modal v-model:show="showModal" :mask-closable="false"> 
           <n-card
-              style="width: 800px; height: 600px;"
+              style="width: 900px; height: 800px;"
               title="位点重新选取"
               :bordered="false"
               size="huge"
               role="dialog"
               aria-modal="true">
-              <editable-rdkit v-bind="props" qsmiles='*~*' :width="400" :height="300"/>
+              <editable-rdkit v-bind="props" qsmiles='*~*' style="width:70%"/>
               <template #footer>
                 <n-space>
                   <n-button @Click="onNegativeClick">取消</n-button>

@@ -1,18 +1,19 @@
 export interface molData{
+    id?: number
     smiles?:string|any
     qsmiles?:string
-    atoms?:Number[]
-    bonds?:Number[]
-    addAtomIndices?:Boolean
-    addBondIndices?:Boolean
-    legend?:String
-    width?:Number
-    height?:Number
-    highlightColor?:Number[]
-    bondLineWidth?: Number
-    highlightBondWidthMultiplier?:Number
-    highlightRadius?:Number
-    minFontSize?:Number
-    explicitMethyl?:Boolean
-    editable?:Boolean
+    atoms?:number[]
+    bonds?:number[]
+    addAtomIndices?:boolean
+    addBondIndices?:boolean
+    legend?:string
+    width?:number
+    height?:number
+    highlightColor?:number[]
+    bondLineWidth?: number
+    highlightBondWidthMultiplier?:number
+    highlightRadius?:number
+    minFontSize?:number
+    explicitMethyl?:boolean
+    editable?:boolean
 }
