@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, reactive } from 'vue';
+import { ref, onMounted, watch, reactive,nextTick,onUpdated } from 'vue';
 import type { molData } from '@/components/types'
 import  initRDKit  from  '@/components/RDKit'
 const props = defineProps<molData>()
 const emit = defineEmits(['update-mol'])
 const highlightMap:molData=reactive({
   smiles:props.smiles,
-  atoms:[],
-  bonds:[],
+  atoms:Array.from(new Set(props.atoms)), 
+  bonds:Array.from(new Set(props.bonds)),
 })
 const svgitem=reactive<HTMLDivElement|any>({
   svg:{},
@@ -97,15 +97,15 @@ function renderMol(props:molData){
     mDetail['highlightRadius']=props.highlightRadius ?? 0.25
     mDetail['minFontSize']=props.minFontSize ?? 10
     mDetail['explicitMethyl']=props.explicitMethyl ?? false
-    console.log(mDetail)
+    //console.log(mDetail)
     mDetail=JSON.stringify(mDetail)
     let svg=mol.get_svg_with_highlights(mDetail)
     mol.delete()
     qmol.delete()
     getSvgData(svg)
-    
+    //console.log(svg)
     //console.log(bondMap.value)
-    console.log(svgitem)
+    //console.log(svgitem)
     //rdkitdiv.value.innerHTML=svg
 }
 
@@ -120,7 +120,7 @@ function domClick($event:any){
     highlightMap.atoms?.push(itemList[1]/1)
     highlightMap.atoms=Array.from(new Set(highlightMap.atoms)).sort()
     emit('update-mol', highlightMap)
-    //console.log(highlightMap.atoms)
+    //console.log('ssddd',highlightMap.atoms)
   } else if(itemList[0]=="bond"){//如果点击bond
       $event.target.style.stroke='#3fada8'
       $event.target.style.fill='#3fada8'
@@ -161,6 +161,34 @@ function domDblClick($event:any){
     console.log(itemList[0],'error')
   }
 }
+function clearAll(){
+  renderMol(props)
+  highlightMap.atoms=[]
+  highlightMap.bonds=[]
+  emit('update-mol', highlightMap)
+}
+
+//根据highlightMap初始化高亮svg中的atoms和bonds
+const svg_id=ref()
+function initHighlightSvg(){
+  //初始化处理高亮atoms
+  for (let item of svg_id.value.getElementsByTagName('ellipse')){
+    //在atoms中添加item.class属性具有highlightMap.atoms的元素
+    if (highlightMap.atoms?.includes(item.getAttribute('class').split('-')[1]/1)){
+      item.style.stroke='#3fada8'
+      item.style.fill='#3fada8'
+      item.style.opacity=0.8
+    }
+  }
+  //初始化处理高亮bonds
+  for (let item of svg_id.value.getElementsByTagName('path')){
+    if ((item.style.strokeWidth==='13.7px')&&(highlightMap.bonds?.includes(item.getAttribute('class').split(' ')[0].split('-')[1]/1))){
+      item.style.stroke='#3fada8'
+      item.style.fill='#3fada8'
+      item.style.opacity=0.4
+    }
+  }
+}
 
 onMounted(
   async()=>{
@@ -168,8 +196,13 @@ onMounted(
       window.RDKit=res
     })
     renderMol(props)
+    //console.log("onmounted",props)
+    //initHighlightSvg()
   }
 )
+onUpdated(()=>{
+  initHighlightSvg()
+})
 
 watch(
   props,
@@ -178,13 +211,14 @@ watch(
     highlightMap.smiles=newVal.smiles
     highlightMap.atoms=[]
     highlightMap.bonds=[]
+    console.log("watch",highlightMap.atoms)
   }
 )
 
 </script>
 
-<template class="svg">
-<svg v-bind="svgitem.svg" style="width:100%; height:100%">
+<template  class="svg">
+<svg v-bind="svgitem.svg" ref="svg_id" class='svgstyle' @click.right.prevent="clearAll" style="width:100%; height:100%">
   <rect v-bind="svgitem.rect" />
   <path v-for="item in svgitem.path.symble" v-bind="item.path" />
   <path v-for="item in svgitem.path.bond" v-bind="item.path"  />

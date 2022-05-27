@@ -16,18 +16,22 @@ const showModal=ref(false)
 const editRdkitKey=ref(1)
 const showLigandCore = ref(true)
 const options=[{label: 'Ketcher: 2.4.0'},{label: 'RDKit: 2022.3.2'}]
+const initMol:molData=reactive({
+    smiles:'CC(=O)Oc1ccccc1C(=O)O',
+    qsmiles:'*~*',
+    atoms:[],
+    bonds:[],
+})
+
 
 function drawMol(){
   initMol.smiles=inputText.value
+  tmpSmile.atoms=[]
+  tmpSmile.bonds=[]
   //console.log(initMol)
 }
 
 const { copy } = useClipboard()
-
-const initMol:molData=reactive({
-    smiles:'CC(=O)Oc1ccccc1C(=O)O',
-    qsmiles:'*~*',
-})
 
 const tmpSmile=reactive({
   smiles:initMol.smiles as any,
@@ -57,8 +61,8 @@ function addCore(){
   }
   //判断存在形式
   if((tmpSmile.smiles!='')&&((JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile.smiles))==-1)
-  ||(JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile.bonds))==-1)
-  ||(JSON.stringify(mol4enum.core).indexOf(JSON.stringify(tmpSmile.atoms))==-1))){
+  ||(JSON.stringify(mol4enum.core).indexOf('"bonds":'+JSON.stringify(tmpSmile.bonds))==-1)
+  ||(JSON.stringify(mol4enum.core).indexOf('"atoms":'+JSON.stringify(tmpSmile.atoms))==-1))){
     mol.smiles=tmpSmile.smiles
     mol.atoms=tmpSmile.atoms
     mol.bonds=tmpSmile.bonds
@@ -81,8 +85,8 @@ function addLigand(){
   }
   //判断存在形式
   if((tmpSmile.smiles!='')&&((JSON.stringify(mol4enum.ligand).indexOf(JSON.stringify(tmpSmile.smiles))==-1)
-  ||(JSON.stringify(mol4enum.ligand).indexOf(JSON.stringify(tmpSmile.bonds))==-1)
-  ||(JSON.stringify(mol4enum.ligand).indexOf(JSON.stringify(tmpSmile.atoms))==-1))){
+  ||(JSON.stringify(mol4enum.ligand).indexOf('"bonds":'+JSON.stringify(tmpSmile.bonds))==-1)
+  ||(JSON.stringify(mol4enum.ligand).indexOf('"atoms":'+JSON.stringify(tmpSmile.atoms))==-1))){
     mol.smiles=tmpSmile.smiles
     mol.atoms=tmpSmile.atoms
     mol.bonds=tmpSmile.bonds
@@ -93,7 +97,11 @@ function addLigand(){
   }
   console.log(mol4enum.ligand)
 }
-
+function itemEdit(mol:any,index:number,molObjList:any[]){
+  molObjList[index].smiles=mol.smiles
+  molObjList[index].atoms=mol.atoms
+  molObjList[index].bonds=mol.bonds
+}
 
 onMounted(()=>{
 
@@ -230,7 +238,9 @@ watch(
             <n-grid-item
               v-for="(item,index) in mol4enum.core"
               :key="item.id">
-              <card-rdkit v-bind="item" @item-deleted="mol4enum.core.splice(index,1)"/>
+              <card-rdkit v-bind="item"
+                          @item-deleted="mol4enum.core.splice(index,1)"
+                          @it-edit-save="itemEdit($event,index,mol4enum.core)"/>
             </n-grid-item>
           </n-grid>
         </n-collapse-item>

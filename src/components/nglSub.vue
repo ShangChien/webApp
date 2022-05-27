@@ -4,7 +4,7 @@ import  * as NGL from 'ngl/dist/ngl.js';
 const viewport = ref(null);
 
 function initViewer(viewport:any){
-  let stage = new NGL.Stage(viewport.value,{backgroundColor:'white'});
+  let stage = new NGL.Stage(viewport,{backgroundColor:'white'});
   stage.loadFile("/moleculeData/1ycr.pdb")
     .then(function(o:any) {
       o.addRepresentation("cartoon");
@@ -19,8 +19,10 @@ function initViewer(viewport:any){
   });
 }
 onMounted(()=>{
-  initViewer(viewport)
+  initViewer(viewport.value)
+  
 })
+
 
 </script>
 

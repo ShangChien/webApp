@@ -2,8 +2,8 @@ export interface molData{
     id?: number
     smiles?:string|any
     qsmiles?:string
-    atoms?:number[]
-    bonds?:number[]
+    atoms?:number[]|any
+    bonds?:number[]|any
     addAtomIndices?:boolean
     addBondIndices?:boolean
     legend?:string
@@ -16,4 +16,5 @@ export interface molData{
     minFontSize?:number
     explicitMethyl?:boolean
     editable?:boolean
+    extraData?:any
 }
