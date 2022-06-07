@@ -43,13 +43,24 @@ export default defineConfig({
   ],
   server: {
             host: '0.0.0.0',
-            https:true
+            https:true,
+            cors: true, // 默认启用并允许任何源
+            port: 8080,
+            //反向代理配置，注意rewrite写法，开始没看文档在这里踩了坑
+            proxy: {
+              '^/api': {
+                target: 'http://192.168.2.160:8000',   //代理接口
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api/, '')
+              }
+            }
           },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
+  base: '/',
   //build: {
   //  rollupOptions: {
   //      external: ['jquery'],

@@ -3,12 +3,21 @@ import { NSpace,NPageHeader,NGrid,NGridItem,NStatistic,NButton,NDropdown,NAvatar
 NCollapseItem,NInputGroup,NInput,NDivider,NModal,NCard,NGradientText } from 'naive-ui'
 import { ColorPaletteOutline } from '@vicons/ionicons5'
 import { CloudSatellite,CopyFile  } from '@vicons/carbon'
+import { BrandAppleArcade } from '@vicons/tabler'
 import { useClipboard } from '@vueuse/core'
 import initKetcher from '../components/initKetcher.vue';
 import editableRdkit from '@/components/editableRdkit.vue'
 import cardRdkit from '@/components/cardRdkit.vue'
 import { reactive,onMounted,ref,watch } from 'vue';
 import type { molData } from '@/components/types'
+import axios from 'axios'
+import { useAxios } from '@vueuse/integrations/useAxios'
+
+const instance = axios.create({
+  baseURL: '/api',
+})
+const { data,execute } = useAxios('/enum', { method: 'POST' }, instance,{ immediate: false })
+
 
 const inputText=ref('')
 const showAbout=ref(false)
@@ -22,7 +31,6 @@ const initMol:molData=reactive({
     atoms:[],
     bonds:[],
 })
-
 
 function drawMol(){
   initMol.smiles=inputText.value
@@ -153,9 +161,9 @@ watch(
   <n-collapse :default-expanded-names="['1']" style="width:60%">
         <n-collapse-item title=" RDKit位点标注" display-directive="show"  class="collapse" name="1" style="width:100%;height:100%">
           <n-card style="width:100%;height:100%">
-          <n-thing style="width:100%;height:100%">
-          <template #description>
-            <n-input-group class="inputG" >
+            <n-thing style="width:100%;height:100%">
+              <template #description>
+              <n-input-group class="inputG" >
                 <n-input v-model:value="inputText"
                          style="font-size:20px;max-width: 90%"
                          type="text"
@@ -196,15 +204,15 @@ watch(
                           </template>
                    绘制
                 </n-button>
-            </n-input-group>
-          </template>
-          <template #default>
-            <div style="display:flex;align-items:center;justify-content:center">
-              <!--rdkit-sub v-bind="initMol"/-->
-              <editable-rdkit :key="editRdkitKey" v-bind="initMol" @update-mol="acceptMol" style="width:60%"/>
-            </div>
-          </template>
-          <template #footer >
+              </n-input-group>
+              </template>
+              <template #default>
+                <div style="display:flex;align-items:center;justify-content:center">
+                  <!--rdkit-sub v-bind="initMol"/-->
+                  <editable-rdkit :key="editRdkitKey" v-bind="initMol" @update-mol="acceptMol" style="width:60%"/>
+                </div>
+              </template>
+              <template #footer >
             <n-space justify="space-between" style="width: 100%">
               <n-button quaternary :focusable=false @click="copy(initMol.smiles)">
                <template #icon>
@@ -220,16 +228,22 @@ watch(
               <n-space justify="end">
                 <n-button size="medium" strong secondary round type="info" @click="addCore" >添加主核</n-button>
                 <n-button size="medium" strong secondary round type="info" @click="addLigand" >添加配体</n-button>
-                <n-button szie="large" round color="#ff69b4" >开始枚举</n-button>
+                <n-button szie="large" round color="#ff69b4" @click='execute(undefined,{data:mol4enum})'>
+                    <template #icon>
+                      <n-icon :size="20">
+                        <BrandAppleArcade />
+                      </n-icon>
+                    </template>
+                      开始枚举
+                </n-button>
               </n-space>  
             </n-space>
-          </template>
-          </n-thing>
+              </template>
+            </n-thing>
           </n-card>
         </n-collapse-item>
       </n-collapse>
   <n-divider />
-<!--core and ligand-->
   <n-grid x-gap="40" y-gap="20" :cols="2" v-show="showLigandCore" >
     <n-grid-item>
       <n-collapse :default-expanded-names="['1']">
@@ -249,19 +263,33 @@ watch(
     <n-grid-item>
       <n-collapse :default-expanded-names="['1']">
         <n-collapse-item title="配体结构" display-directive="show" name="1">
-          <n-grid :cols="6" x-gap="8" y-gap="8">
+          <n-grid :cols="4" x-gap="8" y-gap="8">
             <n-grid-item
               v-for="(item,index) in mol4enum.ligand"
               :key="item.id">
-              <card-rdkit v-bind="item" @item-deleted="mol4enum.ligand.splice(index,1)"/>
+              <card-rdkit v-bind="item" 
+                          @item-deleted="mol4enum.ligand.splice(index,1)"
+                          @it-edit-save="itemEdit($event,index,mol4enum.ligand)"/>
             </n-grid-item>
           </n-grid>
         </n-collapse-item>
       </n-collapse>
     </n-grid-item>
   </n-grid>
-  
+  <n-divider />
+  <n-collapse :default-expanded-names="['1']">
+    <n-collapse-item title="结果输出" display-directive="show" name="1">
+      <n-grid :cols="8" x-gap="8" y-gap="8">
+        <n-grid-item
+          v-for="(item,index) in data?.message"
+          :key="index">
+          <card-rdkit :smiles="item" style="width:95%;height:95%;"/>
+        </n-grid-item>
+      </n-grid>
+    </n-collapse-item>
+  </n-collapse>
 </template>
+
 <style>
 .collapse{
   padding: 5px;

@@ -5,7 +5,7 @@ import { NCol,NRow,NStatistic } from 'naive-ui'
 <template>
   <n-row>
     <n-col :span="20">
-      <n-statistic label="画布" >
+      <n-statistic label="平面分子画布" >
         <a href='https://lifescience.opensource.epam.com/ketcher/index.html'>Ketcher</a>
         (Apache License v2.0)
       </n-statistic>
@@ -14,7 +14,7 @@ import { NCol,NRow,NStatistic } from 'naive-ui'
   <hr>
   <n-row>
     <n-col :span="20">
-      <n-statistic label="2D.js" >
+      <n-statistic label="2D分子展示" >
         <a href='https://greglandrum.github.io/rdkit-blog/'>Rdkit</a>
         (BSD 3-Clause License)
       </n-statistic>
@@ -23,8 +23,8 @@ import { NCol,NRow,NStatistic } from 'naive-ui'
   <hr>
   <n-row>
     <n-col :span="20">
-      <n-statistic label="3D.js" >
-        <a href='http://3dmol.csb.pitt.edu/index.html'>3Dmol</a>
+      <n-statistic label="3D分子展示" >
+        <a href='http://nglviewer.org/ngl/'>NGL</a>
         (BSD-3-Clause license)
       </n-statistic>
     </n-col>
@@ -32,7 +32,7 @@ import { NCol,NRow,NStatistic } from 'naive-ui'
   <hr>
   <n-row>
     <n-col :span="20">
-      <n-statistic label="Data-base" >
+      <n-statistic label="分子数据库" >
         <a href='https://www.postgresql.org/about/'>PostgreSQL</a>
         is released under the PostgreSQL License (similar to the BSD or MIT licenses)
       </n-statistic>

@@ -33,9 +33,9 @@ const router = createRouter({
       component: ()=>(import('../views/task.vue')),
     },
     {
-      path: '/workspace',
-      name: 'workspace',
-      component: ()=>(import('../views/workSpace.vue'))
+      path: '/enummole',
+      name: 'enumMole',
+      component: ()=>(import('../views/enumMole.vue'))
     },
   ]
 })

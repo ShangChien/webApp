@@ -5,8 +5,9 @@ import { NLayout,NLayoutSider,NMenu,NIcon,NLayoutFooter,NLayoutHeader,NMessagePr
 import { RouterLink, RouterView } from 'vue-router'
 import type { MenuOption } from 'naive-ui'
 import { LogoElectron } from '@vicons/ionicons5'
-import { Home,Tabler3DCubeSphere } from '@vicons/tabler'
-import { Carbon,Workspace,Data1 } from '@vicons/carbon'
+import { Home,Tabler3DCubeSphere,BrandSlack } from '@vicons/tabler'
+import { Carbon,Data1 } from '@vicons/carbon'
+
 
 function renderIcon (icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
@@ -38,19 +39,19 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(Data1)
   },
   {
-    label: () =>h(RouterLink,{to: {name: 'workspace',}},{ default: () => 'WorkSpace' }),
+    label: () =>h(RouterLink,{to: {name: 'enumMole',}},{ default: () => 'Enum Molecule' }),
     key: 'view-workSpcae',
-    icon: renderIcon(Workspace)
+    icon: renderIcon(BrandSlack)
   }
 ]
 </script>
 
 <template>
-<n-layout bordered position="absolute">
+<n-layout bordered position="absolute" :native-scrollbar="false" >
   <n-layout-header style="height: 60px; padding: 1px " bordered >
     <img class="logo" src="/picture/colorlogo.svg" width="55"  />
   </n-layout-header>
-  <n-layout has-sider position="absolute" style="top: 60px; bottom: 30px" bordered > 
+  <n-layout has-sider position="absolute" style="top: 60px" bordered > 
         <n-layout-sider bordered
                         show-trigger
                         collapse-mode="width"
@@ -71,8 +72,6 @@ const menuOptions: MenuOption[] = [
             </n-message-provider>
         </n-layout>
   </n-layout> 
-  <n-layout-footer position="absolute" style="padding: 5px" bordered>
-  </n-layout-footer>
 </n-layout>
 </template>
 

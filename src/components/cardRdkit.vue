@@ -4,7 +4,7 @@ import type { Component } from 'vue'
 import type { molData } from '@/components/types';
 import svgRdkit from '@/components/svgRdkit.vue';
 import editableRdkit from '@/components/editableRdkit.vue'
-import { NCard,NCheckbox,NSpace,NDropdown,NButton,NIcon,NPopover,NEllipsis,NModal } from 'naive-ui';
+import { NCard,NCheckbox,NSpace,NDropdown,NButton,NIcon,NPopover,NModal } from 'naive-ui';
 import { useClipboard } from '@vueuse/core'
 import { Dots } from '@vicons/tabler';
 import { Edit,Delete,CopyFile } from '@vicons/carbon';
@@ -86,14 +86,13 @@ onMounted(()=>{
 })
 </script>
 <template>
-<n-card hoverable class="card"
+<n-card hoverable style="position:relative"
 				@mouseover="visible"
 				@mouseout="visible">
 	<template #cover  >
-		<n-space justify="space-between" style="padding-left: 2%;padding-top: 1%;padding-right: 1%;" >
-			<n-checkbox v-model:checked="checked" v-show='showOptions' />
-      &nbsp
-			<div v-show='showOptions'>
+		<n-space justify="space-between" v-show='showOptions' style="padding-left: 3%;padding-top: 2%;padding-right: 1%;position:absolute;z-index: 1;width: 95%;opacity:1" >
+			<n-checkbox v-model:checked="checked"  />
+			<div>
         <n-dropdown trigger="click" :options="options" placement="bottom-end" @select="handleDropOption">
           <n-button tertiary circle size="tiny" >
             <template #icon>
@@ -120,14 +119,12 @@ onMounted(()=>{
         </n-modal>
       </div> 
 	  </n-space>
-    <n-popover trigger="hover" width="trigger" placement="right-end" >
+    <n-popover trigger="hover" placement="right" width="trigger" display-directive="if" :to="false" style="max-width: 100%;" >
       <template #trigger>
         <svg-rdkit v-bind="props" style="width:100%; height:100%;"/>
       </template>
-      <span>
-        <n-ellipsis style="max-width: 100%">
-          {{props.smiles}}
-        </n-ellipsis>
+      <span style="word-break:break-word">
+        {{props.smiles}}<br>
 		    atoms:{{props.atoms}}<br>
 		    bonds:{{props.bonds}}
       </span>
