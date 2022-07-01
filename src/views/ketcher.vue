@@ -2,16 +2,12 @@
 import { NButton, NInput, NInputGroup, NSpace } from "naive-ui";
 import { ref, onMounted, onBeforeUnmount } from "vue";
 
-const src = ref<string>("/static/index.html?");
+const src = ref<string>();
 const smiles = ref<string | any>("");
 const refketcher = ref<HTMLIFrameElement | any>();
 const iframeWin = ref<any>(null);
 const showketcher = ref<boolean>(true);
 
-onMounted(() => {
-  window.addEventListener("message", handleMessage);
-  iframeWin.value = refketcher.value.contentWindow;
-});
 const handleMessage = (event: {
   data: { cmd: any; params: { data: null } };
 }) => {
@@ -42,6 +38,12 @@ function getMessage() {
     "*"
   );
 }
+
+onMounted(() => {
+  src.value="static/ketcher/index.html"
+  window.addEventListener("message", handleMessage);
+  iframeWin.value = refketcher.value.contentWindow;
+});
 
 onBeforeUnmount(() => {
   window.removeEventListener("message", handleMessage);
@@ -94,7 +96,7 @@ onBeforeUnmount(() => {
           id="ifKetcher"
           frameborder="0"
           ref="refketcher"
-          :src="src"
+          :src=src
           width="1050"
           height="780"
         ></iframe>

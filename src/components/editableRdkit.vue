@@ -261,24 +261,20 @@ watch(props, (newVal) => {
     <path
       v-for="item in svgitem.path.symble"
       v-bind="item.path"
-      :key="item.path.class"
     />
     <path
       v-for="item in svgitem.path.bond"
       v-bind="item.path"
-      :key="item.path.class"
     />
     <path
       v-for="item in svgitem.path.hightBonds"
       v-bind="item.path"
-      :key="item.path.class"
       @click="domClick($event)"
       @dblclick="domDblClick($event)"
     />
     <ellipse
       v-for="item in svgitem.ellipse"
       v-bind="item.ellipse"
-      :key="item.ellipse.class"
       @click="domClick($event)"
       @dblclick="domDblClick($event)"
     />

@@ -5,14 +5,13 @@ const viewport = ref(null);
 
 function initViewer(viewport: any) {
   let stage = new NGL.Stage(viewport, { backgroundColor: "white" });
-  stage.loadFile("/moleculeData/1ycr.pdb").then(function (o: any) {
-    o.addRepresentation("cartoon");
-    o.addRepresentation("licorice", { sele: "/0", multipleBond: "symmetric" });
-    //o.stage.setSpin(true);
+  stage.loadFile("/moleculeData/mol1.sdf").then(function (o: any) {
+    o.addRepresentation("licorice");
+    o.stage.setSpin(true);
     o.autoView();
     console.log(o);
     //悬停事件
-  });
+  })
 }
 onMounted(() => {
   initViewer(viewport.value);
@@ -26,7 +25,7 @@ onMounted(() => {
 <style>
 .nglView {
   width: 400px;
-  height: 400px;
+  height: 50vh;
   position: relative;
 }
 </style>

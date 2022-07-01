@@ -14,6 +14,7 @@ import type { MenuOption } from "naive-ui";
 import { LogoElectron } from "@vicons/ionicons5";
 import { Home, Tabler3DCubeSphere, BrandSlack } from "@vicons/tabler";
 import { Carbon, Data1 } from "@vicons/carbon";
+import  ReloadPrompt  from "@/components/ReloadPrompt.vue";
 
 function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) });
@@ -50,11 +51,7 @@ const menuOptions: MenuOption[] = [
   },
   {
     label: () =>
-      h(
-        RouterLink,
-        { to: { name: "enumMole" } },
-        { default: () => "Enum Molecule" }
-      ),
+      h(RouterLink,{ to: { name: "enumMole" } },{ default: () => "Enum Molecule" }),
     key: "view-workSpcae",
     icon: renderIcon(BrandSlack),
   },
@@ -63,8 +60,9 @@ const menuOptions: MenuOption[] = [
 
 <template>
   <n-layout bordered position="absolute" :native-scrollbar="false">
-    <n-layout-header style="height: 60px; padding: 1px" bordered>
-      <img class="logo" src="/picture/colorlogo.svg" width="55" />
+    <n-layout-header style="height: 60px; padding: 2px" bordered>
+      <img class="logo" src="/favicon.svg" width="55" />
+      <reload-prompt/>
     </n-layout-header>
     <n-layout has-sider position="absolute" style="top: 60px" bordered>
       <n-layout-sider

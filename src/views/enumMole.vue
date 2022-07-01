@@ -35,9 +35,14 @@ import { useAxios } from "@vueuse/integrations/useAxios";
 const instance = axios.create({
   baseURL: "/api",
 });
-const { data, execute } = useAxios("/enum", { method: "POST" }, instance, {
-  immediate: false,
-});
+const { data, execute } = useAxios("/enum", 
+                                   { method: "POST" }, 
+                                   instance, 
+                                   {immediate: false,}
+                                   );
+async function getData() {
+  await execute(undefined, { data: mol4enum })
+}
 
 const inputText = ref("");
 const showAbout = ref(false);
@@ -183,7 +188,7 @@ watch(
       <n-avatar
         @click="showAbout = !showAbout"
         color=" white"
-        src="/picture/enum.svg"
+        src="/favicon.svg"
       />
     </template>
     <template #extra>
@@ -328,7 +333,7 @@ watch(
                   szie="large"
                   round
                   color="#ff69b4"
-                  @click="execute(undefined, { data: mol4enum })"
+                  @click="getData"
                 >
                   <template #icon>
                     <n-icon :size="20">
