@@ -16,6 +16,7 @@ import { Delete, View, Edit } from "@vicons/carbon";
 </script>
 
 <template>
+<div>
   <n-space vertical>
     <n-table :single-line="false" size="small">
       <n-thead>
@@ -81,4 +82,5 @@ import { Delete, View, Edit } from "@vicons/carbon";
       </n-tbody>
     </n-table>
   </n-space>
+</div>
 </template>

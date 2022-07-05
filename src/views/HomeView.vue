@@ -3,6 +3,7 @@ import { NCol, NRow, NStatistic } from "naive-ui";
 </script>
 
 <template>
+<div>
   <n-row>
     <n-col :span="20">
       <n-statistic label="平面分子画布">
@@ -49,4 +50,5 @@ import { NCol, NRow, NStatistic } from "naive-ui";
   <br />
   开源协议的通俗解释:<br />
   <img src="/picture/openbranch.png" />
+</div>
 </template>

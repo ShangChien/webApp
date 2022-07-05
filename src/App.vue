@@ -4,6 +4,7 @@ import type { Component } from "vue";
 import {
   NLayout,
   NLayoutSider,
+  NLayoutFooter,
   NMenu,
   NIcon,
   NLayoutHeader,
@@ -59,12 +60,12 @@ const menuOptions: MenuOption[] = [
 </script>
 
 <template>
-  <n-layout bordered position="absolute" :native-scrollbar="false">
+  <n-layout bordered position="absolute" style="height: 100vh" :native-scrollbar="false">
     <n-layout-header style="height: 60px; padding: 2px" bordered>
       <img class="logo" src="/favicon.svg" width="55" />
       <reload-prompt/>
     </n-layout-header>
-    <n-layout has-sider position="absolute" style="top: 60px" bordered>
+    <n-layout has-sider position="absolute" style="top: 60px; bottom: 20px" bordered>
       <n-layout-sider
         bordered
         show-trigger
@@ -85,14 +86,20 @@ const menuOptions: MenuOption[] = [
         bordered
       >
         <n-message-provider>
-          <router-view v-slot="{ Component }">
+          <router-view v-slot="{ Component,route }">
+          <Transition name='fade' mode="out-in">
             <keep-alive>
               <component :is="Component" />
             </keep-alive>
+          </Transition>
           </router-view>
         </n-message-provider>
       </n-layout>
     </n-layout>
+    <n-layout-footer
+        bordered
+        position="absolute"
+        style="height: 20px; padding: 2px" />
   </n-layout>
 </template>
 
@@ -100,5 +107,15 @@ const menuOptions: MenuOption[] = [
 .logo {
   position: relative;
   left: 10px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

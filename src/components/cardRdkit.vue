@@ -102,10 +102,9 @@ onMounted(() => {
           position: absolute;
           z-index: 1;
           width: 95%;
-          opacity: 1;
         "
       >
-        <n-checkbox v-model:checked="checked" />
+        <n-checkbox v-model:checked="checked" style="opacity: 0.8;" />
         <div>
           <n-dropdown
             trigger="click"
@@ -149,7 +148,7 @@ onMounted(() => {
         placement="right"
         width="trigger"
         display-directive="if"
-        :to="false"
+        to=".n-scrollbar"
         style="max-width: 100%"
       >
         <template #trigger>

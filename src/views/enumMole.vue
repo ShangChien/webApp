@@ -26,23 +26,53 @@ import { BrandAppleArcade } from "@vicons/tabler";
 import { useClipboard } from "@vueuse/core";
 import initKetcher from "../components/initKetcher.vue";
 import editableRdkit from "@/components/editableRdkit.vue";
-import cardRdkit from "@/components/cardRdkit.vue";
-import { reactive, ref, watch } from "vue";
+import { reactive, ref, watch, 
+         computed,
+         defineAsyncComponent } from "vue";
 import type { molData } from "@/components/types";
 import axios from "axios";
-import { useAxios } from "@vueuse/integrations/useAxios";
+import Grid from "vue-virtual-scroll-grid";
 
-const instance = axios.create({
-  baseURL: "/api",
-});
-const { data, execute } = useAxios("/enum", 
-                                   { method: "POST" }, 
-                                   instance, 
-                                   {immediate: false,}
-                                   );
-async function getData() {
-  await execute(undefined, { data: mol4enum })
+const cardRdkit = defineAsyncComponent(() =>
+  import('@/components/cardRdkit.vue')
+)
+
+const resultData:any=ref()
+function enumMol(){
+  axios.post('/api/enum', mol4enum)
+  .then(function (response:any) {
+    resultData.value=response;
+    console.log(response)
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
 }
+
+//virtualGrid
+const VLength=computed(() => resultData.value?.data.message.length)
+const VPageSize=ref<number>(10)
+const pageProvider:any=(pageNumber:number, pageSize:number)=>(
+      new Promise((resolve) => {
+        if (resultData.value?.data.message.length<1) {
+          setTimeout(
+            () => resolve(
+              new Array(pageSize).fill("Loaded Item")
+            ),
+            300
+          )
+        } else {
+          setTimeout(
+            () => resolve(
+              resultData.value?.data.message.slice(
+                pageNumber*pageSize,(pageNumber+1)*pageSize
+              )
+            ),
+            300
+          )
+        }
+      })
+)
 
 const inputText = ref("");
 const showAbout = ref(false);
@@ -162,6 +192,7 @@ watch(
 </script>
 
 <template>
+<div>
   <n-page-header subtitle="分子结构枚举，子结构筛选 ( beta 1.0 )">
     <n-grid :cols="5" v-if="showAbout">
       <n-grid-item>
@@ -333,7 +364,7 @@ watch(
                   szie="large"
                   round
                   color="#ff69b4"
-                  @click="getData"
+                  @click="enumMol"
                 >
                   <template #icon>
                     <n-icon :size="20">
@@ -387,14 +418,40 @@ watch(
   </n-grid>
   <n-divider />
   <n-collapse :default-expanded-names="['1']">
-    <n-collapse-item title="结果输出" display-directive="show" name="1">
-      <n-grid :cols="8" x-gap="8" y-gap="8">
-        <n-grid-item v-for="(item, index) in data?.message" :key="index">
-          <card-rdkit :smiles="item" style="width: 95%; height: 95%" />
-        </n-grid-item>
-      </n-grid>
-    </n-collapse-item>
+    <Suspense>
+    <!-- 具有深层异步依赖的组件 -->
+      <n-collapse-item title="结果输出" display-directive="show" name="1">
+        <!-- <n-grid :cols="8" x-gap="8" y-gap="8">
+          <n-grid-item v-for="(item, index) in resultData?.data.message" :key="index">
+            <card-rdkit :smiles="item" style="width: 95%; height: 95%" />
+          </n-grid-item>
+        </n-grid> -->
+        <Grid :length="VLength" :pageSize="VPageSize" :pageProvider="pageProvider" class="grid"
+        v-if="resultData?.data.message">
+         <template v-slot:probe>
+           <div class="item">Probe</div>
+         </template>
+
+         <!-- When the item is not loaded, a placeholder is rendered -->
+         <template v-slot:placeholder="{ index, style }">
+           <div class="item" :style="style">Placeholder {{ index }}</div>
+         </template>
+
+         <!-- Render a loaded item -->
+         <template v-slot:default="{ item, style, index }">
+          <div class="item" :style="style">
+           <card-rdkit :smiles="item" style="width: 95%; height: 95%" />
+          </div>
+         </template>
+       </Grid>
+      </n-collapse-item>
+    <!-- 在 #fallback 插槽中显示 “正在加载中” -->
+    <template #fallback>
+      Loading...
+    </template>
+    </Suspense>
   </n-collapse>
+</div>
 </template>
 
 <style>
@@ -407,5 +464,51 @@ watch(
   position: relative;
   border-radius: 3px 3px 3px 3px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+}
+.grid {
+  display: grid;
+  grid-gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 992px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+@media (min-width: 1280px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+@media (min-width: 1440px) {
+  .grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+@media (min-width: 1650px) {
+  .grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+@media (min-width: 1890px) {
+  .grid {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+@media (min-width: 2530px) {
+  .grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+.item {
+  padding: 1px;
+  text-align: center;
 }
 </style>

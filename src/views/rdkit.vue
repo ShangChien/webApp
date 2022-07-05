@@ -63,6 +63,7 @@ function change() {
 </script>
 
 <template>
+<div>
   <NButton @click="change"> 切换颜色 </NButton>
   <n-space>
     <card-rdkit v-bind="mol3"></card-rdkit>
@@ -72,4 +73,5 @@ function change() {
     <rdkit-sub v-bind="mol2"></rdkit-sub>
     <rdkit-sub v-bind="mol1"></rdkit-sub>
   </n-space>
+</div>
 </template>
