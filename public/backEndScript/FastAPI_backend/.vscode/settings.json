@@ -1,0 +1,6 @@
+{
+	"python.analysis.extraPaths": [
+		"./sql_app"
+	],
+	"python.pythonPath": "D:\\conda\\python.exe"
+}
