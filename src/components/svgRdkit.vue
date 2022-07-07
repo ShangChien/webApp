@@ -2,6 +2,8 @@
 import { ref, onMounted, watch, reactive } from "vue";
 import type { molData } from "@/components/types";
 import initRDKit from "@/components/RDKit";
+
+const canvas=ref()
 const props = defineProps<molData>();
 const svgitem = reactive<HTMLDivElement | any>({
   svg: {},
@@ -121,9 +123,12 @@ function renderMol(props: molData) {
   mDetail["explicitMethyl"] = props.explicitMethyl ?? false;
   mDetail = JSON.stringify(mDetail);
   let svg = mol.get_svg_with_highlights(mDetail);
+  //draw canvas
+  //mol.draw_to_canvas_with_highlights(canvas.value, mDetail);
   mol.delete();
   qmol.delete();
   getSvgData(svg);
+  
   //console.log(bondMap.value)
   //console.log(svgitem)
   //rdkitdiv.value.innerHTML=svg
@@ -132,6 +137,7 @@ function renderMol(props: molData) {
 onMounted(async () => {
   await initRDKit.then((res) => {
     window.RDKit = res;
+    //console.log(res)
   });
   renderMol(props);
 });
@@ -141,7 +147,8 @@ watch(props, (newVal) => {
 });
 </script>
 
-<template class="svg">
+<template >
+  <!-- <canvas ref="canvas" :width="props.width ?? 200" :height="props.height ?? 200" ></canvas> -->
   <svg v-bind="svgitem.svg">
     <rect v-bind="svgitem.rect" />
     <path
@@ -163,12 +170,4 @@ watch(props, (newVal) => {
   </svg>
 </template>
 <style>
-.svg {
-  display: inline-block;
-  position: relative;
-  width: 100%;
-  padding-bottom: 100%;
-  vertical-align: middle;
-  overflow: hidden;
-}
 </style>

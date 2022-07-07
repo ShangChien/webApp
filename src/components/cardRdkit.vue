@@ -152,7 +152,7 @@ onMounted(() => {
         style="max-width: 100%"
       >
         <template #trigger>
-          <svg-rdkit v-bind="props" style="width: 100%; height: 100%" />
+          <svg-rdkit v-bind="props" style="width: 100%; height: 100%" @click.left.prevent />
         </template>
         <span style="word-break: break-word">
           {{ props.smiles }}<br />

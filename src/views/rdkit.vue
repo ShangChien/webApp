@@ -4,6 +4,7 @@ import type { molData } from "@/components/types";
 import rdkitSub from "@/components/rdkitSub.vue";
 import cardRdkit from "@/components/svgRdkit.vue";
 import { NSpace, NButton } from "naive-ui";
+
 const mol1: molData = reactive({
   smiles: "CC(=O)Oc1ccccc1C(=O)O",
   qsmiles: "CC(=O)Oc1ccccc1C(=O)O",
@@ -60,11 +61,14 @@ function change() {
     mol4.highlightColor = color2;
   }
 }
+const show=ref<boolean>(true)
 </script>
 
 <template>
 <div>
   <NButton @click="change"> 切换颜色 </NButton>
+  <NButton @click="show=!show"> show </NButton>
+  <n-space v-if="show">
   <n-space>
     <card-rdkit v-bind="mol3"></card-rdkit>
     <rdkit-sub v-bind="mol4"></rdkit-sub>
@@ -72,6 +76,7 @@ function change() {
   <n-space>
     <rdkit-sub v-bind="mol2"></rdkit-sub>
     <rdkit-sub v-bind="mol1"></rdkit-sub>
+  </n-space>
   </n-space>
 </div>
 </template>

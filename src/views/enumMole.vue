@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   NSpace,
+  NSpin,
   NPageHeader,
   NGrid,
   NGridItem,
@@ -51,7 +52,7 @@ function enumMol(){
 
 //virtualGrid
 const VLength=computed(() => resultData.value?.data.message.length)
-const VPageSize=ref<number>(10)
+const VPageSize=ref<number>(4)
 const pageProvider:any=(pageNumber:number, pageSize:number)=>(
       new Promise((resolve) => {
         if (resultData.value?.data.message.length<1) {
@@ -59,7 +60,7 @@ const pageProvider:any=(pageNumber:number, pageSize:number)=>(
             () => resolve(
               new Array(pageSize).fill("Loaded Item")
             ),
-            300
+            100
           )
         } else {
           setTimeout(
@@ -68,7 +69,7 @@ const pageProvider:any=(pageNumber:number, pageSize:number)=>(
                 pageNumber*pageSize,(pageNumber+1)*pageSize
               )
             ),
-            300
+            100
           )
         }
       })
@@ -418,45 +419,50 @@ watch(
   </n-grid>
   <n-divider />
   <n-collapse :default-expanded-names="['1']">
-    <Suspense>
-    <!-- 具有深层异步依赖的组件 -->
-      <n-collapse-item title="结果输出" display-directive="show" name="1">
-        <!-- <n-grid :cols="8" x-gap="8" y-gap="8">
-          <n-grid-item v-for="(item, index) in resultData?.data.message" :key="index">
-            <card-rdkit :smiles="item" style="width: 95%; height: 95%" />
-          </n-grid-item>
-        </n-grid> -->
-        <Grid :length="VLength" :pageSize="VPageSize" :pageProvider="pageProvider" class="grid"
-        v-if="resultData?.data.message">
-         <template v-slot:probe>
-           <div class="item">Probe</div>
-         </template>
-
-         <!-- When the item is not loaded, a placeholder is rendered -->
-         <template v-slot:placeholder="{ index, style }">
-           <div class="item" :style="style">Placeholder {{ index }}</div>
-         </template>
-
-         <!-- Render a loaded item -->
-         <template v-slot:default="{ item, style, index }">
-          <div class="item" :style="style">
-           <card-rdkit :smiles="item" style="width: 95%; height: 95%" />
+    <n-collapse-item title="结果输出" display-directive="if" name="1" >
+      <!-- <n-grid :cols="8" x-gap="8" y-gap="8">
+        <n-grid-item v-for="(item, index) in resultData?.data.message" :key="index">
+          <card-rdkit :smiles="item" style="width: 95%; height: 95%" />
+        </n-grid-item>
+      </n-grid> -->
+      <Grid :length="VLength" 
+            :pageSize="VPageSize" 
+            :pageProvider="pageProvider" 
+            :pageProviderDebounceTime="500" 
+            class="grid"
+            v-if="resultData?.data.message">
+        <template v-slot:probe>
+          <div class="item" >
+            <div width="200" height="200"></div>
           </div>
-         </template>
-       </Grid>
-      </n-collapse-item>
-    <!-- 在 #fallback 插槽中显示 “正在加载中” -->
-    <template #fallback>
-      Loading...
-    </template>
-    </Suspense>
+        </template>
+ 
+        <!-- When the item is not loaded, a placeholder is rendered -->
+        <template v-slot:placeholder="{ index, style }">
+          <div class="item" :style="style">
+            <div width="200" height="200" text-align="center">
+              <n-spin size="large" />
+            </div>
+          </div>
+        </template>
+ 
+        <!-- Render a loaded item -->
+        <template v-slot:default="{ item, style, index }">
+          <div class="item" :style="style">
+            <div width="200" height="200">
+              <card-rdkit :smiles="item" />
+            </div>
+          </div>
+        </template>
+     </Grid>
+    </n-collapse-item>
   </n-collapse>
 </div>
 </template>
 
 <style>
 .collapse {
-  padding: 5px;
+  padding: 20px;
   width: 100%;
 }
 .inputG {
@@ -471,11 +477,11 @@ watch(
   grid-template-columns: repeat(2, 1fr);
 }
 
-@media (min-width: 768px) {
+/* @media (min-width: 768px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
   }
-}
+} */
 @media (min-width: 992px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
@@ -483,32 +489,27 @@ watch(
 }
 @media (min-width: 1280px) {
   .grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 @media (min-width: 1440px) {
   .grid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
   }
 }
 @media (min-width: 1650px) {
   .grid {
-    grid-template-columns: repeat(6, 1fr);
-  }
-}
-@media (min-width: 1890px) {
-  .grid {
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(8, 1fr);
   }
 }
 @media (min-width: 2530px) {
   .grid {
-    grid-template-columns: repeat(8, 1fr);
+    grid-template-columns: repeat(10, 1fr);
   }
 }
 
 .item {
-  padding: 1px;
+  padding: 5px;
   text-align: center;
 }
 </style>
