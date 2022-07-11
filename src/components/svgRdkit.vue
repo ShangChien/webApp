@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, reactive } from "vue";
+import { ref, onMounted, nextTick, watch, reactive } from "vue";
 import type { molData } from "@/components/types";
-import initRDKit from "@/components/RDKit";
+//import initRDKit from "@/components/RDKit";
 
-const canvas=ref()
+//const canvas=ref()
+const svg=ref()
 const props = defineProps<molData>();
 const svgitem = reactive<HTMLDivElement | any>({
   svg: {},
@@ -92,7 +93,7 @@ function getSvgData(svg: string) {
   }
 }
 
-function renderMol(props: molData) {
+async function renderMol(props: molData) {
   window.RDKit.prefer_coordgen(true);
   let mol = window.RDKit.get_mol(props.smiles ?? "");
   let qmol = window.RDKit.get_qmol(props.qsmiles ?? "");
@@ -122,24 +123,32 @@ function renderMol(props: molData) {
   mDetail["minFontSize"] = props.minFontSize ?? 10;
   mDetail["explicitMethyl"] = props.explicitMethyl ?? false;
   mDetail = JSON.stringify(mDetail);
-  let svg = mol.get_svg_with_highlights(mDetail);
+  svg.value.innerHTML =mol.get_svg_with_highlights(mDetail);
   //draw canvas
   //mol.draw_to_canvas_with_highlights(canvas.value, mDetail);
-  mol.delete();
-  qmol.delete();
-  getSvgData(svg);
   
+  //getSvgData(svgMol);
+  qmol.delete();
+  mol.delete();
+  //return Promise.resolve({mol,mDetail})
   //console.log(bondMap.value)
   //console.log(svgitem)
   //rdkitdiv.value.innerHTML=svg
 }
 
+  
 onMounted(async () => {
-  await initRDKit.then((res) => {
-    window.RDKit = res;
-    //console.log(res)
-  });
-  renderMol(props);
+  
+  await Promise.resolve().then(()=>{
+    setTimeout(() => {
+      renderMol(props)
+    ,0})
+  })
+  // await nextTick(()=>{
+  //   setTimeout(() => {
+  //     renderMol(props)
+  //   ,0})
+  // })
 });
 
 watch(props, (newVal) => {
@@ -148,8 +157,9 @@ watch(props, (newVal) => {
 </script>
 
 <template >
+  <div ><svg ref='svg' viewBox="0 0 200 200" ></svg></div>
   <!-- <canvas ref="canvas" :width="props.width ?? 200" :height="props.height ?? 200" ></canvas> -->
-  <svg v-bind="svgitem.svg">
+  <!-- <svg style="position:relative;width:100%" v-bind="svgitem.svg">
     <rect v-bind="svgitem.rect" />
     <path
       v-for="item in svgitem.path.hightBonds"
@@ -167,7 +177,7 @@ watch(props, (newVal) => {
       v-for="item in svgitem.path.bond"
       v-bind="item.path"
     />
-  </svg>
+  </svg> -->
 </template>
 <style>
 </style>

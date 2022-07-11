@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, h, onMounted, reactive } from "vue";
+import { ref, h, reactive } from "vue";
 import type { Component } from "vue";
 import type { molData } from "@/components/types";
 import svgRdkit from "@/components/svgRdkit.vue";
-import editableRdkit from "@/components/editableRdkit.vue";
 import {
   NCard,
+  NSpin,
+  NEmpty,
   NCheckbox,
   NSpace,
   NDropdown,
@@ -17,8 +18,28 @@ import {
 import { useClipboard } from "@vueuse/core";
 import { Dots } from "@vicons/tabler";
 import { Edit, Delete, CopyFile } from "@vicons/carbon";
+import { defineAsyncComponent } from 'vue'
+//异步加载mol编辑组件
+const editableRdkit = defineAsyncComponent({
+  loader:() =>import('@/components/editableRdkit.vue'),
+  loadingComponent: NSpin,
+  delay: 2000,//+600*Math.random(),
+  errorComponent: NEmpty,
+  timeout: 3000,
+  suspensible:false
+})
+
 const emit = defineEmits(["itemChecked", "itEditSave", "itemDeleted"]);
 const props = defineProps<molData>();
+//可视加载
+// const target = ref(null)
+// const targetIsVisible = ref(false)
+// const { stop } = useIntersectionObserver(
+//       target,
+//       ([{ isIntersecting }]) => {
+//         targetIsVisible.value = isIntersecting
+//       },
+//     )
 
 //handle Modal
 const showModal = ref(false);
@@ -80,16 +101,17 @@ function visible() {
   }
 }
 
-onMounted(() => {
-  console.log(props);
-});
+// onMounted(() => {
+//   console.log(props);
+// });
 </script>
 <template>
-  <n-card
+<div ref="target" style="width:100%;height:100%" >
+  <!-- v-if="targetIsVisible" -->
+  <n-card 
     hoverable
-    style="position: relative"
-    @mouseover="visible"
-    @mouseout="visible"
+    @mouseenter="visible"
+    @mouseleave="visible"
   >
     <template #cover>
       <n-space
@@ -149,10 +171,9 @@ onMounted(() => {
         width="trigger"
         display-directive="if"
         to=".n-scrollbar"
-        style="max-width: 100%"
       >
         <template #trigger>
-          <svg-rdkit v-bind="props" style="width: 100%; height: 100%" @click.left.prevent />
+          <svg-rdkit v-bind="props" style="width: 100%; height: 100%"  />
         </template>
         <span style="word-break: break-word">
           {{ props.smiles }}<br />
@@ -162,5 +183,6 @@ onMounted(() => {
       </n-popover>
     </template>
   </n-card>
+</div>
 </template>
 <style></style>

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import {
+  NText,
+  NScrollbar,
   NSpace,
+  NEmpty,
   NSpin,
   NPageHeader,
   NGrid,
@@ -26,17 +29,37 @@ import { CloudSatellite, CopyFile } from "@vicons/carbon";
 import { BrandAppleArcade } from "@vicons/tabler";
 import { useClipboard } from "@vueuse/core";
 import initKetcher from "../components/initKetcher.vue";
-import editableRdkit from "@/components/editableRdkit.vue";
-import { reactive, ref, watch, 
-         computed,
+//import editableRdkit from "@/components/editableRdkit.vue";
+import { reactive, ref, watch, computed,
          defineAsyncComponent } from "vue";
 import type { molData } from "@/components/types";
 import axios from "axios";
-import Grid from "vue-virtual-scroll-grid";
+//import Grid from "vue-virtual-scroll-grid";
 
-const cardRdkit = defineAsyncComponent(() =>
-  import('@/components/cardRdkit.vue')
-)
+const Grid = defineAsyncComponent({
+  loader:() =>import('vue-virtual-scroll-grid'),
+  loadingComponent: NSpin,
+  delay: 2000,//+600*Math.random(),
+  errorComponent: NEmpty,
+  timeout: 3000,
+  suspensible:false
+})
+const cardRdkit = defineAsyncComponent({
+  loader:() =>import('@/components/cardRdkit.vue'),
+  loadingComponent: NSpin,
+  delay: 2000,//+600*Math.random(),
+  errorComponent: NEmpty,
+  timeout: 3000,
+  suspensible:false
+})
+const editableRdkit = defineAsyncComponent({
+  loader:() =>import('@/components/editableRdkit.vue'),
+  loadingComponent: NSpin,
+  delay: 2000,//+600*Math.random(),
+  errorComponent: NEmpty,
+  timeout: 3000,
+  suspensible:false
+})
 
 const resultData:any=ref()
 function enumMol(){
@@ -52,7 +75,7 @@ function enumMol(){
 
 //virtualGrid
 const VLength=computed(() => resultData.value?.data.message.length)
-const VPageSize=ref<number>(4)
+const VPageSize=ref<number>(40)
 const pageProvider:any=(pageNumber:number, pageSize:number)=>(
       new Promise((resolve) => {
         if (resultData.value?.data.message.length<1) {
@@ -418,8 +441,14 @@ watch(
     </n-grid-item>
   </n-grid>
   <n-divider />
-  <n-collapse :default-expanded-names="['1']">
-    <n-collapse-item title="结果输出" display-directive="if" name="1" >
+  <n-collapse :default-expanded-names="['1']" >
+    <n-collapse-item  display-directive="if" name="1" >
+      <template #header>
+        <div style="background-color: #ddffff;padding: 14px;border-left: 6px solid #ccc;border-color: #2196F3; width:100%">
+        结果输出</div>  
+      </template>
+      <div style="padding-left:20px;padding-right:20px">
+      <n-scrollbar style="height:80vh;border: 1px solid #ccc;padding:5px;border-radius: 10px;width:100%;">
       <!-- <n-grid :cols="8" x-gap="8" y-gap="8">
         <n-grid-item v-for="(item, index) in resultData?.data.message" :key="index">
           <card-rdkit :smiles="item" style="width: 95%; height: 95%" />
@@ -428,33 +457,31 @@ watch(
       <Grid :length="VLength" 
             :pageSize="VPageSize" 
             :pageProvider="pageProvider" 
-            :pageProviderDebounceTime="500" 
+            :pageProviderDebounceTime="300" 
             class="grid"
             v-if="resultData?.data.message">
         <template v-slot:probe>
-          <div class="item" >
-            <div width="200" height="200"></div>
+          <div class="item" style="width:100%; padding-top:100%">
           </div>
         </template>
  
         <!-- When the item is not loaded, a placeholder is rendered -->
         <template v-slot:placeholder="{ index, style }">
-          <div class="item" :style="style">
-            <div width="200" height="200" text-align="center">
-              <n-spin size="large" />
-            </div>
+          <div class="item" :style="style" >
+            <n-spin size="large" />
           </div>
         </template>
  
         <!-- Render a loaded item -->
         <template v-slot:default="{ item, style, index }">
           <div class="item" :style="style">
-            <div width="200" height="200">
-              <card-rdkit :smiles="item" />
-            </div>
-          </div>
+              <!-- <div style=" border-style:solid;border-color: brown;border-radius: 5px;">{{item}}</div> -->
+              <card-rdkit :smiles="item"/>
+           </div>
         </template>
-     </Grid>
+      </Grid>
+    </n-scrollbar>
+    </div>
     </n-collapse-item>
   </n-collapse>
 </div>
@@ -501,7 +528,7 @@ watch(
   .grid {
     grid-template-columns: repeat(8, 1fr);
   }
-}
+} 
 @media (min-width: 2530px) {
   .grid {
     grid-template-columns: repeat(10, 1fr);
