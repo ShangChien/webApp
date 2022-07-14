@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  NText,
   NScrollbar,
   NSpace,
   NEmpty,
@@ -75,7 +74,7 @@ function enumMol(){
 
 //virtualGrid
 const VLength=computed(() => resultData.value?.data.message.length)
-const VPageSize=ref<number>(40)
+const VPageSize=ref<number>(20)
 const pageProvider:any=(pageNumber:number, pageSize:number)=>(
       new Promise((resolve) => {
         if (resultData.value?.data.message.length<1) {
@@ -457,7 +456,7 @@ watch(
       <Grid :length="VLength" 
             :pageSize="VPageSize" 
             :pageProvider="pageProvider" 
-            :pageProviderDebounceTime="300" 
+            :pageProviderDebounceTime="500" 
             class="grid"
             v-if="resultData?.data.message">
         <template v-slot:probe>
@@ -529,7 +528,7 @@ watch(
     grid-template-columns: repeat(8, 1fr);
   }
 } 
-@media (min-width: 2530px) {
+@media (min-width: 2200px) {
   .grid {
     grid-template-columns: repeat(10, 1fr);
   }

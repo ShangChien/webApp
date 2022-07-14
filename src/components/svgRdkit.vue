@@ -1,159 +1,96 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch, reactive } from "vue";
+import { ref, onMounted, onUnmounted, nextTick, toRaw,
+  inject, watch, reactive } from "vue";
 import type { molData } from "@/components/types";
+import { useWebWorker } from '@vueuse/core'
 //import initRDKit from "@/components/RDKit";
+//const { data, post, terminate } = useWebWorker('/src/worker/workerRdkit.js')
 
 //const canvas=ref()
-const svg=ref()
 const props = defineProps<molData>();
-const svgitem = reactive<HTMLDivElement | any>({
-  svg: {},
-  rect: {},
-  ellipse: [],
-  path: {
-    hightBonds: [],
-    symble: [],
-    bond: [],
-  },
-});
-const parser = new DOMParser();
-const xmlDoc = ref<Document>();
-function getSvgData(svg: string) {
-  svgitem.svg = {};
-  svgitem.rect = {};
-  svgitem.ellipse = [];
-  svgitem.path = {
-    hightBonds: [],
-    symble: [],
-    bond: [],
-  };
-  xmlDoc.value = parser.parseFromString(svg, "text/xml");
-  //获取svgRoot内容
-  let svgRoot = xmlDoc.value.getElementsByTagName("svg")[0];
-  for (var attrs of [
-    "xmlns",
-    "xmlns:rdkit",
-    "xmlns:xlink",
-    "version",
-    "baseProfile",
-    "xml:space",
-    "width",
-    "height",
-    "viewBox",
-  ]) {
-    svgitem.svg[attrs] = svgRoot.getAttribute(attrs);
-  }
-  //获取svgRect内容
-  let svgRect = xmlDoc.value.getElementsByTagName("rect")[0];
-  for (let attrs of ["style", "width", "height", "x", "y"]) {
-    svgitem.rect[attrs] = svgRect.getAttribute(attrs);
-  }
-  //获取svgEllipse内容（高亮无符号的原子）
-  let svgEllipse: any = xmlDoc.value.getElementsByTagName("ellipse");
-  for (var item of svgEllipse) {
-    svgitem.ellipse.push({ ellipse: {} });
-    for (let attrs of ["cx", "cy", "rx", "ry", "class"]) {
-      svgitem.ellipse[svgitem.ellipse.length - 1].ellipse[attrs] =
-        item.getAttribute(attrs);
-    }
-    svgitem.ellipse[svgitem.ellipse.length - 1].ellipse["style"] =
-      item.getAttribute("style"); //.concat(';opacity: 0.6')
-  }
-  //获取svgPath内容
-  let svgPath: any = xmlDoc.value.getElementsByTagName("path");
-  for (let item of svgPath) {
-    //字符匹配
-    if (item.getAttribute("style") == null) {
-      svgitem.path.symble.push({ path: {} });
-      for (let attrs of ["class", "d", "fill"]) {
-        svgitem.path.symble[svgitem.path.symble.length - 1].path[attrs] =
-          item.getAttribute(attrs);
-      }
-      //化学键匹配
-    } else if (
-      item.getAttribute("style")?.split(";")[3] == "stroke-width:1.0px"
-    ) {
-      svgitem.path.bond.push({ path: {} });
-      for (let attrs of ["class", "d", "style"]) {
-        svgitem.path.bond[svgitem.path.bond.length - 1].path[attrs] =
-          item.getAttribute(attrs);
-      }
-      //高亮化学键
-    } else {
-      svgitem.path.hightBonds.push({ path: {} });
-      for (let attrs of ["class", "d", "style"]) {
-        svgitem.path.hightBonds[svgitem.path.hightBonds.length - 1].path[
-          attrs
-        ] = item.getAttribute(attrs);
-      }
-      svgitem.path.hightBonds[svgitem.path.hightBonds.length - 1].path[
-        "style"
-      ] = item.getAttribute("style"); //.concat(';opacity: 0.2')
-    }
-  }
-}
+//const rdkit:any = toRaw(inject('rdkit'))
+const svg=ref()
 
-async function renderMol(props: molData) {
-  window.RDKit.prefer_coordgen(true);
-  let mol = window.RDKit.get_mol(props.smiles ?? "");
-  let qmol = window.RDKit.get_qmol(props.qsmiles ?? "");
-  //let mDetail = JSON.parse(mol.get_substruct_match(qmol))
-  let mdetailsRaw = mol.get_substruct_matches(qmol);
-  let mDetail = mdetailsRaw.length > 2 ? JSON.parse(mdetailsRaw) : [];
-  mDetail = mDetail.reduce(
-    (acc: any, { atoms, bonds }: any) => ({
-      atoms: [...acc.atoms, ...atoms],
-      bonds: [...acc.bonds, ...bonds],
-    }),
-    { bonds: [], atoms: [] }
-  );
-  mDetail["atoms"] = mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms;
-  mDetail["bonds"] = mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds;
-  mDetail["addAtomIndices"] = props.addAtomIndices;
-  mDetail["addBondIndices"] = props.addBondIndices;
-  mDetail["lenged"] = props.legend;
-  mDetail["width"] = props.width ?? 200;
-  mDetail["height"] = props.height ?? 200;
-  mDetail["highlightColour"] =
-    props.highlightColor ?? [208, 78, 214].map((i) => i / 255);
-  mDetail["bondLineWidth"] = props.bondLineWidth ?? 1;
-  mDetail["highlightBondWidthMultiplier"] =
-    props.highlightBondWidthMultiplier ?? 15;
-  mDetail["highlightRadius"] = props.highlightRadius ?? 0.25;
-  mDetail["minFontSize"] = props.minFontSize ?? 10;
-  mDetail["explicitMethyl"] = props.explicitMethyl ?? false;
-  mDetail = JSON.stringify(mDetail);
-  svg.value.innerHTML =mol.get_svg_with_highlights(mDetail);
-  //draw canvas
-  //mol.draw_to_canvas_with_highlights(canvas.value, mDetail);
-  
-  //getSvgData(svgMol);
-  qmol.delete();
-  mol.delete();
-  //return Promise.resolve({mol,mDetail})
-  //console.log(bondMap.value)
-  //console.log(svgitem)
-  //rdkitdiv.value.innerHTML=svg
-}
-
-  
+// function renderMol(props:any){
+//   rdkit.prefer_coordgen(true);
+//   let mol = rdkit.get_mol(props.smiles ?? "");
+//   let qmol = rdkit.get_qmol(props.qsmiles ?? "");
+//   //let mDetail = JSON.parse(mol.get_substruct_match(qmol))
+//   let mdetailsRaw = mol.get_substruct_matches(qmol);
+//   let mDetail = mdetailsRaw.length > 2 ? JSON.parse(mdetailsRaw) : [];
+//   mDetail = mDetail.reduce(
+//     (acc: any, { atoms, bonds }: any) => ({
+//       atoms: [...acc.atoms, ...atoms],
+//       bonds: [...acc.bonds, ...bonds],
+//     }),
+//     { bonds: [], atoms: [] }
+//   );
+//   mDetail["atoms"] = mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms;
+//   mDetail["bonds"] = mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds;
+//   mDetail["addAtomIndices"] = props.addAtomIndices;
+//   mDetail["addBondIndices"] = props.addBondIndices;
+//   mDetail["lenged"] = props.legend;
+//   mDetail["width"] = props.width ?? 200;
+//   mDetail["height"] = props.height ?? 200;
+//   mDetail["highlightColour"] =
+//     props.highlightColor ?? [208, 78, 214].map((i) => i / 255);
+//   mDetail["bondLineWidth"] = props.bondLineWidth ?? 1;
+//   mDetail["highlightBondWidthMultiplier"] =
+//     props.highlightBondWidthMultiplier ?? 15;
+//   mDetail["highlightRadius"] = props.highlightRadius ?? 0.25;
+//   mDetail["minFontSize"] = props.minFontSize ?? 10;
+//   mDetail["explicitMethyl"] = props.explicitMethyl ?? false;
+//   mDetail = JSON.stringify(mDetail);
+//   let out = mol.get_svg_with_highlights(mDetail);
+//   //draw canvas
+//   //mol.draw_to_canvas_with_highlights(canvas.value, mDetail);
+//   qmol.delete();
+//   mol.delete();
+//   return out
+// }
+const myWorker = new SharedWorker('/src/worker/shareWorker.js')
 onMounted(async () => {
-  
-  await Promise.resolve().then(()=>{
-    setTimeout(() => {
-      renderMol(props)
-    ,0})
-  })
-  // await nextTick(()=>{
+  const propsData:any = toRaw(props)
+  propsData.atoms = toRaw(props.atoms)
+  propsData.bonds = toRaw(props.bonds)
+  myWorker.port.postMessage(propsData);
+  myWorker.port.onmessage = async function(e) {
+    await nextTick(()=>{
+      requestAnimationFrame(() => {
+        svg.value.innerHTML=e.data;
+      })
+    })  
+  }
+  //post(propsData)
+  //await nextTick()
+   // await Promise.resolve().then(()=>{
   //   setTimeout(() => {
   //     renderMol(props)
-  //   ,0})
+  //   },0)
   // })
 });
 
-watch(props, (newVal) => {
-  renderMol(newVal);
-});
+// watch(props, (newVal) => {
+//   let dataNew = toRaw(newVal)
+//   svg.value.innerHTML=renderMol(dataNew);
+// });
+// watch(
+//   data,
+//   async (dataNew) => {
+//     terminate()
+//     await nextTick(()=>{
+//       requestAnimationFrame(() => {
+//         svg.value.innerHTML=dataNew;
+//       })
+//     })
+    
+//   }
+// )
+
+
+// onUnmounted(()=>{
+//   terminate()
+// })
 </script>
 
 <template >
