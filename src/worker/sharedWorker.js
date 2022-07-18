@@ -1,14 +1,16 @@
 // import rdkit into the worker, and export the renderMol function
 importScripts("./RDKit_minimal.js")
+//initialize the rdkit
+//initRDKitModule().then(res=>{
+//	self.rdkit = res	
+//  self.rdkit.prefer_coordgen(true);
+//}).catch(err=>{
+//	console.log(err)
+//})
 
-initRDKitModule().then(res=>{
-		self.rdkit = res	
-	}).catch(err=>{
-		console.log(err)
-	})
-
+let i = 0 //counter for the number of times the worker is connected
+let out = null //the output(svg image) of the renderMol function
 function renderMol(props){
-  self.rdkit.prefer_coordgen(true);
   let mol = self.rdkit.get_mol(props.smiles ?? "");
   let qmol = self.rdkit.get_qmol(props.qsmiles ?? "");
   let mdetailsRaw = mol.get_substruct_matches(qmol);
@@ -36,37 +38,35 @@ function renderMol(props){
   mDetail["minFontSize"] = props.minFontSize ?? 10;
   mDetail["explicitMethyl"] = props.explicitMethyl ?? false;
   mDetail = JSON.stringify(mDetail);
-  let out = mol.get_svg_with_highlights(mDetail);
-  qmol.delete();
-  mol.delete();
+  out = mol.get_svg_with_highlights(mDetail);
+  mDetail=null;
+  mdetailsRaw=null;
+  qmol=null ;
+  mol=null;
   return out
 }
 
-onconnect = function(e) {
+self.onconnect = function(e) {
   var port = e.ports[0];
+  console.log("the ",i++,"th time connected")
+  initRDKitModule().then(res=>{
+  	self.rdkit = res	
+    self.rdkit.prefer_coordgen(true);
+  }).catch(err=>{
+  	console.log(err)
+  })
   port.onmessage = function(e) {
-		console.log("onmessage")
-    let out = renderMol(e.data)
+    out = renderMol(JSON.parse(e.data))
     port.postMessage(out);
-		console.log("postMessage")
+		out=null;
+  }
+  port.onmessageerror = function(e) {
+    console.log("error", e);
   }
 }
-// onmessage = function (e) {
-//   initRDKitModule()
-// 	.then(res=>{
-// 		self.rdkit = res
-//     let out = renderMol(e.data)
-//     //console.log(out)
-//     postMessage(out)
-//     self.rdkit=null
-//     self.close()
-// 	})
-// 	.catch(err=>{
-// 		console.log(err)
-//     self.rdkit=null
-//     self.close()
-// 	})
-// }
+self.onerror = function(e) {
+  console.log("error", e);
+}
 
 
 

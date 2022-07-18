@@ -456,7 +456,7 @@ watch(
       <Grid :length="VLength" 
             :pageSize="VPageSize" 
             :pageProvider="pageProvider" 
-            :pageProviderDebounceTime="500" 
+            :pageProviderDebounceTime="1000" 
             class="grid"
             v-if="resultData?.data.message">
         <template v-slot:probe>
@@ -464,18 +464,16 @@ watch(
           </div>
         </template>
  
-        <!-- When the item is not loaded, a placeholder is rendered -->
+        
         <template v-slot:placeholder="{ index, style }">
           <div class="item" :style="style" >
-            <n-spin size="large" />
+            loanding...
           </div>
         </template>
  
-        <!-- Render a loaded item -->
         <template v-slot:default="{ item, style, index }">
           <div class="item" :style="style">
-              <!-- <div style=" border-style:solid;border-color: brown;border-radius: 5px;">{{item}}</div> -->
-              <card-rdkit :smiles="item"/>
+             <card-rdkit :smiles="item" />
            </div>
         </template>
       </Grid>

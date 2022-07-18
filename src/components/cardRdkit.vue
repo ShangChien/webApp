@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, h, reactive } from "vue";
+import { ref, h, reactive,onUnmounted } from "vue";
 import type { Component } from "vue";
 import type { molData } from "@/components/types";
 import svgRdkit from "@/components/svgRdkit.vue";
@@ -15,7 +15,7 @@ import {
   NPopover,
   NModal,
 } from "naive-ui";
-import { useClipboard } from "@vueuse/core";
+import { useClipboard,useMouseInElement } from "@vueuse/core";
 import { Dots } from "@vicons/tabler";
 import { Edit, Delete, CopyFile } from "@vicons/carbon";
 import { defineAsyncComponent } from 'vue'
@@ -31,22 +31,17 @@ const editableRdkit = defineAsyncComponent({
 
 const emit = defineEmits(["itemChecked", "itEditSave", "itemDeleted"]);
 const props = defineProps<molData>();
-//可视加载
-// const target = ref(null)
-// const targetIsVisible = ref(false)
-// const { stop } = useIntersectionObserver(
-//       target,
-//       ([{ isIntersecting }]) => {
-//         targetIsVisible.value = isIntersecting
-//       },
-//     )
+//可视加载组件
+const checked = ref(false);
+const cardView=ref()
+const { isOutside }=useMouseInElement(cardView)
+const target = ref(null)
 
 //handle Modal
 const showModal = ref(false);
 function onNegativeClick() {
   showModal.value = false;
 }
-const showOptions = ref(false);
 
 function onPositiveClick() {
   emit("itEditSave", initSmile);
@@ -91,32 +86,23 @@ function handleDropOption(key: string) {
     //
   }
 }
+onUnmounted(()=>{
+  target.value=null
 
-const checked = ref(false);
-function visible() {
-  if (checked.value == true) {
-    showOptions.value = true;
-  } else {
-    showOptions.value = !showOptions.value;
-  }
-}
+})
 
-// onMounted(() => {
-//   console.log(props);
-// });
 </script>
 <template>
 <div ref="target" style="width:100%;height:100%" >
   <!-- v-if="targetIsVisible" -->
   <n-card 
     hoverable
-    @mouseenter="visible"
-    @mouseleave="visible"
+    ref="cardView"
   >
     <template #cover>
       <n-space
         justify="space-between"
-        v-show="showOptions"
+        v-if="!isOutside||checked"
         style="
           padding-left: 3%;
           padding-top: 2%;
@@ -140,7 +126,10 @@ function visible() {
               </template>
             </n-button>
           </n-dropdown>
-          <n-modal v-model:show="showModal" :mask-closable="false">
+          
+        </div>
+      </n-space>
+      <n-modal v-model:show="showModal" :mask-closable="false">
             <n-card
               style="width: 900px; height: 800px"
               title="位点重新选取"
@@ -163,8 +152,6 @@ function visible() {
               </template>
             </n-card>
           </n-modal>
-        </div>
-      </n-space>
       <n-popover
         trigger="hover"
         placement="right"
@@ -173,7 +160,9 @@ function visible() {
         to=".n-scrollbar"
       >
         <template #trigger>
-          <svg-rdkit v-bind="props" style="width: 100%; height: 100%"  />
+          <div  style="width: 100%; height: 100%">
+            <svg-rdkit  v-bind="props"  />
+          </div> 
         </template>
         <span style="word-break: break-word">
           {{ props.smiles }}<br />

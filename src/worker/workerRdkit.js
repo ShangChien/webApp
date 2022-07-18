@@ -40,10 +40,9 @@ onmessage = function (e) {
   initRDKitModule()
 	.then(res=>{
 		self.rdkit = res
-		console.log("RDKit version: " + rdkit.version())
     let out = renderMol(e.data)
     //console.log(out)
-    postMessage(out)
+    sendMessage(out)
     self.rdkit=null
     self.close()
 	})

@@ -2,8 +2,8 @@
 import { reactive, ref } from "vue";
 import type { molData } from "@/components/types";
 import rdkitSub from "@/components/rdkitSub.vue";
-import cardRdkit from "@/components/svgRdkit.vue";
-import { NSpace, NButton } from "naive-ui";
+import cardRdkit from "@/components/cardRdkit.vue";
+import { NSpace, NButton,NCollapse,NCollapseItem } from "naive-ui";
 
 const mol1: molData = reactive({
   smiles: "CC(=O)Oc1ccccc1C(=O)O",
@@ -19,7 +19,7 @@ const mol2: molData = reactive({
   qsmiles: "CS.c1ccccc1.c1ccccc1",
   width: 400,
   height: 400,
-  highlightColor: [0.624, 0.675, 0.2],
+  //highlightColor: [0.624, 0.675, 0.2],
   addAtomIndices: true,
   addBondIndices: true,
 });
@@ -28,8 +28,8 @@ const mol3: molData = reactive({
   smiles:
     "CC(C)(C)C(C=C1)=CC2=C1SC3=C2N(C4=CC(C5=CC=C(C(C)(C)C)C=C5)=CC6=C4B3C7=C8N6C9=C(C=CC=C9)C8=CC%10=C7C=CC=C%10)C%11=CC=C(C(C)(C)C)C=C%11",
   qsmiles: "[B].c1ccccc1",
-  width: 400,
-  height: 400,
+  width: 200,
+  height: 200,
   addAtomIndices: true,
   addBondIndices: true,
   highlightColor: [0.24, 0.675, 0.8],
@@ -41,7 +41,7 @@ const mol4: molData = reactive({
   height: 200,
   addBondIndices: true,
   addAtomIndices: true,
-  highlightColor: [0.94, 0.475, 0.8],
+  //highlightColor: [0.94, 0.475, 0.8],
 });
 const colorNum = ref<number>(0);
 
@@ -65,12 +65,19 @@ const show=ref<boolean>(true)
 </script>
 
 <template>
-<div>
+<div style="position:relative">
   <NButton @click="change"> 切换颜色 </NButton>
   <NButton @click="show=!show"> show </NButton>
+   <n-collapse :default-expanded-names="['1']" >
+    <n-collapse-item  display-directive="if" name="1" >
+    <div style="padding-left:20px;padding-right:20px">
+      <card-rdkit v-bind="mol3"  style="width:20%" ></card-rdkit>
+    </div>
+    </n-collapse-item>
+  </n-collapse>
   <n-space v-if="show">
   <n-space>
-    <card-rdkit v-bind="mol3"></card-rdkit>
+ 
     <rdkit-sub v-bind="mol4"></rdkit-sub>
   </n-space>
   <n-space>
@@ -78,5 +85,6 @@ const show=ref<boolean>(true)
     <rdkit-sub v-bind="mol1"></rdkit-sub>
   </n-space>
   </n-space>
+  
 </div>
 </template>
