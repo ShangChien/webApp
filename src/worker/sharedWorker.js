@@ -1,12 +1,12 @@
 // import rdkit into the worker, and export the renderMol function
 importScripts("./RDKit_minimal.js")
 //initialize the rdkit
-//initRDKitModule().then(res=>{
-//	self.rdkit = res	
-//  self.rdkit.prefer_coordgen(true);
-//}).catch(err=>{
-//	console.log(err)
-//})
+initRDKitModule().then(res=>{
+	self.rdkit = res	
+  self.rdkit.prefer_coordgen(true);
+}).catch(err=>{
+	console.log(err)
+})
 
 let i = 0 //counter for the number of times the worker is connected
 let out = null //the output(svg image) of the renderMol function
@@ -39,22 +39,19 @@ function renderMol(props){
   mDetail["explicitMethyl"] = props.explicitMethyl ?? false;
   mDetail = JSON.stringify(mDetail);
   out = mol.get_svg_with_highlights(mDetail);
-  mDetail=null;
-  mdetailsRaw=null;
-  qmol=null ;
-  mol=null;
+  mDetail = null;
+  mdetailsRaw = null;
+  qmol.delete();
+  qmol = null;
+  mol.delete();
+  mol = null;
+  console.log(mol)
   return out
 }
 
 self.onconnect = function(e) {
   var port = e.ports[0];
   console.log("the ",i++,"th time connected")
-  initRDKitModule().then(res=>{
-  	self.rdkit = res	
-    self.rdkit.prefer_coordgen(true);
-  }).catch(err=>{
-  	console.log(err)
-  })
   port.onmessage = function(e) {
     out = renderMol(JSON.parse(e.data))
     port.postMessage(out);
