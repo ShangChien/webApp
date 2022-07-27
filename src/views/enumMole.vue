@@ -44,7 +44,7 @@ const Grid = defineAsyncComponent({
   suspensible:false
 })
 const cardRdkit = defineAsyncComponent({
-  loader:() =>import('@/components/cardRdkit.vue'),
+  loader:() =>import('@/components/rdkitComponent/cardRdkit.vue'),
   loadingComponent: NSpin,
   delay: 2000,//+600*Math.random(),
   errorComponent: NEmpty,
@@ -52,7 +52,7 @@ const cardRdkit = defineAsyncComponent({
   suspensible:false
 })
 const editableRdkit = defineAsyncComponent({
-  loader:() =>import('@/components/editableRdkit.vue'),
+  loader:() =>import('@/components/rdkitComponent/editableRdkit.vue'),
   loadingComponent: NSpin,
   delay: 2000,//+600*Math.random(),
   errorComponent: NEmpty,
@@ -199,11 +199,12 @@ function addLigand() {
   }
   console.log(mol4enum.ligand);
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 function itemEdit(mol: any, index: number, molObjList: any[]) {
   molObjList[index].smiles = mol.smiles;
   molObjList[index].atoms = mol.atoms;
   molObjList[index].bonds = mol.bonds;
+  console.log('enum accept edit', mol)
 }
 
 watch(

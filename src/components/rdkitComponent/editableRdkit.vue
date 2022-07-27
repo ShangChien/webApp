@@ -1,8 +1,7 @@
-/* eslint-disable vue/require-v-for-key */
 <script setup lang="ts">
-import { ref, onMounted, watch, reactive, onUpdated } from "vue";
+import { ref, onMounted, watch, reactive, onUpdated,inject } from "vue";
 import type { molData } from "@/components/types";
-import initRDKit from "@/components/RDKit";
+const rdkit:any = inject("rdkit");
 const props = defineProps<molData>();
 const emit = defineEmits(["update-mol"]);
 const highlightMap: molData = reactive({
@@ -99,9 +98,8 @@ function getSvgData(svg: string) {
 }
 
 function renderMol(props: molData) {
-  window.RDKit.prefer_coordgen(true);
-  let mol = window.RDKit.get_mol(props.smiles ?? "");
-  let qmol = window.RDKit.get_qmol(props.qsmiles ?? "");
+  let mol = rdkit.get_mol(props.smiles ?? "");
+  let qmol = rdkit.get_qmol(props.qsmiles ?? "");
   //let mDetail = JSON.parse(mol.get_substruct_match(qmol))
   let mdetailsRaw = mol.get_substruct_matches(qmol);
   let mDetail = mdetailsRaw.length > 2 ? JSON.parse(mdetailsRaw) : [];
@@ -116,7 +114,6 @@ function renderMol(props: molData) {
   mDetail["bonds"] = mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds;
   mDetail["addAtomIndices"] = props.addAtomIndices;
   mDetail["addBondIndices"] = props.addBondIndices;
-  mDetail["lenged"] = props.legend;
   mDetail["width"] = props.width ?? 200;
   mDetail["height"] = props.height ?? 200;
   mDetail["highlightColour"] = props.highlightColor ?? [0.624, 0.675, 0.902];
@@ -125,7 +122,6 @@ function renderMol(props: molData) {
     props.highlightBondWidthMultiplier ?? 20;
   mDetail["highlightRadius"] = props.highlightRadius ?? 0.25;
   mDetail["minFontSize"] = props.minFontSize ?? 10;
-  mDetail["explicitMethyl"] = props.explicitMethyl ?? false;
   //console.log(mDetail)
   mDetail = JSON.stringify(mDetail);
   let svg = mol.get_svg_with_highlights(mDetail);
@@ -229,9 +225,7 @@ function initHighlightSvg() {
 }
 
 onMounted(async () => {
-  await initRDKit.then((res) => {
-    window.RDKit = res;
-  });
+  rdkit.prefer_coordgen(true);
   renderMol(props);
   //console.log("onmounted",props)
   //initHighlightSvg()

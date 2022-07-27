@@ -1,19 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted,inject,nextTick } from "vue";
+import { ref, onMounted, onUnmounted,watch } from "vue";
 import type { molData } from "@/components/types";
 
 const props = defineProps<molData>();
-let timeFn = ref()
 const svg = ref()
 
 let myWorker = new SharedWorker('/src/worker/sharedWorker.js')
 
 //const myWorker:any = inject('myWorker')
-myWorker.port.onmessage= async (e:any)=>{
+myWorker.port.onmessage = (e:any)=>{
   //await nextTick()
   svg.value.innerHTML = e.data; 
-  console.log(props.smiles,myWorker)
-  myWorker.port.close()
 }
 myWorker.port.onmessageerror = (e:any)=>{
   console.log(e)
@@ -22,29 +19,14 @@ myWorker.onerror = (e:any)=>{
   console.log(e)
 }
 onMounted(() => {
-  console.log(props.smiles,myWorker)
   myWorker.port.postMessage(JSON.stringify(props))
 })
 
-// watch(props, (newVal) => {
-//   let dataNew = toRaw(newVal)
-//   svg.value.innerHTML=renderMol(dataNew);
-// });
-// watch(
-//   data,
-//   async (dataNew) => {
-//     terminate()
-//     await nextTick(()=>{
-//       requestAnimationFrame(() => {
-//         svg.value.innerHTML=dataNew;
-//       })
-//     })
-    
-//   }
-// )
+watch(props, (newVal) => {
+  myWorker.port.postMessage(JSON.stringify(newVal))
+})
 
 onUnmounted(()=>{
-  clearTimeout(timeFn.value)
   myWorker.port.close()
 })
 </script>

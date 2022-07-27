@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 import type { molData } from "@/components/types";
-import rdkitSub from "@/components/rdkitSub.vue";
-import cardRdkit from "@/components/cardRdkit.vue";
+import rdkitSub from "@/components/rdkitComponent/rdkitSub.vue";
+import cardRdkit from "@/components/rdkitComponent/cardRdkit.vue";
 import { NSpace, NButton,NCollapse,NCollapseItem } from "naive-ui";
 
 const mol1: molData = reactive({

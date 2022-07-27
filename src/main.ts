@@ -3,7 +3,7 @@ import { createPinia } from "pinia";
 import "uno.css";
 import App from "./App.vue";
 import router from "./router";
-import initRDKit from "@/components/RDKit";
+import initRDKit from "@/components/rdkitComponent/RDKit";
 const myWorker = new SharedWorker('/src/worker/sharedWorker.js')
 myWorker.port.postMessage(null);
 const app = createApp(App);

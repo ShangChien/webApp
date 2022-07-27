@@ -52,8 +52,14 @@ const menuOptions: MenuOption[] = [
   },
   {
     label: () =>
-      h(RouterLink,{ to: { name: "enumMole" } },{ default: () => "Enum Molecule" }),
+      h(RouterLink, { to: { name: "enumMole" } },{ default: () => "Enum Molecule" }),
     key: "view-workSpcae",
+    icon: renderIcon(BrandSlack),
+  },
+  {
+    label: () =>
+      h(RouterLink, { to: { name: "enum" } },{ default: () => "Enum" }),
+    key: "view-enum",
     icon: renderIcon(BrandSlack),
   },
 ];
@@ -62,7 +68,7 @@ const menuOptions: MenuOption[] = [
 <template>
   <n-layout bordered position="absolute" style="height: 100vh" :native-scrollbar="false">
     <n-layout-header style="height: 60px; padding: 2px" bordered>
-      <img class="logo" src="/favicon.svg" width="55" />
+      <img class="logo" src="/favicon.ico" width="55" />
       <reload-prompt/>
     </n-layout-header>
     <n-layout has-sider position="absolute" style="top: 60px; bottom: 20px" bordered>
@@ -89,7 +95,7 @@ const menuOptions: MenuOption[] = [
           <router-view v-slot="{ Component,route }">
           <Transition name='fade' mode="out-in">
             <keep-alive>
-              <component :is="Component" />
+              <Component :is="Component" />
             </keep-alive>
           </Transition>
           </router-view>
@@ -97,9 +103,9 @@ const menuOptions: MenuOption[] = [
       </n-layout>
     </n-layout>
     <n-layout-footer
-        bordered
-        position="absolute"
-        style="height: 20px; padding: 2px" />
+      bordered
+      position="absolute"
+      style="height: 20px; padding: 2px" />
   </n-layout>
 </template>
 

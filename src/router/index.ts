@@ -37,6 +37,11 @@ const router = createRouter({
       name: "enumMole",
       component: () => import("../views/enumMole.vue"),
     },
+    {
+      path: "/enum",
+      name: "enum",
+      component: () => import("../views/enum.vue"),
+    },
   ],
 });
 

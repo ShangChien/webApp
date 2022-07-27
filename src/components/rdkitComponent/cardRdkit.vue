@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, h, reactive,onUnmounted } from "vue";
+import { ref, h, reactive,onMounted } from "vue";
 import type { Component } from "vue";
 import type { molData } from "@/components/types";
-import svgRdkit from "@/components/svgRdkit.vue";
+import svgRdkit from "@/components/rdkitComponent/svgRdkit.vue";
 import {
   NCard,
   NSpin,
@@ -21,7 +21,7 @@ import { Edit, Delete, CopyFile } from "@vicons/carbon";
 import { defineAsyncComponent } from 'vue'
 //异步加载mol编辑组件
 const editableRdkit = defineAsyncComponent({
-  loader:() =>import('@/components/editableRdkit.vue'),
+  loader:() =>import('@/components/rdkitComponent/editableRdkit.vue'),
   loadingComponent: NSpin,
   delay: 2000,//+600*Math.random(),
   errorComponent: NEmpty,
@@ -56,7 +56,7 @@ function acceptMol(mol: molData) {
   initSmile.smiles = mol.smiles;
   initSmile.atoms = mol.atoms;
   initSmile.bonds = mol.bonds;
-  console.log(initSmile);
+  console.log(initSmile,"cardRdkit.vue acceptMol");
 }
 
 const { copy } = useClipboard();
@@ -86,11 +86,9 @@ function handleDropOption(key: string) {
     //
   }
 }
-onUnmounted(()=>{
-  target.value=null
-
-})
-
+onMounted(() => {
+  console.log(props);
+});
 </script>
 <template>
 <div ref="target" style="width:100%;height:100%" >
@@ -129,29 +127,26 @@ onUnmounted(()=>{
           
         </div>
       </n-space>
-      <n-modal v-model:show="showModal" :mask-closable="false">
-            <n-card
-              style="width: 900px; height: 800px"
-              title="位点重新选取"
-              :bordered="false"
-              size="huge"
-              role="dialog"
-              aria-modal="true"
-            >
-              <editable-rdkit
-                v-bind="props"
-                qsmiles="*~*"
-                @update-mol="acceptMol"
-                style="width: 70%"
-              />
-              <template #footer>
-                <n-space>
-                  <n-button @Click="onNegativeClick">取消</n-button>
-                  <n-button @Click="onPositiveClick">确定</n-button>
-                </n-space>
-              </template>
-            </n-card>
-          </n-modal>
+        <n-modal v-model:show="showModal" :mask-closable="false">
+          <n-card style="width: 900px; height: 800px"
+                  title="位点重新选取"
+                  :bordered="false"
+                  size="huge"
+                  role="dialog"
+                  aria-modal="true" >
+            <editable-rdkit
+              v-bind="props"
+              qsmiles="*~*"
+              @update-mol="acceptMol"
+              style="width: 70%" />
+            <template #footer>
+              <n-space>
+                <n-button @Click="onNegativeClick">取消</n-button>
+                <n-button @Click="onPositiveClick">确定</n-button>
+              </n-space>
+            </template>
+          </n-card>
+        </n-modal>
       <n-popover
         trigger="hover"
         placement="right"
@@ -160,8 +155,8 @@ onUnmounted(()=>{
         to=".n-scrollbar"
       >
         <template #trigger>
-          <div  style="width: 100%; height: 100%">
-            <svg-rdkit  v-bind="props"  />
+          <div style="width: 100%; height: 100%">
+            <svg-rdkit  v-bind="props" />
           </div> 
         </template>
         <span style="word-break: break-word">

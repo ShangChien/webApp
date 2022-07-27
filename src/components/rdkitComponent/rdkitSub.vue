@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import type { molData } from "@/components/types";
-import initRDKit from "@/components/RDKit";
+import initRDKit from "@/components/rdkitComponent/RDKit";
 const props = defineProps<molData>();
 const rdkitdiv = ref<HTMLDivElement | any>();
 
