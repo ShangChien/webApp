@@ -13,32 +13,34 @@ const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
 <template>
 <div>
 <n-page-header subtitle="分子结构枚举，子结构筛选 ( beta 1.0 )">
-    <n-divider />
-    <template #title>
-      <a style="text-decoration: none; color: inherit">分子生成器</a>
-    </template>
-    <template #avatar>
-      <n-avatar
-        color=" white"
-        src="/favicon.svg"
-      />
-    </template>
-    <template #extra>
-      <n-space>
-        <n-switch v-model:value="showInputBoard" >
-          <template #checked>
-            已显示画板
-          </template>
-          <template #unchecked>
-            已隐藏画板
-          </template>
-        </n-switch>
-        <n-dropdown :options="options" placement="bottom-start">
-          <n-button text>· · ·</n-button>
-        </n-dropdown>
-      </n-space>
-    </template>
-  </n-page-header>
+  <n-divider />
+  <template #title>
+    <a style="text-decoration: none; color: inherit">分子生成器</a>
+  </template>
+  <template #avatar>
+    <n-avatar
+      color=" white"
+      src="/favicon.svg"
+    />
+  </template>
+  <template #extra>
+    <n-space>
+      <n-switch v-model:value="showInputBoard" >
+        <template #checked>
+          已显示画板
+        </template>
+        <template #unchecked>
+          已隐藏画板
+        </template>
+      </n-switch>
+      <n-dropdown :options="options" placement="bottom-start">
+        <n-button text>· · ·</n-button>
+      </n-dropdown>
+    </n-space>
+  </template>
+  <site-selcet v-show="showInputBoard" />
+</n-page-header>
+
 <n-card embedded>
   <n-steps v-model:current="currentRef">
     <n-step title="配体" description="标记配体位点和分类" />
@@ -51,12 +53,12 @@ const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
       back
     </n-button>
 		<n-button @click="currentRef++" :disabled="currentRef===4" type="info">
-      {{currentRef===0?'initialze':'next'}}
+      {{currentRef === 0 ? 'initialze' : 'next'}}
     </n-button>
 	</n-space>
 </n-card>
 <div v-if="currentRef === 1" style="padding-top:10px;">
-  <site-selcet v-show="showInputBoard"  ></site-selcet >
+  
 </div>
 <div v-else-if="currentRef === 2">
   主核
@@ -68,7 +70,7 @@ const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
   结果页
 </div>
 <div v-else>
-  <n-thing>
+<n-thing>
   <n-grid :cols="5" >
     <n-grid-item>
       <n-statistic label="主核" value="125 个" />

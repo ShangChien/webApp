@@ -8,7 +8,6 @@ import {
   NInput,
   NModal,
   NCard,
-  NEllipsis,
   NScrollbar,
 } from "naive-ui";
 import { 
@@ -25,15 +24,16 @@ import initKetcher from "@/components/initKetcher.vue";
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
 import { reactive, ref } from "vue";
 import type { molData } from "@/components/types";
-import { useDraggable } from '@vueuse/core'
+import { useDraggable,useElementSize } from '@vueuse/core'
 
 const el1 = ref<HTMLElement | null>(null)
-
+const controlPin=ref<HTMLElement | null>(null)
 const { x, y, style } = useDraggable(el1, {
-  initialValue: { x: 300, y: 330 },
+  initialValue: { x: 74, y: 9 },
 })
+const { width } = useElementSize(controlPin)
 
-const mini=ref(false)
+const mini=ref(true)
 const openBox=ref(true)
 
 const initMol: molData = reactive({
@@ -67,13 +67,14 @@ const { copy } = useClipboard();
 </script>
 
 <template>
-<div style="width: 100%;z-index:30;" v-if="openBox">
-  <div  ref="el1" style="position: fixed;z-index:1;width:100%" :style="style">
-    <n-button  
-      v-if="!mini"
-      size="tiny" color="#FFA48D" circle>
-      <n-icon><move /></n-icon>
-    </n-button>
+<div style="width:100%;z-index:1;position: fixed" v-if="openBox">
+  <div ref="el1" style="position: fixed;z-index:1" :style="style">
+    <div v-if="!mini" :style="{'width':width*0.8+'px'}">
+      <n-button
+        size="tiny" color="#FFA48D" circle>
+        <n-icon><move /></n-icon>
+      </n-button>
+    </div>
     <n-button v-else
               class="simplify" 
               style="position: fixed;"
@@ -89,22 +90,20 @@ const { copy } = useClipboard();
       </template>
     </n-button>
   </div>
-  
   <div v-show="!mini" 
        class="entireBox" 
        :style="{left:x-60+'px',top:y-5+'px'}" 
-       style="position:fixed;">
-       
-    <div style="padding-bottom:5px;z-index:13">
-      <n-button style="margin-left:0px;margin-right:5px;z-index:13" @click="mini=!mini" size="tiny" color="#7CBD99" circle>
+       style="position:fixed;"> 
+    <div ref="controlPin" style="padding-bottom:5px;z-index:1">
+      <n-button style="margin-left:0px;margin-right:5px;z-index:1" @click="mini=!mini" size="tiny" color="#7CBD99" circle>
         <n-icon><minimize /></n-icon>
       </n-button>
-      <n-button styel="z-index:13" @click="openBox=false" size="tiny" color="#F39BBA" circle>
+      <n-button style="z-index:1" @click="openBox=false" size="tiny" color="#F39BBA" circle>
         <n-icon ><close /></n-icon>
       </n-button>
     </div>
     <n-scrollbar :x-scrollable="true" style="resize:both">
-    <n-thing   >
+    <n-thing >
       <template #description>
         <n-input-group >
           <n-input
@@ -189,9 +188,7 @@ const { copy } = useClipboard();
               <CopyFile />
             </n-icon>
           </template>
-          <n-ellipsis style="max-width: 140px">
-            {{ initMol.smiles }}
-          </n-ellipsis>
+            copy smiles
         </n-button>
           <n-button
             size="medium"
@@ -204,8 +201,7 @@ const { copy } = useClipboard();
       </template>
     </n-thing>
     </n-scrollbar>
-  </div>
-  
+  </div> 
 </div>
 </template>
 
