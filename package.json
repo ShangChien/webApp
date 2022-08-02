@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@rdkit/rdkit": "^2022.3.4-1.0.4",
+    "@types/offscreencanvas": "^2019.7.0",
     "@volar/pug-language-service": "^0.37.9",
     "@volar/typescript-language-service": "^0.37.9",
     "@volar/vue-language-service": "^0.37.9",

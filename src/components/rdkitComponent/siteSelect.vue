@@ -22,7 +22,7 @@ import {
 import { useClipboard } from "@vueuse/core";
 import initKetcher from "@/components/initKetcher.vue";
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
-import { reactive, ref } from "vue";
+import { reactive, ref, inject } from "vue";
 import type { molData } from "@/components/types";
 import { useDraggable,useElementSize } from '@vueuse/core'
 
@@ -34,7 +34,7 @@ const { x, y, style } = useDraggable(el1, {
 const { width } = useElementSize(controlPin)
 
 const mini=ref(true)
-const openBox=ref(true)
+const visiualBox=inject('visiualBox')
 
 const initMol: molData = reactive({
   smiles: "CC(=O)Oc1ccccc1C(=O)O",
@@ -67,7 +67,7 @@ const { copy } = useClipboard();
 </script>
 
 <template>
-<div style="width:100%;z-index:1;position: fixed" v-if="openBox">
+<div style="width:100%;z-index:1;position: fixed" v-show="visiualBox">
   <div ref="el1" style="position: fixed;z-index:1" :style="style">
     <div v-if="!mini" :style="{'width':width*0.8+'px'}">
       <n-button
@@ -98,7 +98,7 @@ const { copy } = useClipboard();
       <n-button style="margin-left:0px;margin-right:5px;z-index:1" @click="mini=!mini" size="tiny" color="#7CBD99" circle>
         <n-icon><minimize /></n-icon>
       </n-button>
-      <n-button style="z-index:1" @click="openBox=false" size="tiny" color="#F39BBA" circle>
+      <n-button style="z-index:1" @click="visiualBox=false" size="tiny" color="#F39BBA" circle>
         <n-icon ><close /></n-icon>
       </n-button>
     </div>

@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted,provide } from "vue";
 import { NStep,NSteps,NCard,NButton,NButtonGroup,NIcon,NSpace,NDivider,NSwitch,NPageHeader,
 NGrid,NGridItem,NStatistic,NAvatar,NDropdown,NThing } from "naive-ui"
 import { MdArrowRoundBack,MdArrowRoundForward } from '@vicons/ionicons4'
 import siteSelcet from "@/components/rdkitComponent/siteSelect.vue"
+import classTree from "@/components/dataView/classTree.vue"
+import type { mol4E } from "@/components/types"
 
-const currentRef=ref(0);
-const showInputBoard=ref(true);
+const currentRef=ref(0)//当前步骤
+const visiualBox=ref(true)//是否显示可视化框
+provide('visiualBox',visiualBox)
 const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
+const cores=ref<number[]>()
+const ligands=ref<number[]>()
+
 </script>
 
 <template>
@@ -25,7 +31,7 @@ const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
   </template>
   <template #extra>
     <n-space>
-      <n-switch v-model:value="showInputBoard" >
+      <n-switch v-model:value="visiualBox" >
         <template #checked>
           已显示画板
         </template>
@@ -38,9 +44,8 @@ const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
       </n-dropdown>
     </n-space>
   </template>
-  <site-selcet v-show="showInputBoard" />
+  <site-selcet />
 </n-page-header>
-
 <n-card embedded>
   <n-steps v-model:current="currentRef">
     <n-step title="配体" description="标记配体位点和分类" />
@@ -58,7 +63,7 @@ const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
 	</n-space>
 </n-card>
 <div v-if="currentRef === 1" style="padding-top:10px;">
-  
+  <class-tree style="width:20%"/>
 </div>
 <div v-else-if="currentRef === 2">
   主核

@@ -2,7 +2,7 @@
 import { reactive, ref } from "vue";
 import type { molData } from "@/components/types";
 import rdkitSub from "@/components/rdkitComponent/rdkitSub.vue";
-import cardRdkit from "@/components/rdkitComponent/cardRdkit.vue";
+import svgRdkit from "@/components/rdkitComponent/svgRdkit.vue";
 import { NSpace, NButton,NCollapse,NCollapseItem } from "naive-ui";
 
 const mol1: molData = reactive({
@@ -71,7 +71,7 @@ const show=ref<boolean>(true)
    <n-collapse :default-expanded-names="['1']" >
     <n-collapse-item  display-directive="if" name="1" >
     <div style="padding-left:20px;padding-right:20px">
-      <card-rdkit v-bind="mol3"  style="width:20%" ></card-rdkit>
+      <svg-rdkit v-bind="mol3"  style="width:20%" ></svg-rdkit>
     </div>
     </n-collapse-item>
   </n-collapse>
