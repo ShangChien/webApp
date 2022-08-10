@@ -21,6 +21,7 @@ import {
 } from "@vicons/carbon";
 import { useClipboard } from "@vueuse/core";
 import initKetcher from "@/components/initKetcher.vue";
+import classSites from "@/components/rdkitComponent/classSites.vue";
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
 import { reactive, ref, inject } from "vue";
 import type { molData } from "@/components/types";
@@ -69,7 +70,7 @@ const { copy } = useClipboard();
 <template>
 <div style="width:100%;z-index:1;position: fixed" v-show="visiualBox">
   <div ref="el1" style="position: fixed;z-index:1" :style="style">
-    <div v-if="!mini" :style="{'width':width*0.8+'px'}">
+    <div v-if="!mini" :style="{'width':width*0.74+'px'}">
       <n-button
         size="tiny" color="#FFA48D" circle>
         <n-icon><move /></n-icon>
@@ -102,6 +103,19 @@ const { copy } = useClipboard();
         <n-icon ><close /></n-icon>
       </n-button>
     </div>
+    <n-button style="position:absolute;top:2px;right:4px"
+          secondary
+          size="small"
+          round
+          :focusable="false"
+          @click="copy(initMol.smiles)"
+        >
+          <template #icon>
+            <n-icon>
+              <CopyFile color="#406C81" />
+            </n-icon>
+          </template>
+        </n-button>
     <n-scrollbar :x-scrollable="true" style="resize:both">
     <n-thing >
       <template #description>
@@ -178,25 +192,13 @@ const { copy } = useClipboard();
       </template>
       <template #footer>
       <n-space justify="space-between" style="width: 100%">
+        <class-sites />
         <n-button
-          quaternary
-          :focusable="false"
-          @click="copy(initMol.smiles)"
-        >
-          <template #icon>
-            <n-icon>
-              <CopyFile />
-            </n-icon>
-          </template>
-            copy smiles
-        </n-button>
-          <n-button
-            size="medium"
-            strong
-            secondary
-            round
-            type="info"
-            >添加结构</n-button>  
+          size="medium"
+          strong
+          round
+          type="info"
+          >添加结构</n-button>  
       </n-space>
       </template>
     </n-thing>

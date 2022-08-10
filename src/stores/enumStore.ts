@@ -7,11 +7,16 @@ export const useEnumCores = defineStore('enum',{
     nextId: 0,
   }),
   getters: {
-    getCoreByLabel(state) {
+    getByLabel(state) {
       return (label:string)=> state.cores.filter(
-        (mol) => mol.label ? (label in mol.label) : false
+        (mol) => label in mol.label
       )
     },
+    getById(state) {
+      return (id:number)=> state.cores.filter(
+        (mol) => mol.id === id
+      )
+    }
   },
   actions: {
     addMol(x:mol4E) {
@@ -23,24 +28,31 @@ export const useEnumCores = defineStore('enum',{
         label:x.label,
       })
     },
-    //delete mol by id
+    addLabelById(id:number,label:string) {
+      const item = this.cores.find(
+        (mol) => mol.id === id
+      )
+      if (item?.label.indexOf(label) === -1) {
+        item.label.push(label)
+      } else {
+        console.log('label already exists') 
+      }  
+    },
     rmMolById(id:number) {
       this.cores = this.cores.filter(
         (mol) => mol.id !== id
       )
     },
-    //delete mol by label
     rmMolByLabel(label:string) {
       this.cores = this.cores.filter(
         (mol) => !(label in mol.label)
       )
     },
-    //remove label in label array
     rmLabel(label:string) {
       for (var i = 0; i < this.cores.length; i++) {
         this.cores[i].label=this.cores[i].label.filter(
-          (l) => l !== label
-        ) 
+          (le) => le !== label
+        )
       }
     }, 
   },

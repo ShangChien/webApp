@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted,watch } from "vue";
 import type { molData } from "@/components/types";
 import { useCopyPNG } from "@/components/rdkitComponent/useCopyPNG";
 
-let myWorker = new SharedWorker('/src/worker/sharedWorker.js')
+const myWorker = new SharedWorker(new URL('../../worker/sharedWorker.js',import.meta.url))
 const props = defineProps<molData>();
 const svg = ref()
 const svgText = ref()
@@ -23,6 +23,7 @@ myWorker.onerror = (e:any)=>{
 }
 
 onMounted(() => {
+  console.log(myWorker)
   myWorker.port.postMessage(JSON.stringify(props))
 })
 

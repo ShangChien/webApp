@@ -1,10 +1,10 @@
 import { createApp,ref,readonly } from "vue";
 import { createPinia } from "pinia";
-import "uno.css";
 import App from "./App.vue";
 import router from "./router";
 import initRDKit from "@/components/rdkitComponent/RDKit";
-const myWorker = new SharedWorker('/src/worker/sharedWorker.js')
+//init SharedWorker(rdkit)
+const myWorker = new SharedWorker(new URL('./worker/sharedWorker.js',import.meta.url))
 myWorker.port.postMessage(null);
 const app = createApp(App);
 

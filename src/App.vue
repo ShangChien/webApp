@@ -14,7 +14,7 @@ import { RouterLink, RouterView } from "vue-router";
 import type { MenuOption } from "naive-ui";
 import { LogoElectron } from "@vicons/ionicons5";
 import { Home, Tabler3DCubeSphere, BrandSlack } from "@vicons/tabler";
-import { Carbon, Data1 } from "@vicons/carbon";
+import { Carbon, Data1, DataVis1 ,Theater} from "@vicons/carbon";
 import  ReloadPrompt  from "@/components/ReloadPrompt.vue";
 
 function renderIcon(icon: Component) {
@@ -60,7 +60,7 @@ const menuOptions: MenuOption[] = [
     label: () =>
       h(RouterLink, { to: { name: "enum" } },{ default: () => "Enum" }),
     key: "view-enum",
-    icon: renderIcon(BrandSlack),
+    icon: renderIcon(DataVis1),
   },
 ];
 </script>

@@ -1,5 +1,5 @@
 // import rdkit into the worker, and export the renderMol function
-importScripts("./RDKit_minimal.js")
+importScripts("/RDKit_minimal.js")
 
 function renderMol(props){
   self.rdkit.prefer_coordgen(true);
@@ -32,7 +32,9 @@ function renderMol(props){
   mDetail = JSON.stringify(mDetail);
   let out = mol.get_svg_with_highlights(mDetail);
   qmol.delete();
+  qmol=null;
   mol.delete();
+  mol=null;
   return out
 }
 

@@ -14,12 +14,13 @@ export async function useCopyPNG(svgText:any) {
 	 });
 	} 
 	const clipboardData = {};
-	const blobText = new Blob([svgText], {type:'text/plain'})
 	const blobSvg = new Blob([svgText], {type:'image/svg+xml'})
-	await convertPngBlob(blobSvg).then((pngBlob:any)=>{
-	 clipboardData[pngBlob.type] = pngBlob
-	})
+	const blobText = new Blob([svgText], {type:'text/plain'})
+	clipboardData[blobSvg.type] = blobSvg
 	clipboardData[blobText.type] = blobText
+	await convertPngBlob(blobSvg).then((pngBlob:any)=>{
+		clipboardData[pngBlob.type] = pngBlob
+	 })
 	try {
 	 console.log(clipboardData)
 	 await navigator.clipboard.write([

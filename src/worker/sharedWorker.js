@@ -45,7 +45,6 @@ function renderMol(props){
   qmol = null;
   mol.delete();
   mol = null;
-  console.log(mol)
   return out
 }
 
@@ -53,9 +52,11 @@ self.onconnect = function(e) {
   var port = e.ports[0];
   console.log("the ",i++,"th time connected")
   port.onmessage = function(e) {
-    out = renderMol(JSON.parse(e.data))
-    port.postMessage(out);
-		out=null;
+    if (e.data) {
+      out = renderMol(JSON.parse(e.data))
+      port.postMessage(out);
+		  out=null;
+    }
   }
   port.onmessageerror = function(e) {
     console.log("error", e);

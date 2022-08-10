@@ -18,10 +18,13 @@ export interface molData {
   editable?: boolean;
   extraData?: any;
 }
+export interface class4AtomsAndBonds {
+  [key: number|string]: number[];
+}
 export interface mol4E {
   id: number
   smiles: string
-  atoms?: (number|null)[]
-  bonds?: (number|null)[]
+  atoms?: class4AtomsAndBonds
+  bonds?: class4AtomsAndBonds
   label: (string|null)[]
 }
