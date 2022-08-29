@@ -1,6 +1,6 @@
-import initRDKitModule from "@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js";
+import initRDKitModule from "@rdkit/rdkit/dist/RDKit_minimal.js";
 const initRDKit = (() => {
-  let rdkitLoadingPromise: Promise<void>;
+  let rdkitLoadingPromise: Promise<void>
 
   return () => {
     /**

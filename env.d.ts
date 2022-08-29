@@ -1,7 +1,6 @@
 /// <reference types="vite/client" />
-declare module "@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js";
+declare module "@rdkit/rdkit/dist/RDKit_minimal.js"
 declare module "ngl/dist/ngl.js";
-//declare module "@/components/rdkitComponent/useCopyPNG.ts"
 declare interface Window {
   RDKit: any;
 }

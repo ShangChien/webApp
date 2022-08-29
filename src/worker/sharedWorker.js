@@ -1,5 +1,5 @@
 // import rdkit into the worker, and export the renderMol function
-importScripts("./RDKit_minimal.js")
+importScripts("/RDKit_minimal.js")
 //initialize the rdkit
 initRDKitModule().then(res=>{
 	self.rdkit = res	

@@ -22,6 +22,7 @@ import {
 import { useClipboard } from "@vueuse/core";
 import initKetcher from "@/components/initKetcher.vue";
 import classSites from "@/components/rdkitComponent/classSites.vue";
+import classMols from "@/components/rdkitComponent/classMols.vue"
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
 import { reactive, ref, inject } from "vue";
 import type { molData } from "@/components/types";
@@ -69,7 +70,7 @@ const { copy } = useClipboard();
 
 <template>
 <div style="width:100%;z-index:1;position: fixed" v-show="visiualBox">
-  <div ref="el1" style="position: fixed;z-index:1" :style="style">
+  <div ref="el1" style="position: fixed;z-index:1;cursor:move" :style="style">
     <div v-if="!mini" :style="{'width':width*0.74+'px'}">
       <n-button
         size="tiny" color="#FFA48D" circle>
@@ -78,7 +79,7 @@ const { copy } = useClipboard();
     </div>
     <n-button v-else
               class="simplify" 
-              style="position: fixed;"
+              style="position: fixed;cursor:grab"
               :style="{left:x-60+'px',top:y-5+'px'}"
               @dblclick="mini=!mini"
               circle 
@@ -93,8 +94,8 @@ const { copy } = useClipboard();
   </div>
   <div v-show="!mini" 
        class="entireBox" 
-       :style="{left:x-60+'px',top:y-5+'px'}" 
-       style="position:fixed;"> 
+       :style="{'left':x-60+'px','top':y-5+'px'}" 
+       style="position:fixed"> 
     <div ref="controlPin" style="padding-bottom:5px;z-index:1">
       <n-button style="margin-left:0px;margin-right:5px;z-index:1" @click="mini=!mini" size="tiny" color="#7CBD99" circle>
         <n-icon><minimize /></n-icon>
@@ -116,7 +117,7 @@ const { copy } = useClipboard();
             </n-icon>
           </template>
         </n-button>
-    <n-scrollbar :x-scrollable="true" style="resize:both">
+    <n-scrollbar :x-scrollable="true" >
     <n-thing >
       <template #description>
         <n-input-group >
@@ -191,8 +192,14 @@ const { copy } = useClipboard();
       </div>
       </template>
       <template #footer>
-      <n-space justify="space-between" style="width: 100%">
-        <class-sites />
+      <div :style="{'width':width+'px'}"
+           style="margin-top:-8px">
+        <div class="i-fluent-emoji-label text-4xl" style="float:left; width:10%" />
+        <div style="float:left; width:4%" class="text-xl">: </div>
+        <div style="float:left; width:86%"><class-mols /></div>
+      </div>
+      <n-space justify="space-between" style="width: 100%;padding-top:3px ;">
+        <class-sites style="margin-top: 0px;" />
         <n-button
           size="medium"
           strong
@@ -211,6 +218,7 @@ const { copy } = useClipboard();
 .entireBox{
   height: auto; 
   overflow:auto;
+  resize:horizontal;
   background-image: linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);
   padding:5px;
   border-radius: 10px;

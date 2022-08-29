@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted,watch } from "vue";
+import { ref, onMounted, onUnmounted,watch,nextTick } from "vue";
 import type { molData } from "@/components/types";
-import { useCopyPNG } from "@/components/rdkitComponent/useCopyPNG";
 
 const myWorker = new SharedWorker(new URL('../../worker/sharedWorker.js',import.meta.url))
 const props = defineProps<molData>();
@@ -11,7 +10,9 @@ const svgText = ref()
 
 myWorker.port.onmessage = async (e:any)=>{
   //await nextTick()
-  svg.value.innerHTML = e.data
+  requestAnimationFrame(()=>{
+    svg.value.innerHTML = e.data// URL.createObjectURL(new Blob([e.data], {type:'image/svg+xml'}))
+  }); 
   svgText.value=e.data
 }
 
@@ -39,7 +40,6 @@ onUnmounted(()=>{
 <template >
 <div>
   <svg ref='svg' viewBox='0, 0, 200, 200' ></svg>
-  <button @click="useCopyPNG(svgText)"></button>
 </div>
 </template>
 <style>

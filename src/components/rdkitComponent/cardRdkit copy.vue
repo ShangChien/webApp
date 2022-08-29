@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, h, reactive,onMounted } from "vue";
 import type { Component } from "vue";
-import type { molData } from "@/components/types";
+import { useVModels } from '@vueuse/core'
+import type { mol4E,molData } from "@/components/types";
 import svgRdkit from "@/components/rdkitComponent/svgRdkit.vue";
 import {
   NCard,
@@ -28,8 +29,14 @@ const editableRdkit = defineAsyncComponent({
   timeout: 3000,
   suspensible:false
 })
-const emit = defineEmits(["itemDeleted","itemChecked", "itEditSave"]);
-const props = defineProps<molData>();
+const emit = defineEmits(["update:smiles",
+                          "update:atoms",
+                          "update:bonds",
+                          "update:selected",
+                          "update:label",
+                          "itemDeleted"]);
+const props = defineProps<mol4E>();
+const { smiles,atoms,bonds,selected,label } = useVModels(props, emit)
 //可视加载组件
 const checked = ref(false);
 const cardView=ref()
@@ -43,7 +50,6 @@ function onNegativeClick() {
 }
 
 function onPositiveClick() {
-  emit("itEditSave", initSmile);
   showModal.value = false;
 }
 const initSmile = reactive({

@@ -1,27 +1,33 @@
-import Components from "unplugin-vue-components/vite";
 import { VitePWA } from 'vite-plugin-pwa'
-import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import VueTypeImports from "vite-plugin-vue-type-imports";
 import mkcert from "vite-plugin-mkcert";
-import {
-  AntDesignVueResolver,
-  NaiveUiResolver,
-} from "unplugin-vue-components/resolvers";
+import Unocss from 'unocss/vite'
+import { presetAttributify, presetUno } from 'unocss'
+import presetIcons from '@unocss/preset-icons'
 import { resolve } from "path";
 
-Components({
-  resolvers: [AntDesignVueResolver(), NaiveUiResolver()],
-});
-
 // https://vitejs.dev/config/
-export default defineConfig({
+export default {
   plugins: [
     vue(),
     mkcert(),
     vueJsx(),
     VueTypeImports(),
+    Unocss({
+      presets: [
+        presetAttributify({ /* preset options */}),
+        presetUno(),
+        presetIcons({
+          extraProperties: {
+            'display': 'inline-block',
+            'vertical-align': 'middle',
+            // ...
+          },
+        })
+      ],
+    }),
     VitePWA({
       includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
@@ -50,7 +56,8 @@ export default defineConfig({
       },
       workbox: {
         maximumFileSizeToCacheInBytes: 10000000,
-        globPatterns: ['**/*{js,css,html,ico,png,svg,pdb,sdf,wasm}']
+        globPatterns: ['**/*{js,css,html,ico,png,svg,pdb,sdf,wasm}'],
+        navigateFallbackDenylist: [/^\/api/],
       }
     }),
   ],
@@ -64,7 +71,7 @@ export default defineConfig({
       "^/api": {
         target: "http://192.168.2.160:8000", //代理接口
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        rewrite: (path:string) => path.replace(/^\/api/, ""),
       },
     },
   },
@@ -73,4 +80,4 @@ export default defineConfig({
       "@": resolve(__dirname,"./src"),
     },
   },
-});
+};
