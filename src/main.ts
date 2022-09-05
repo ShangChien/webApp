@@ -8,7 +8,7 @@ import initRDKit from "@/components/rdkitComponent/RDKit";
 const myWorker = new SharedWorker(new URL('./worker/sharedWorker.js',import.meta.url))
 myWorker.port.postMessage(null);
 const siteType=ref<number>(0)
-const molTags=ref<string[]>(["label1","lab2","lab3","lab4"])
+const molTags=ref<string[]>(["芳胺","咔唑","配体"])
 const app = createApp(App);
 app.provide('molTags',molTags)
 app.provide('siteType',siteType)

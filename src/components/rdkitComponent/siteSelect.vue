@@ -22,7 +22,7 @@ import {
 import { useClipboard } from "@vueuse/core";
 import initKetcher from "@/components/initKetcher.vue";
 import classSites from "@/components/rdkitComponent/classSites.vue";
-import classMols from "@/components/rdkitComponent/classMols.vue"
+import tagMols from "@/components/rdkitComponent/tagMols.vue"
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
 import { reactive, ref, inject } from "vue";
 import type { molData } from "@/components/types";
@@ -195,10 +195,10 @@ const { copy } = useClipboard();
       <div :style="{'width':width+'px'}"
            style="margin-top:-8px">
         <div class="i-fluent-emoji-label text-4xl" style="float:left; width:10%" />
-        <div style="float:left; width:4%" class="text-xl">: </div>
-        <div style="float:left; width:86%"><class-mols /></div>
+        <div style="float:left; width:4%" class="text-xl" >: </div>
+        <div style="float:left; width:86%"><tag-mols /></div>
       </div>
-      <n-space justify="space-between" style="width: 100%;padding-top:3px ;">
+      <n-space justify="space-between" style="width:100%; padding-top:3px" >
         <class-sites style="margin-top: 0px;" />
         <n-button
           size="medium"

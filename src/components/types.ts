@@ -23,7 +23,7 @@ export interface mol4E {
   id: number
   smiles: string
   selected?: boolean
-  atoms?: {[key: number|string]: number[]}
-  bonds?: {[key: number|string]: number[]}
+  atoms: {[key: number|string]: number[]}
+  bonds: {[key: number|string]: number[]}
   label: (string|null)[]
 }

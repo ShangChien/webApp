@@ -18,10 +18,10 @@ const ligands=ref<number[]>()
 
 <template>
 <div>
-<n-page-header subtitle="分子结构枚举，子结构筛选 ( beta 1.0 )">
+<n-page-header subtitle="Molecule Edit, Substructure Search( beta 1.0 )">
   <n-divider />
   <template #title>
-    <a style="text-decoration: none; color: inherit">分子生成器</a>
+    <a style="text-decoration: none; color: inherit">Molecule Generate</a>
   </template>
   <template #avatar>
     <n-avatar

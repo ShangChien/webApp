@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, reactive, onUpdated,inject } from "vue";
-import type { molData } from "@/components/types";
+import type { molData,mol4E } from "@/components/types";
 const rdkit:any = inject("rdkit");
 const props = defineProps<molData>();
 const emit = defineEmits(["update-mol"]);
-const highlightMap: molData = reactive({
+const highlightMap:mol4E= reactive({
+  id: 0,
   smiles: props.smiles,
-  atoms: Array.from(new Set(props.atoms)),
-  bonds: Array.from(new Set(props.bonds)),
+  atoms: {},
+  bonds: {},
+  label: [],
 });
 const svgitem: any = reactive({
   svg: {},
@@ -21,6 +23,8 @@ const svgitem: any = reactive({
 });
 const parser = new DOMParser();
 const xmlDoc = ref<Document>();
+const siteType:any= inject('siteType')
+const Color = (n:any) => 'hsla('+ Math.floor((n+8.6)*36) +',90%,70%,1)'
 function getSvgData(svg: string) {
   svgitem.svg = {};
   svgitem.rect = {};
@@ -133,28 +137,46 @@ function renderMol(props: molData) {
   //console.log(svgitem);
   //rdkitdiv.value.innerHTML=svg
 }
-
+//目的,遍历highlightMap对象atoms属性的所有子属性，如果包含atomIndex，则删除
+function preHandleIndex(obj:object,atomIndex:number){
+    for (let key in obj) {
+      if (obj[key].includes(atomIndex)) {
+        obj[key].splice(
+          obj[key].indexOf(atomIndex),
+          1
+        );
+      }
+    }
+}
 function domClick($event: any) {
   let itemList = $event.target.getAttribute("class").split(" ")[0].split("-");
   if (itemList[0] == "atom") {
     //如果点击atom
     //改颜色
-    $event.target.style.stroke = "#3fada8";
-    $event.target.style.fill = "#3fada8";
+    $event.target.style.stroke = Color(siteType.value);
+    $event.target.style.fill = Color(siteType.value);
     $event.target.style.opacity = 0.8;
+    var atomIndex = itemList[1] / 1
+    preHandleIndex(highlightMap.atoms,atomIndex)
     //添加index到数组
-    highlightMap.atoms?.push(itemList[1] / 1);
-    highlightMap.atoms = Array.from(new Set(highlightMap.atoms)).sort();
+    highlightMap.atoms[siteType.value] = highlightMap.atoms[siteType.value] ? 
+                                         highlightMap.atoms[siteType.value]:[]
+    highlightMap.atoms[siteType.value].push(itemList[1] / 1);
+    //highlightMap.atoms[siteType.value] = Array.from(new Set(highlightMap.atoms[siteType.value])).sort();
     emit("update-mol", highlightMap);
     //console.log('ssddd',highlightMap.atoms)
   } else if (itemList[0] == "bond") {
     //如果点击bond
-    $event.target.style.stroke = "#3fada8";
-    $event.target.style.fill = "#3fada8";
+    $event.target.style.stroke = Color(siteType.value);
+    $event.target.style.fill = Color(siteType.value);
     $event.target.style.opacity = 0.4;
+    var bondIndex = itemList[1] / 1
+    preHandleIndex(highlightMap.atoms,bondIndex)
     //添加index到数组
-    highlightMap.bonds?.push(itemList[1] / 1);
-    highlightMap.bonds = Array.from(new Set(highlightMap.bonds)).sort();
+    highlightMap.bonds[siteType.value] = highlightMap.bonds[siteType.value] ? 
+                                         highlightMap.bonds[siteType.value]:[]
+    highlightMap.bonds[siteType.value].push(itemList[1] / 1);
+    //highlightMap.bonds[siteType.value] = Array.from(new Set(highlightMap.bonds[siteType.value])).sort();
     emit("update-mol", highlightMap);
     //console.log(highlightMap.bonds)
   } else {
@@ -170,8 +192,7 @@ function domDblClick($event: any) {
     $event.target.style.fill = "#9FACE6";
     $event.target.style.opacity = 0.6;
     //删除index
-    highlightMap.atoms?.splice(highlightMap.atoms?.indexOf(itemList[1] / 1), 1);
-    highlightMap.atoms = Array.from(new Set(highlightMap.atoms)).sort();
+    preHandleIndex(highlightMap.atoms,itemList[1] / 1)
     emit("update-mol", highlightMap);
     //console.log(highlightMap.highlightAtoms)
   } else if (itemList[0] == "bond") {
@@ -180,8 +201,7 @@ function domDblClick($event: any) {
     $event.target.style.fill = "#9FACE6";
     $event.target.style.opacity = 0.2;
     //删除index
-    highlightMap.bonds?.splice(highlightMap.bonds.indexOf(itemList[1] / 1), 1);
-    highlightMap.bonds = Array.from(new Set(highlightMap.bonds)).sort();
+    preHandleIndex(highlightMap.bonds,itemList[1] / 1)
     emit("update-mol", highlightMap);
     //console.log(highlightMap.highlightAtoms)
   } else {
@@ -190,39 +210,39 @@ function domDblClick($event: any) {
 }
 function clearAll() {
   renderMol(props);
-  highlightMap.atoms = [];
-  highlightMap.bonds = [];
+  highlightMap.atoms = {};
+  highlightMap.bonds = {};
   emit("update-mol", highlightMap);
 }
 
 //根据highlightMap初始化高亮svg中的atoms和bonds
 const svg_id = ref();
-function initHighlightSvg() {
-  //初始化处理高亮atoms
-  for (let item of svg_id.value.getElementsByTagName("ellipse")) {
-    //在atoms中添加item.class属性具有highlightMap.atoms的元素
-    if (
-      highlightMap.atoms?.includes(item.getAttribute("class").split("-")[1] / 1)
-    ) {
-      item.style.stroke = "#3fada8";
-      item.style.fill = "#3fada8";
-      item.style.opacity = 0.8;
-    }
-  }
-  //初始化处理高亮bonds
-  for (let item of svg_id.value.getElementsByTagName("path")) {
-    if (
-      item.style.strokeWidth === "13.7px" &&
-      highlightMap.bonds?.includes(
-        item.getAttribute("class").split(" ")[0].split("-")[1] / 1
-      )
-    ) {
-      item.style.stroke = "#3fada8";
-      item.style.fill = "#3fada8";
-      item.style.opacity = 0.4;
-    }
-  }
-}
+// function initHighlightSvg() {
+//   //初始化处理高亮atoms
+//   for (let item of svg_id.value.getElementsByTagName("ellipse")) {
+//     //在atoms中添加item.class属性具有highlightMap.atoms的元素
+//     if (
+//       highlightMap.atoms?.includes(item.getAttribute("class").split("-")[1] / 1)
+//     ) {
+//       item.style.stroke = Color(siteType.value);
+//       item.style.fill = Color(siteType.value);
+//       item.style.opacity = 0.8;
+//     }
+//   }
+//   //初始化处理高亮bonds
+//   for (let item of svg_id.value.getElementsByTagName("path")) {
+//     if (
+//       item.style.strokeWidth === "13.7px" &&
+//       highlightMap.bonds?.includes(
+//         item.getAttribute("class").split(" ")[0].split("-")[1] / 1
+//       )
+//     ) {
+//       item.style.stroke = Color(siteType.value);
+//       item.style.fill = Color(siteType.value);
+//       item.style.opacity = 0.4;
+//     }
+//   }
+// }
 
 onMounted(async () => {
   rdkit.prefer_coordgen(true);
@@ -230,15 +250,15 @@ onMounted(async () => {
   //console.log("onmounted",props)
   //initHighlightSvg()
 });
-onUpdated(() => {
-  initHighlightSvg();
-});
+// onUpdated(() => {
+//   initHighlightSvg();
+// });
 
 watch(props, (newVal) => {
   renderMol(newVal);
   highlightMap.smiles = newVal.smiles;
-  highlightMap.atoms = [];
-  highlightMap.bonds = [];
+  highlightMap.atoms = {};
+  highlightMap.bonds = {};
   console.log("watch", highlightMap.atoms);
 });
 </script>
