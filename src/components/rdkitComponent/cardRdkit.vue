@@ -20,14 +20,7 @@ import { Dots } from "@vicons/tabler";
 import { Edit, Delete, CopyFile } from "@vicons/carbon";
 import { defineAsyncComponent } from 'vue'
 //异步加载mol编辑组件
-const editableRdkit = defineAsyncComponent({
-  loader:() =>import('@/components/rdkitComponent/editableRdkit.vue'),
-  loadingComponent: NSpin,
-  delay: 2000,//+600*Math.random(),
-  errorComponent: NEmpty,
-  timeout: 3000,
-  suspensible:false
-})
+
 const emit = defineEmits(["itemDeleted","itemChecked", "itEditSave"]);
 const props = defineProps<molData>();
 //可视加载组件
@@ -126,26 +119,6 @@ onMounted(() => {
           
         </div>
       </n-space>
-        <n-modal v-model:show="showModal" :mask-closable="false">
-          <n-card style="width: 900px; height: 800px"
-                  title="位点重新选取"
-                  :bordered="false"
-                  size="huge"
-                  role="dialog"
-                  aria-modal="true" >
-            <editable-rdkit
-              v-bind="props"
-              qsmiles="*~*"
-              @update-mol="acceptMol"
-              style="width: 70%" />
-            <template #footer>
-              <n-space>
-                <n-button @Click="onNegativeClick">取消</n-button>
-                <n-button @Click="onPositiveClick">确定</n-button>
-              </n-space>
-            </template>
-          </n-card>
-        </n-modal>
       <n-popover
         trigger="hover"
         placement="right"

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   NSpace,
+  NButtonGroup,
   NButton,
   NIcon,
   NThing,
@@ -24,35 +25,41 @@ import initKetcher from "@/components/initKetcher.vue";
 import classSites from "@/components/rdkitComponent/classSites.vue";
 import tagMols from "@/components/rdkitComponent/tagMols.vue"
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
-import { reactive, ref, inject } from "vue";
+import { reactive, ref, inject, onMounted } from "vue";
 import type { molData } from "@/components/types";
 import { useDraggable,useElementSize } from '@vueuse/core'
-
-const el1 = ref<HTMLElement | null>(null)
-const controlPin=ref<HTMLElement | null>(null)
-const { x, y, style } = useDraggable(el1, {
-  initialValue: { x: 74, y: 9 },
-})
-const { width } = useElementSize(controlPin)
-
-const mini=ref(true)
-const visiualBox=inject('visiualBox')
+import { useEditState } from '@/stores/editMol'
+const EditStore = useEditState()
 
 const initMol: molData = reactive({
   smiles: "CC(=O)Oc1ccccc1C(=O)O",
   qsmiles: "*~*",
-  atoms: [],
-  bonds: [],
+  atoms: {},
+  bonds: {},
+  label: [],
 })
-const tmpSmile = reactive({
+
+const el1 = ref<HTMLElement | null>(null)
+const controlPin=ref<HTMLElement | null>(null)
+const NBG=ref<HTMLElement | null>(null)
+const { x, y, style } = useDraggable(el1, {
+  initialValue: { x: 74, y: 9 },
+})
+const { width:widthBOX } = useElementSize(controlPin)
+const { width:widthNBG } = useElementSize(NBG)
+const mini=ref(true)
+const visiualBox=inject('visiualBox')
+
+
+const tmpSmile: molData = reactive({
   smiles: initMol.smiles,
-  atoms: [],
-  bonds: [],
+  atoms: {},
+  bonds: {},
 });
 const drawMol=()=>{
   initMol.smiles = inputText.value;
-  tmpSmile.atoms = [];
-  tmpSmile.bonds = [];
+  tmpSmile.atoms = {};
+  tmpSmile.bonds = {};
   //console.log(initMol)
 }
 const onReceiveMol=(mol: molData)=>{
@@ -71,7 +78,7 @@ const { copy } = useClipboard();
 <template>
 <div style="width:100%;z-index:1;position: fixed" v-show="visiualBox">
   <div ref="el1" style="position: fixed;z-index:1;cursor:move" :style="style">
-    <div v-if="!mini" :style="{'width':width*0.74+'px'}">
+    <div v-if="!mini" :style="{'width':widthBOX-widthNBG-60+'px'}">
       <n-button
         size="tiny" color="#FFA48D" circle>
         <n-icon><move /></n-icon>
@@ -104,19 +111,17 @@ const { copy } = useClipboard();
         <n-icon ><close /></n-icon>
       </n-button>
     </div>
-    <n-button style="position:absolute;top:2px;right:4px"
-          secondary
-          size="small"
-          round
-          :focusable="false"
-          @click="copy(initMol.smiles)"
-        >
-          <template #icon>
-            <n-icon>
-              <CopyFile color="#406C81" />
-            </n-icon>
-          </template>
-        </n-button>
+    <n-button-group style="position:absolute;top:2px;right:4px" ref="NBG">
+      <n-button secondary size="small" :focusable="false" @click="copy(initMol.smiles)">
+        <div class="i-flat-color-icons-undo text-xl"></div> 
+      </n-button>
+      <n-button secondary size="small" :focusable="false" @click="copy(initMol.smiles)">
+        <div class="i-flat-color-icons-redo text-xl"></div> 
+      </n-button>
+      <n-button secondary size="small" :focusable="false" @click="copy(initMol.smiles)">
+        <div class="i-icon-park-copy text-xl"></div> 
+      </n-button>
+    </n-button-group>
     <n-scrollbar :x-scrollable="true" >
     <n-thing >
       <template #description>
@@ -192,7 +197,7 @@ const { copy } = useClipboard();
       </div>
       </template>
       <template #footer>
-      <div :style="{'width':width+'px'}"
+      <div :style="{'width':widthBOX+'px'}"
            style="margin-top:-8px">
         <div class="i-fluent-emoji-label text-4xl" style="float:left; width:10%" />
         <div style="float:left; width:4%" class="text-xl" >: </div>
@@ -205,6 +210,7 @@ const { copy } = useClipboard();
           strong
           round
           type="info"
+          @click="EditStore.addMol(tmpSmile)"
           >添加结构</n-button>  
       </n-space>
       </template>

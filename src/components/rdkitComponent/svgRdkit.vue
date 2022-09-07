@@ -1,11 +1,26 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted,watch,nextTick } from "vue";
+import { ref, onMounted, onUnmounted,watch,toRaw } from "vue";
 import type { molData } from "@/components/types";
 
 const myWorker = new SharedWorker(new URL('../../worker/sharedWorker.js',import.meta.url))
 const props = defineProps<molData>();
 const svg = ref()
 const svgText = ref()
+function preHandleProps(props:molData) {
+  const concatIndex = (list1:{[key: number|string]: number[]}|undefined) =>{ 
+    let outList: any[] = []
+    for(let i in list1){
+      outList = outList.concat(list1[i])
+    }
+    return Array.from(new Set(outList)) 
+  }
+  const initProps:any = toRaw(props)
+  initProps.atoms = concatIndex(props.atoms)
+  initProps.bonds = concatIndex(props.bonds)
+  return initProps
+}
+
+
 
 
 myWorker.port.onmessage = async (e:any)=>{
@@ -24,12 +39,12 @@ myWorker.onerror = (e:any)=>{
 }
 
 onMounted(() => {
-  console.log(myWorker)
-  myWorker.port.postMessage(JSON.stringify(props))
+  //console.log(props)
+  myWorker.port.postMessage(JSON.stringify(preHandleProps(props)))
 })
 
 watch(props, (newVal) => {
-  myWorker.port.postMessage(JSON.stringify(newVal))
+  myWorker.port.postMessage(JSON.stringify(preHandleProps(newVal)))
 })
 
 onUnmounted(()=>{

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, reactive, onUpdated,inject } from "vue";
-import type { molData,mol4E } from "@/components/types";
+import type { molData } from "@/components/types";
 const rdkit:any = inject("rdkit");
 const props = defineProps<molData>();
 const emit = defineEmits(["update-mol"]);
-const highlightMap:mol4E= reactive({
+const highlightMap= reactive({
   id: 0,
   smiles: props.smiles,
   atoms: {},
@@ -102,6 +102,15 @@ function getSvgData(svg: string) {
 }
 
 function renderMol(props: molData) {
+  const concatIndex = (list1:{[key: number|string]: number[]}|undefined) =>{ 
+    let outList: any[] = []
+    for(let i in list1){
+      outList = outList.concat(list1[i])
+    }
+    return Array.from(new Set(outList)) 
+  }
+  var atomsIndex = concatIndex(props.atoms)
+  var bondsIndex = concatIndex(props.bonds)
   let mol = rdkit.get_mol(props.smiles ?? "");
   let qmol = rdkit.get_qmol(props.qsmiles ?? "");
   //let mDetail = JSON.parse(mol.get_substruct_match(qmol))
@@ -114,8 +123,8 @@ function renderMol(props: molData) {
     }),
     { bonds: [], atoms: [] }
   );
-  mDetail["atoms"] = mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms;
-  mDetail["bonds"] = mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds;
+  mDetail["atoms"] = mDetail.atoms?.concat(atomsIndex ?? []) ?? atomsIndex;
+  mDetail["bonds"] = mDetail.bonds?.concat(bondsIndex ?? []) ?? bondsIndex;
   mDetail["addAtomIndices"] = props.addAtomIndices;
   mDetail["addBondIndices"] = props.addBondIndices;
   mDetail["width"] = props.width ?? 200;
@@ -138,7 +147,7 @@ function renderMol(props: molData) {
   //rdkitdiv.value.innerHTML=svg
 }
 //目的,遍历highlightMap对象atoms属性的所有子属性，如果包含atomIndex，则删除
-function preHandleIndex(obj:object,atomIndex:number){
+function preHandleIndex(obj:object|undefined,atomIndex:number){
     for (let key in obj) {
       if (obj[key].includes(atomIndex)) {
         obj[key].splice(
@@ -161,7 +170,7 @@ function domClick($event: any) {
     //添加index到数组
     highlightMap.atoms[siteType.value] = highlightMap.atoms[siteType.value] ? 
                                          highlightMap.atoms[siteType.value]:[]
-    highlightMap.atoms[siteType.value].push(itemList[1] / 1);
+    highlightMap?.atoms[siteType.value].push(itemList[1] / 1);
     //highlightMap.atoms[siteType.value] = Array.from(new Set(highlightMap.atoms[siteType.value])).sort();
     emit("update-mol", highlightMap);
     //console.log('ssddd',highlightMap.atoms)
@@ -175,7 +184,7 @@ function domClick($event: any) {
     //添加index到数组
     highlightMap.bonds[siteType.value] = highlightMap.bonds[siteType.value] ? 
                                          highlightMap.bonds[siteType.value]:[]
-    highlightMap.bonds[siteType.value].push(itemList[1] / 1);
+    highlightMap?.bonds[siteType.value].push(itemList[1] / 1);
     //highlightMap.bonds[siteType.value] = Array.from(new Set(highlightMap.bonds[siteType.value])).sort();
     emit("update-mol", highlightMap);
     //console.log(highlightMap.bonds)
