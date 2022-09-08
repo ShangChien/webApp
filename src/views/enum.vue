@@ -5,7 +5,7 @@ NGrid,NGridItem,NStatistic,NAvatar,NDropdown,NThing } from "naive-ui"
 import { MdArrowRoundBack,MdArrowRoundForward } from '@vicons/ionicons4'
 import siteSelcet from "@/components/rdkitComponent/siteSelect.vue"
 import classTree from "@/components/dataView/classTree.vue"
-import type { mol4E } from "@/components/types"
+import type { molData } from "@/components/types"
 
 const currentRef=ref(0)//当前步骤
 const visiualBox=ref(true)//是否显示可视化框

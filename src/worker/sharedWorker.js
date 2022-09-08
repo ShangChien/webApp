@@ -2,17 +2,28 @@
 importScripts("/RDKit_minimal.js")
 //initialize the rdkit
 initRDKitModule().then(res=>{
-	self.rdkit = res	
-  self.rdkit.prefer_coordgen(true);
+	self.RDKit = res	
+  self.RDKit.prefer_coordgen(true);
 }).catch(err=>{
 	console.log(err)
 })
-
+function preHandleProps(props) {
+  const concatIndex = (list1) =>{ 
+    let outList= []
+    for(let i in list1){
+      outList = outList.concat(list1[i])
+    }
+    return Array.from(new Set(outList)) 
+  }
+  props.atoms = concatIndex(props.atoms)
+  props.bonds = concatIndex(props.bonds)
+  return props
+}
 let i = 0 //counter for the number of times the worker is connected
 let out = null //the output(svg image) of the renderMol function
 function renderMol(props){
-  let mol = self.rdkit.get_mol(props.smiles ?? "");
-  let qmol = self.rdkit.get_qmol(props.qsmiles ?? "");
+  let mol = self.RDKit.get_mol(props.smiles ?? "");
+  let qmol = self.RDKit.get_qmol(props.qsmiles ?? "");
   let mdetailsRaw = mol.get_substruct_matches(qmol);
   let mDetail = mdetailsRaw.length > 2 ? JSON.parse(mdetailsRaw) : [];
   mDetail = mDetail.reduce(
@@ -53,7 +64,7 @@ self.onconnect = function(e) {
   console.log("the ",i++,"th time connected")
   port.onmessage = function(e) {
     if (e.data) {
-      out = renderMol(JSON.parse(e.data))
+      out = renderMol(preHandleProps(JSON.parse(e.data)))
       port.postMessage(out);
 		  out=null;
     }

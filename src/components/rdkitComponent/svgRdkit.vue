@@ -27,6 +27,7 @@ myWorker.port.onmessage = async (e:any)=>{
   //await nextTick()
   requestAnimationFrame(()=>{
     svg.value.innerHTML = e.data// URL.createObjectURL(new Blob([e.data], {type:'image/svg+xml'}))
+    console.log(e.data)
   }); 
   svgText.value=e.data
 }
@@ -40,11 +41,11 @@ myWorker.onerror = (e:any)=>{
 
 onMounted(() => {
   //console.log(props)
-  myWorker.port.postMessage(JSON.stringify(preHandleProps(props)))
+  myWorker.port.postMessage(JSON.stringify(props))
 })
 
 watch(props, (newVal) => {
-  myWorker.port.postMessage(JSON.stringify(preHandleProps(newVal)))
+  myWorker.port.postMessage(JSON.stringify(newVal))
 })
 
 onUnmounted(()=>{

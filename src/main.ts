@@ -15,6 +15,7 @@ app.provide('siteType',siteType)
 const rdkit = ref<any>();
 initRDKit.then((res) => {
   rdkit.value = res; 
+  rdkit.value.prefer_coordgen(true);
   app.provide('rdkit', readonly(rdkit.value))
   app.provide('myWorker', readonly(myWorker))
 })
