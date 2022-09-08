@@ -80,5 +80,12 @@ export function useGetSvg(props: molData) {
       ] = item.getAttribute("style").concat(";opacity: 0.3");
     }
   }
-	return svgItem;
+  //如果props.atoms存在非空属性，则添加原子索引
+  if (Object.values(props.atoms ?? {}).some(e => {typeof e === 'number' || typeof e === 'string'})) {
+
+  }
+
+  console.log(svgItem)
+	return svgItem
+  
 }

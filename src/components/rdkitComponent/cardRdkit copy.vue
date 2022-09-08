@@ -2,7 +2,7 @@
 import { ref, h, reactive,onMounted } from "vue";
 import type { Component } from "vue";
 import { useVModels } from '@vueuse/core'
-import type { mol4E,molData } from "@/components/types";
+import type { molData } from "@/components/types";
 import svgRdkit from "@/components/rdkitComponent/svgRdkit.vue";
 import {
   NCard,
@@ -35,7 +35,7 @@ const emit = defineEmits(["update:smiles",
                           "update:selected",
                           "update:label",
                           "itemDeleted"]);
-const props = defineProps<mol4E>();
+const props = defineProps<molData>();
 const { smiles,atoms,bonds,selected,label } = useVModels(props, emit)
 //可视加载组件
 const checked = ref(false);

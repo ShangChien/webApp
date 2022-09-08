@@ -1,10 +1,16 @@
 {
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "src/worker"],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
+    "outDir": "./",
     "allowJs": true,
     "suppressImplicitAnyIndexErrors": true,
     "baseUrl": ".",
+    "lib":[
+      "esnext",
+      "dom"
+    ],
     "paths": {
       "@/*": ["./src/*"]
     }
@@ -14,5 +20,5 @@
     {
       "path": "./tsconfig.vite-config.json"
     }
-  ]
+  ],
 }
