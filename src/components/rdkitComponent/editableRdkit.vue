@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { ref, watch, reactive,inject } from "vue";
+import { ref, watch, reactive,inject,toRaw } from "vue";
 import type { molData } from "@/components/types";
 import { useGetSvg } from '@/components/rdkitComponent/composable/useGetSvg'
 const props = defineProps<molData>();
 const emit = defineEmits(["update-mol"]);
-const svgItem =ref(useGetSvg(props))
+const rdkit = inject('rdkit')
+const svgItem =ref(useGetSvg(props,rdkit))
+const initProps:any = toRaw(props)
 const highlightMap= reactive({
   id: 0,
-  smiles: props.smiles,
-  atoms: {},
-  bonds: {},
+  smiles: initProps.smiles,
+  atoms: initProps.atoms,
+  bonds: initProps.bonds,
   label: [],
 });
 const siteType:any= inject('siteType')
@@ -35,7 +37,7 @@ function domClick($event: any) {
     //添加index到数组
     highlightMap.atoms[siteType.value] = highlightMap.atoms[siteType.value] ? 
                                          highlightMap.atoms[siteType.value]:[]
-    highlightMap?.atoms[siteType.value].push(itemList[1] / 1);
+    highlightMap.atoms[siteType.value].push(itemList[1] / 1);
     //highlightMap.atoms[siteType.value] = Array.from(new Set(highlightMap.atoms[siteType.value])).sort();
     emit("update-mol", highlightMap);
     //console.log('ssddd',highlightMap.atoms)
@@ -49,7 +51,7 @@ function domClick($event: any) {
     //添加index到数组
     highlightMap.bonds[siteType.value] = highlightMap.bonds[siteType.value] ? 
                                          highlightMap.bonds[siteType.value]:[]
-    highlightMap?.bonds[siteType.value].push(itemList[1] / 1);
+    highlightMap.bonds[siteType.value].push(itemList[1] / 1);
     //highlightMap.bonds[siteType.value] = Array.from(new Set(highlightMap.bonds[siteType.value])).sort();
     emit("update-mol", highlightMap);
     //console.log(highlightMap.bonds)
@@ -119,10 +121,11 @@ const svg_id = ref();
 // }
 
 watch(props, (newVal) => {
-  svgItem.value = useGetSvg(props)
-  highlightMap.smiles = newVal.smiles;
-  highlightMap.atoms = {};
-  highlightMap.bonds = {};
+  svgItem.value = useGetSvg(newVal,rdkit)
+  const initProps:any = toRaw(newVal)
+  highlightMap.smiles = initProps.smiles;
+  highlightMap.atoms = initProps.atoms;
+  highlightMap.bonds = initProps.bonds;
   console.log("watch", highlightMap.atoms);
 });
 </script>

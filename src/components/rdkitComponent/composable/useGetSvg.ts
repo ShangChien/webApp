@@ -1,8 +1,8 @@
 import { reactive } from "vue";
 import type { molData } from "@/components/types";
 import { useRenderMol } from '@/components/rdkitComponent/composable/useRenderMol'
-
-export function useGetSvg(props: molData) {
+const Color = (n:number) => 'hsla('+ Math.floor((n+8.6)*36) +',90%,70%,1)'
+export function useGetSvg(props: molData,rdkit:any) {
 	const svgItem:any= reactive({
 		svg: {},
 		rect: {},
@@ -13,7 +13,7 @@ export function useGetSvg(props: molData) {
 			bond: [],
 		},
 	});
-	const svg=useRenderMol(props)
+	const svg=useRenderMol(props,rdkit)
 	const parser = new DOMParser();
   let xmlDoc = parser.parseFromString(svg, "text/xml");
   //获取svgRoot内容
@@ -81,9 +81,13 @@ export function useGetSvg(props: molData) {
     }
   }
   //如果props.atoms存在非空属性，则添加原子索引
-  if (Object.values(props.atoms ?? {}).some(e => {typeof e === 'number' || typeof e === 'string'})) {
-
-  }
+  Object.keys(props?.atoms as {[key: number]: number[]}).forEach((key:string) => {
+    props.atoms?.[key].forEach((n:number)=>{
+      let item = svgItem.ellipse.findIndex((v:any)=>v.ellipse.class.split('-')[1] == n.toString())
+      svgItem.ellipse[item].ellipse.style.replace('#9FACE6', Color(+key))
+    })
+  })
+  
 
   console.log(svgItem)
 	return svgItem

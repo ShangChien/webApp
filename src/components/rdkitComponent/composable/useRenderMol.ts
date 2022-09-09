@@ -1,8 +1,7 @@
 import type { molData } from "@/components/types";
-import { inject } from "vue";
 
-export function useRenderMol(props: molData) {
-  const rdkit:any = inject("rdkit");
+export function useRenderMol(props: molData,rdkit:any) {
+  
   const concatByIndex = (list1:{[key: number|string]: number[]}|undefined) =>{ 
     let outList: any[] = []
     for(let i in list1){
@@ -12,6 +11,7 @@ export function useRenderMol(props: molData) {
   }
   var atomsIndex = concatByIndex(props.atoms)
   var bondsIndex = concatByIndex(props.bonds)
+  console.log(props.smiles,)
   let mol = rdkit.get_mol(props.smiles ?? "");
   let qmol = rdkit.get_qmol(props.qsmiles ?? "");
   //let mDetail = JSON.parse(mol.get_substruct_match(qmol))

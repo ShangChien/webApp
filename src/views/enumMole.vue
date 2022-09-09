@@ -106,14 +106,14 @@ const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
 const initMol: molData = reactive({
   smiles: "CC(=O)Oc1ccccc1C(=O)O",
   qsmiles: "*~*",
-  atoms: [],
-  bonds: [],
+  atoms: {},
+  bonds: {},
 });
 
 function drawMol() {
   initMol.smiles = inputText.value;
-  tmpSmile.atoms = [];
-  tmpSmile.bonds = [];
+  tmpSmile.atoms = {};
+  tmpSmile.bonds = {};
   //console.log(initMol)
 }
 
@@ -121,8 +121,8 @@ const { copy } = useClipboard();
 
 const tmpSmile = reactive({
   smiles: initMol.smiles,
-  atoms: [],
-  bonds: [],
+  atoms: {} as {[key: number]: number[]}|undefined,
+  bonds: {} as {[key: number]: number[]}|undefined,
 });
 function acceptMol(mol: molData) {
   tmpSmile.smiles = mol.smiles;

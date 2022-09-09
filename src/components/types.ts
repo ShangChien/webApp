@@ -3,8 +3,8 @@ export interface molData {
   smiles?: string | any;
   qsmiles?: string;
   selected?: boolean;
-  atoms?: {[key: number|string]: number[]};
-  bonds?: {[key: number|string]: number[]};
+  atoms?: {[key: number]: number[]};
+  bonds?: {[key: number]: number[]};
   label?: (string|null)[];
   addAtomIndices?: boolean;
   addBondIndices?: boolean;

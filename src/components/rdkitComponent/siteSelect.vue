@@ -34,7 +34,7 @@ const EditStore = useEditState()
 const initMol: molData = reactive({
   smiles: "CC(=O)Oc1ccccc1C(=O)O",
   qsmiles: "*~*",
-  atoms: {},
+  atoms: {1:[2,3,5]},
   bonds: {},
   label: [],
 })
