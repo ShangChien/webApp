@@ -14,6 +14,7 @@ export function useGetSvg(props: molData,rdkit:any) {
 		},
 	});
 	const svg=useRenderMol(props,rdkit)
+  console.log(svg)
 	const parser = new DOMParser();
   let xmlDoc = parser.parseFromString(svg, "text/xml");
   //获取svgRoot内容
@@ -46,7 +47,7 @@ export function useGetSvg(props: molData,rdkit:any) {
     }
     svgItem.ellipse[svgItem.ellipse.length - 1].ellipse["style"] = item
       .getAttribute("style")
-      .concat(";opacity: 0.4");
+      .concat(";opacity: 0.3");
   }
   //获取svgPath内容
   let svgPath: any = xmlDoc.getElementsByTagName("path");
@@ -80,16 +81,24 @@ export function useGetSvg(props: molData,rdkit:any) {
       ] = item.getAttribute("style").concat(";opacity: 0.3");
     }
   }
-  //如果props.atoms存在非空属性，则添加原子索引
+  //如果props.atoms存在非空属性，则高亮
   Object.keys(props?.atoms as {[key: number]: number[]}).forEach((key:string) => {
     props.atoms?.[key].forEach((n:number)=>{
       let item = svgItem.ellipse.findIndex((v:any)=>v.ellipse.class.split('-')[1] == n.toString())
-      svgItem.ellipse[item].ellipse.style.replace('#9FACE6', Color(+key))
+      svgItem.ellipse[item].ellipse.style = svgItem.ellipse[item].ellipse.style
+                                              .replace(/#9FACE6/g, Color(+key))
+                                              .replace('opacity: 0.3', 'opacity: 0.7')
     })
   })
-  
-
-  console.log(svgItem)
+  //如果props.bonds存在非空属性，则高亮
+  Object.keys(props?.bonds as {[key: number]: number[]}).forEach((key:string) => {
+    props.bonds?.[key].forEach((n:number)=>{
+      let item = svgItem.path.hightBonds.findIndex((v:any)=>v.path.class.split(/[' ']|-/gi)[1] == n.toString())
+      svgItem.path.hightBonds[item].path.style = svgItem.path.hightBonds[item].path.style
+                                                   .replace(/#9FACE6/g, Color(+key))
+                                                   .replace('opacity: 0.3', 'opacity: 0.6')
+    })
+  })
+  //console.log(svgItem)
 	return svgItem
-  
 }

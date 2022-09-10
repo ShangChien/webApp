@@ -29,9 +29,9 @@ function domClick($event: any) {
   if (itemList[0] == "atom") {
     //如果点击atom
     //改颜色
-    $event.target.style.stroke = Color(siteType.value);
-    $event.target.style.fill = Color(siteType.value);
-    $event.target.style.opacity = 0.8;
+    // $event.target.style.stroke = Color(siteType.value);
+    // $event.target.style.fill = Color(siteType.value);
+    // $event.target.style.opacity = 0.8;
     var atomIndex = itemList[1] / 1
     preHandleIndex(highlightMap.atoms, atomIndex)
     //添加index到数组
@@ -43,9 +43,9 @@ function domClick($event: any) {
     //console.log('ssddd',highlightMap.atoms)
   } else if (itemList[0] == "bond") {
     //如果点击bond
-    $event.target.style.stroke = Color(siteType.value);
-    $event.target.style.fill = Color(siteType.value);
-    $event.target.style.opacity = 0.4;
+    // $event.target.style.stroke = Color(siteType.value);
+    // $event.target.style.fill = Color(siteType.value);
+    // $event.target.style.opacity = 0.4;
     var bondIndex = itemList[1] / 1
     preHandleIndex(highlightMap.bonds, bondIndex)
     //添加index到数组
@@ -64,18 +64,18 @@ function domDblClick($event: any) {
   if (itemList[0] == "atom") {
     //如果点击atom
     //改颜色
-    $event.target.style.stroke = "#9FACE6";
-    $event.target.style.fill = "#9FACE6";
-    $event.target.style.opacity = 0.6;
+    // $event.target.style.stroke = "#9FACE6";
+    // $event.target.style.fill = "#9FACE6";
+    // $event.target.style.opacity = 0.6;
     //删除index
     preHandleIndex(highlightMap.atoms, itemList[1]/1)
     emit("update-mol", highlightMap);
     //console.log(highlightMap.highlightAtoms)
   } else if (itemList[0] == "bond") {
     //如果点击bond
-    $event.target.style.stroke = "#9FACE6";
-    $event.target.style.fill = "#9FACE6";
-    $event.target.style.opacity = 0.2;
+    // $event.target.style.stroke = "#9FACE6";
+    // $event.target.style.fill = "#9FACE6";
+    // $event.target.style.opacity = 0.2;
     //删除index
     preHandleIndex(highlightMap.bonds, itemList[1]/1)
     emit("update-mol", highlightMap);
