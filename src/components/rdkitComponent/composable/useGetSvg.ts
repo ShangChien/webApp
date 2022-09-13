@@ -14,7 +14,7 @@ export function useGetSvg(props: molData,rdkit:any) {
 		},
 	});
 	const svg=useRenderMol(props,rdkit)
-  console.log(svg)
+  //console.log(svg)
 	const parser = new DOMParser();
   let xmlDoc = parser.parseFromString(svg, "text/xml");
   //获取svgRoot内容

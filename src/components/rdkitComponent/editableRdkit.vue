@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, watch, reactive,inject,toRaw } from "vue";
+import { ref, watch,computed, reactive,inject,toRaw } from "vue";
 import type { molData } from "@/components/types";
 import { useGetSvg } from '@/components/rdkitComponent/composable/useGetSvg'
 const props = defineProps<molData>();
 const emit = defineEmits(["update-mol"]);
 const rdkit = inject('rdkit')
-const svgItem =ref(useGetSvg(props,rdkit))
+const svgItem = ref(useGetSvg(props,rdkit))
 const initProps:any = toRaw(props)
 const highlightMap= reactive({
   id: 0,
@@ -21,6 +21,9 @@ function preHandleIndex(obj:object|undefined,atomIndex:number){
   for (let key in obj) {
     if (obj[key].includes(atomIndex)) {
       obj[key].splice(obj[key].indexOf(atomIndex),1);
+      if (obj[key].length === 0){
+        delete obj[key]
+      }
     }
   }
 }
@@ -29,9 +32,9 @@ function domClick($event: any) {
   if (itemList[0] == "atom") {
     //如果点击atom
     //改颜色
-    // $event.target.style.stroke = Color(siteType.value);
-    // $event.target.style.fill = Color(siteType.value);
-    // $event.target.style.opacity = 0.8;
+    $event.target.style.stroke = Color(siteType.value);
+    $event.target.style.fill = Color(siteType.value);
+    $event.target.style.opacity = 0.7;
     var atomIndex = itemList[1] / 1
     preHandleIndex(highlightMap.atoms, atomIndex)
     //添加index到数组
@@ -43,9 +46,9 @@ function domClick($event: any) {
     //console.log('ssddd',highlightMap.atoms)
   } else if (itemList[0] == "bond") {
     //如果点击bond
-    // $event.target.style.stroke = Color(siteType.value);
-    // $event.target.style.fill = Color(siteType.value);
-    // $event.target.style.opacity = 0.4;
+    $event.target.style.stroke = Color(siteType.value);
+    $event.target.style.fill = Color(siteType.value);
+    $event.target.style.opacity = 0.6;
     var bondIndex = itemList[1] / 1
     preHandleIndex(highlightMap.bonds, bondIndex)
     //添加index到数组
@@ -64,18 +67,18 @@ function domDblClick($event: any) {
   if (itemList[0] == "atom") {
     //如果点击atom
     //改颜色
-    // $event.target.style.stroke = "#9FACE6";
-    // $event.target.style.fill = "#9FACE6";
-    // $event.target.style.opacity = 0.6;
+    $event.target.style.stroke = "#9FACE6";
+    $event.target.style.fill = "#9FACE6";
+    $event.target.style.opacity = 0.3;
     //删除index
     preHandleIndex(highlightMap.atoms, itemList[1]/1)
     emit("update-mol", highlightMap);
     //console.log(highlightMap.highlightAtoms)
   } else if (itemList[0] == "bond") {
     //如果点击bond
-    // $event.target.style.stroke = "#9FACE6";
-    // $event.target.style.fill = "#9FACE6";
-    // $event.target.style.opacity = 0.2;
+    $event.target.style.stroke = "#9FACE6";
+    $event.target.style.fill = "#9FACE6";
+    $event.target.style.opacity = 0.3;
     //删除index
     preHandleIndex(highlightMap.bonds, itemList[1]/1)
     emit("update-mol", highlightMap);
@@ -85,7 +88,7 @@ function domDblClick($event: any) {
   }
 }
 function clearAll() {
-  renderMol(props);
+  svgItem.value = useGetSvg(props,rdkit)
   highlightMap.atoms = {};
   highlightMap.bonds = {};
   emit("update-mol", highlightMap);
@@ -120,18 +123,18 @@ const svg_id = ref();
 //   }
 // }
 
-watch(props, (newVal) => {
-  svgItem.value = useGetSvg(newVal,rdkit)
-  const initProps:any = toRaw(newVal)
-  highlightMap.smiles = initProps.smiles;
-  highlightMap.atoms = initProps.atoms;
-  highlightMap.bonds = initProps.bonds;
-  console.log("watch", highlightMap.atoms);
-});
+// watch(props, (newVal) => {
+//   svgItem.value = useGetSvg(newVal,rdkit)
+//   const initProps:any = toRaw(newVal)
+//   highlightMap.smiles = initProps.smiles;
+//   highlightMap.atoms = initProps.atoms;
+//   highlightMap.bonds = initProps.bonds;
+//   console.log("watch", highlightMap.atoms);
+// });
 </script>
 
 <template class="svg">
-  <svg
+  <svg 
     v-bind="svgItem.svg"
     ref="svg_id"
     class="svgstyle"
