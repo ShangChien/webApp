@@ -92,7 +92,7 @@ function domDblClick($event: any) {
   }
 }
 function clearAll() {
-  highlightMap.value.atoms=highlightMap.value.atoms.forEach()
+  highlightMap.value.atoms={}
   highlightMap.value.bonds={}
   svgItem.value = useGetSvg(props,rdkit)
   highlightMap.id=0
