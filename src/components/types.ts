@@ -5,7 +5,7 @@ export interface molData {
   selected?: boolean;
   atoms?: {[key: number]: number[]};
   bonds?: {[key: number]: number[]};
-  label?: (string|null)[];
+  labels?: (string|null)[];
   addAtomIndices?: boolean;
   addBondIndices?: boolean;
   legend?: string;

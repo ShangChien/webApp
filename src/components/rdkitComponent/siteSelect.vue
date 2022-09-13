@@ -26,6 +26,7 @@ import classSites from "@/components/rdkitComponent/classSites.vue";
 import tagMols from "@/components/rdkitComponent/tagMols.vue"
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
 import { reactive, ref, inject, onMounted } from "vue";
+import type { Ref } from "vue";
 import type { molData } from "@/components/types";
 import { useDraggable,useElementSize } from '@vueuse/core'
 import { useEditState } from '@/stores/editMol'
@@ -36,7 +37,7 @@ const initMol: molData = reactive({
   qsmiles: "*~*",
   atoms: {1:[2,3]},
   bonds: {7:[3,4]},
-  label: [],
+  labels: [],
 })
 
 const el1 = ref<HTMLElement | null>(null)
@@ -50,24 +51,24 @@ const { width:widthNBG } = useElementSize(NBG)
 const mini=ref(true)
 const visiualBox=inject('visiualBox')
 
-
-const tmpSmile: molData = reactive({
-  smiles: initMol.smiles,
-  atoms: {},
-  bonds: {},
-});
+const tmpSmile=editableRdkit.highlightMap
+// const tmpSmile: molData = reactive({
+//   smiles: initMol.smiles,
+//   atoms: {},
+//   bonds: {},
+// });
 const drawMol=()=>{
   initMol.smiles = inputText.value;
-  tmpSmile.atoms = {};
-  tmpSmile.bonds = {};
+  //tmpSmile.atoms = {};
+  //tmpSmile.bonds = {};
   //console.log(initMol)
 }
-const onReceiveMol=(mol: molData)=>{
-  tmpSmile.smiles = mol.smiles;
-  tmpSmile.atoms = mol.atoms;
-  tmpSmile.bonds = mol.bonds;
-  console.log(tmpSmile);
-}
+// const onReceiveMol=(mol:Ref<molData>)=>{
+//   tmpSmile.smiles = mol.value.smiles;
+//   tmpSmile.atoms = mol.value.atoms;
+//   tmpSmile.bonds = mol.value.bonds;
+//   //console.log(tmpSmile);
+// }
 const inputText = ref("");
 const showModal = ref(false);
 const editRdkitKey = ref(1);
@@ -191,7 +192,6 @@ const { copy } = useClipboard();
         <editable-rdkit
           :key="editRdkitKey"
           v-bind="initMol"
-          @update-mol="onReceiveMol"
           style="width: 100%; border-radius: 5px"
         />
       </div>
