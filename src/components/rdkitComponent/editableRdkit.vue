@@ -25,14 +25,12 @@ const svgItem = ref(useGetSvg(highlightMap.value,rdkit))
 const { history, undo, redo, clear, canUndo, canRedo } = useRefHistory(highlightMap, { deep: true, flush: 'post' })
 
 function undoRender(){
-  console.log(canRedo.value,canUndo.value)
   if (canUndo.value ) {
     undo()
     svgItem.value=useGetSvg(highlightMap.value,rdkit)
   } 
 }
 function redoRender(){
-  console.log(canRedo.value,canUndo.value)
   if (canRedo.value ) {
     redo()
     svgItem.value=useGetSvg(highlightMap.value,rdkit)
