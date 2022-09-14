@@ -45,7 +45,7 @@ function renderMol(props){
   mDetail["bondLineWidth"] = props.bondLineWidth ?? 1;
   mDetail["highlightBondWidthMultiplier"] =
     props.highlightBondWidthMultiplier ?? 15;
-  mDetail["highlightRadius"] = props.highlightRadius ?? 0.25;
+  mDetail["highlightRadius"] = props.highlightRadius ?? 0.3;
   mDetail["minFontSize"] = props.minFontSize ?? 10;
   mDetail["explicitMethyl"] = props.explicitMethyl ?? false;
   mDetail = JSON.stringify(mDetail);

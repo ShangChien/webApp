@@ -34,7 +34,7 @@ export function useRenderMol(props: molData,rdkit:any) {
   mDetail["bondLineWidth"] = props.bondLineWidth ?? 1;
   mDetail["highlightBondWidthMultiplier"] =
     props.highlightBondWidthMultiplier ?? 20;
-  mDetail["highlightRadius"] = props.highlightRadius ?? 0.25;
+  mDetail["highlightRadius"] = props.highlightRadius ?? 0.3;
   mDetail["minFontSize"] = props.minFontSize ?? 10;
   //console.log(mDetail)
   mDetail = JSON.stringify(mDetail);

@@ -25,7 +25,7 @@ import initKetcher from "@/components/initKetcher.vue";
 import classSites from "@/components/rdkitComponent/classSites.vue";
 import tagMols from "@/components/rdkitComponent/tagMols.vue"
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
-import { reactive, ref, inject, onMounted } from "vue";
+import { reactive, ref, inject, onMounted,computed } from "vue";
 import type { Ref } from "vue";
 import type { molData } from "@/components/types";
 import { useDraggable,useElementSize } from '@vueuse/core'
@@ -39,7 +39,12 @@ const initMol: molData = reactive({
   bonds: {7:[3,4]},
   labels: [],
 })
-
+//获取浮动编辑框子组件的方法
+const editMol=ref()
+const isMounted = ref(false)
+const undo = computed(() => isMounted ? editMol.value?.canUndo : false)
+const redo = computed(() => isMounted ? editMol.value?.canRedo : false)
+//定位浮动的位置
 const el1 = ref<HTMLElement | null>(null)
 const controlPin=ref<HTMLElement | null>(null)
 const NBG=ref<HTMLElement | null>(null)
@@ -51,7 +56,7 @@ const { width:widthNBG } = useElementSize(NBG)
 const mini=ref(true)
 const visiualBox=inject('visiualBox')
 
-const tmpSmile=editableRdkit.highlightMap
+const tmpSmile = editableRdkit.highlightMap
 // const tmpSmile: molData = reactive({
 //   smiles: initMol.smiles,
 //   atoms: {},
@@ -73,7 +78,13 @@ const inputText = ref("");
 const showModal = ref(false);
 const editRdkitKey = ref(1);
 const { copy } = useClipboard();
-
+function copySmile(){
+  console.log(undo.value.value,redo.value.value)
+  copy(initMol.smiles)
+}
+onMounted(()=>{
+  isMounted.value=true
+})
 </script>
 
 <template>
@@ -113,13 +124,13 @@ const { copy } = useClipboard();
       </n-button>
     </div>
     <n-button-group style="position:absolute;top:2px;right:4px" ref="NBG">
-      <n-button secondary size="small" :focusable="false" @click="copy(initMol.smiles)">
+      <n-button :disabled="!undo" secondary size="small" :focusable="false" @click="editMol.undoRender()">
         <div class="i-flat-color-icons-undo text-xl"></div> 
       </n-button>
-      <n-button secondary size="small" :focusable="false" @click="copy(initMol.smiles)">
+      <n-button :disabled="!redo" secondary size="small" :focusable="false" @click="editMol.redoRender()">
         <div class="i-flat-color-icons-redo text-xl"></div> 
       </n-button>
-      <n-button secondary size="small" :focusable="false" @click="copy(initMol.smiles)">
+      <n-button secondary size="small" :focusable="false" @click="copySmile()">
         <div class="i-icon-park-copy text-xl"></div> 
       </n-button>
     </n-button-group>
@@ -190,6 +201,7 @@ const { copy } = useClipboard();
               justify-content: center;
             " >
         <editable-rdkit
+          ref="editMol"
           :key="editRdkitKey"
           v-bind="initMol"
           style="width: 100%; border-radius: 5px"
