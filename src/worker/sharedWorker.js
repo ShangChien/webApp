@@ -22,6 +22,8 @@ function preHandleProps(props) {
 let i = 0 //counter for the number of times the worker is connected
 let out = null //the output(svg image) of the renderMol function
 function renderMol(props){
+  let atomsIndex = Object.values(props.atoms??{}).reduce((pre,cur)=>pre.concat(cur),[])
+  let bondsIndex = Object.values(props.bonds??{}).reduce((pre,cur)=>pre.concat(cur),[])
   let mol = self.RDKit.get_mol(props.smiles ?? "");
   let qmol = self.RDKit.get_qmol(props.qsmiles ?? "");
   let mdetailsRaw = mol.get_substruct_matches(qmol);
@@ -33,8 +35,8 @@ function renderMol(props){
     }),
     { bonds: [], atoms: [] }
   );
-  mDetail["atoms"] = mDetail.atoms?.concat(props.atoms ?? []) ?? props.atoms;
-  mDetail["bonds"] = mDetail.bonds?.concat(props.bonds ?? []) ?? props.bonds;
+  mDetail["atoms"] = mDetail.atoms?.concat(props.atoms ?? []) ?? atomsIndex;
+  mDetail["bonds"] = mDetail.bonds?.concat(props.bonds ?? []) ?? bondsIndex;
   mDetail["addAtomIndices"] = props.addAtomIndices;
   mDetail["addBondIndices"] = props.addBondIndices;
   mDetail["lenged"] = props.legend;

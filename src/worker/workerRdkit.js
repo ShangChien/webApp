@@ -2,9 +2,9 @@
 importScripts("/RDKit_minimal.js")
 
 function renderMol(props){
-  self.rdkit.prefer_coordgen(true);
-  let mol = self.rdkit.get_mol(props.smiles ?? "");
-  let qmol = self.rdkit.get_qmol(props.qsmiles ?? "");
+  self.RDKit.prefer_coordgen(true);
+  let mol = self.RDKit.get_mol(props.smiles ?? "");
+  let qmol = self.RDKit.get_qmol(props.qsmiles ?? "");
   let mdetailsRaw = mol.get_substruct_matches(qmol);
   let mDetail = mdetailsRaw.length > 2 ? JSON.parse(mdetailsRaw) : [];
   mDetail = mDetail.reduce(
@@ -41,16 +41,16 @@ function renderMol(props){
 onmessage = function (e) {
   initRDKitModule()
 	.then(res=>{
-		self.rdkit = res
+		self.RDKit = res
     let out = renderMol(e.data)
     //console.log(out)
     sendMessage(out)
-    self.rdkit=null
+    self.RDKit=null
     self.close()
 	})
 	.catch(err=>{
 		console.log(err)
-    self.rdkit=null
+    self.RDKit=null
     self.close()
 	})
 }

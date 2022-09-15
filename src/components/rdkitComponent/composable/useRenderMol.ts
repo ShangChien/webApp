@@ -1,17 +1,9 @@
 import type { molData } from "@/components/types";
 
 export function useRenderMol(props: molData,rdkit:any) {
-  
-  const concatByIndex = (list1:{[key: number|string]: number[]}|undefined) =>{ 
-    let outList: any[] = []
-    for(let i in list1){
-      outList = outList.concat(list1[i])
-    }
-    return Array.from(new Set(outList)) 
-  }
-  var atomsIndex = concatByIndex(props.atoms)
-  var bondsIndex = concatByIndex(props.bonds)
-  console.log(props.smiles,)
+  var atomsIndex = Object.values(props.atoms??{}).reduce((pre,cur)=>pre.concat(cur),[])
+  var bondsIndex = Object.values(props.bonds??{}).reduce((pre,cur)=>pre.concat(cur),[])
+  //console.log(props.smiles,)
   let mol = rdkit.get_mol(props.smiles ?? "");
   let qmol = rdkit.get_qmol(props.qsmiles ?? "");
   //let mDetail = JSON.parse(mol.get_substruct_match(qmol))
