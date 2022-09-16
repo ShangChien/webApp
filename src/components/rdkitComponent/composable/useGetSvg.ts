@@ -21,11 +21,6 @@ export function useGetSvg(props: molData,rdkit:any) {
   let svgRoot = xmlDoc.getElementsByTagName("svg")[0];
   for (var attrs of [
     "xmlns",
-    "xmlns:rdkit",
-    "xmlns:xlink",
-    "version",
-    "baseProfile",
-    "xml:space",
     "width",
     "height",
     "viewBox",

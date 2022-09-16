@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 declare module "@rdkit/rdkit/dist/RDKit_minimal.js"
 declare module "ngl/dist/ngl.js";
+declare module 'svgo/lib/svgo.js';
 declare interface Window {
   RDKit: any;
 }
