@@ -64,8 +64,8 @@ const tmpSmile = editableRdkit.highlightMap
 // });
 const drawMol=()=>{
   initMol.smiles = inputText.value;
-  //tmpSmile.atoms = {};
-  //tmpSmile.bonds = {};
+  initMol.atoms = {};
+  initMol.bonds = {};
   //console.log(initMol)
 }
 // const onReceiveMol=(mol:Ref<molData>)=>{

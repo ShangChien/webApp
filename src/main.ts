@@ -5,7 +5,10 @@ import App from "./App.vue";
 import router from "./router";
 import initRDKit from "@/components/rdkitComponent/RDKit";
 //init SharedWorker(rdkit)
-const myWorker = new SharedWorker(new URL('./worker/sharedWorker.js',import.meta.url))
+const myWorker = new SharedWorker(new URL('./worker/sharedWorker.js',import.meta.url),{
+  name: 'vastLabSharedWorker',
+  type: "module",
+})
 myWorker.port.postMessage(null);
 const siteType=ref<number>(0)
 const molTags=ref<string[]>(["芳胺","咔唑","配体"])

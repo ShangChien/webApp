@@ -28,10 +28,12 @@ const mol3: molData = reactive({
   smiles:
     "CC(C)(C)C(C=C1)=CC2=C1SC3=C2N(C4=CC(C5=CC=C(C(C)(C)C)C=C5)=CC6=C4B3C7=C8N6C9=C(C=CC=C9)C8=CC%10=C7C=CC=C%10)C%11=CC=C(C(C)(C)C)C=C%11",
   qsmiles: "[B].c1ccccc1",
+  atoms:{},
   width: 200,
   height: 200,
-  addAtomIndices: true,
-  addBondIndices: true,
+  css:true,
+  addAtomIndices: false,
+  addBondIndices: false,
   highlightColor: [0.24, 0.675, 0.8],
 });
 const mol4: molData = reactive({

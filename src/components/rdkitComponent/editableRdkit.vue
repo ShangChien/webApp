@@ -142,7 +142,7 @@ function clearAll() {
   //emit("update-mol", highlightMap);
 }
 onMounted(()=>{
-//console.log(canRedo.value,canUndo.value)
+//console.log(svgItem.value)
 })
 //根据highlightMap初始化高亮svg中的atoms和bonds
 //const svg_id = ref()

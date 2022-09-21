@@ -28,9 +28,9 @@ export function useRenderMol(props: molData,rdkit:any) {
     props.highlightBondWidthMultiplier ?? 20;
   mDetail["highlightRadius"] = props.highlightRadius ?? 0.3;
   mDetail["minFontSize"] = props.minFontSize ?? 10;
-  //console.log(mDetail)
   mDetail = JSON.stringify(mDetail);
   let svg = mol.get_svg_with_highlights(mDetail);
+  //console.log(svg)
   mol.delete();
   mol=null;
   qmol.delete();
