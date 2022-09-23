@@ -75,7 +75,7 @@ const initHighlight=(svg)=>{
       if (colorType!==undefined){
         return str.replace(/#\d[A-z]{5}/g,Color(+colorType))
       }else{
-        console.log('Not matched atom svg element:',str)
+        //console.log('Not matched atom svg element:',str)
         return str
       }
     } else if (str.match(/path[\s,\S]*4.8px/)) {
@@ -85,7 +85,7 @@ const initHighlight=(svg)=>{
       if (colorType!==undefined){
         return str.replace(/#\d[A-z]{5}/g,Color(+colorType))
       }else{
-        console.log('Not matched bond svg element:',str)
+        //console.log('Not matched bond svg element:',str)
         return str
       }
     } else {
