@@ -9,7 +9,7 @@ const myWorker = new SharedWorker(new URL('../../worker/sharedWorker.js',import.
 const bgStyle= ref()
 myWorker.port.onmessage = async (e:any)=>{
   requestAnimationFrame(async()=>{
-    //console.log(e.data)
+    console.log(e.data)
     bgStyle.value={
       background: e.data,
       backgroundColor: 'transparent',

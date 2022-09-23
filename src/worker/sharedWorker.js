@@ -71,7 +71,7 @@ const initHighlight=(svg)=>{
   let out=strList.map((str)=>{
     if (str.match(/ellipse/)){
       let atomIndex = str.match(/atom-\d+/)[0].split('-')[1]
-      let colorType = Object.keys(props.atoms)
+      let colorType = Object.keys(props?.atoms??{})
                       .find((type)=>props.atoms[type].includes(+atomIndex));
       if (colorType!==undefined){
         return str.replace(/#[A-z,0-9]{6}/g,Color(+colorType))
@@ -81,7 +81,7 @@ const initHighlight=(svg)=>{
       }
     } else if (str.match(/path[\s,\S]*4.8px/)) {
       let bondIndex = str.match(/bond-\d+/)[0].split('-')[1]
-      let colorType = Object.keys(props.bonds)
+      let colorType = Object.keys(props?.bonds??{})
                       .find((type)=>props.bonds[type].includes(+bondIndex));
       if (colorType!==undefined){
         return str.replace(/#[A-z,0-9]{6}/g,Color(+colorType))
@@ -124,7 +124,7 @@ self.onconnect = function(e) {
       if (props.css){
         port.postMessage(cssBgSvg(out));
       }else{
-        port.postMessage(out);
+        port.postMessage(cssBgSvg(out));
       }
       //console.log(cssBgSvg(out))
 		  out=null;

@@ -10,18 +10,16 @@ const mol1: molData = reactive({
   qsmiles: "CC(=O)Oc1ccccc1C(=O)O",
   width: 200,
   height: 200,
-  addAtomIndices: true,
+  
 });
 
 const mol2: molData = reactive({
   smiles:
     "CSCC[C@H](NC(=O)[C@H](CC1=CNC2=C1C=CC=C2)NC(=O)CCNC(=O)OC(C)(C)C)C(=O)N[C@@H](CC(O)=O)C(=O)N[C@@H](CC1=CC=CC=C1)C(N)=O",
   qsmiles: "CS.c1ccccc1.c1ccccc1",
-  width: 400,
-  height: 400,
+  width: 200,
+  height: 200,
   //highlightColor: [0.624, 0.675, 0.2],
-  addAtomIndices: true,
-  addBondIndices: true,
 });
 
 const mol3: molData = reactive({
@@ -42,8 +40,6 @@ const mol4: molData = reactive({
   qsmiles: "[O].[O]",
   width: 200,
   height: 200,
-  addBondIndices: true,
-  addAtomIndices: true,
   //highlightColor: [0.94, 0.475, 0.8],
 });
 const colorNum = ref<number>(0);
@@ -74,20 +70,19 @@ const show=ref<boolean>(true)
    <n-collapse :default-expanded-names="['1']" >
     <n-collapse-item  display-directive="if" name="1" >
     <div style="padding-left:20px;padding-right:20px">
-      <svg-rdkit v-bind="mol3"  style="width:20%" ></svg-rdkit>
+      <svg-rdkit v-bind="mol3"  style="width:20%" />
+      <svg-rdkit v-bind="mol4" style="width:20%"/>
+      <svg-rdkit v-bind="mol2" style="width:20%" />
+      <svg-rdkit v-bind="mol1" style="width:20%" />
     </div>
     </n-collapse-item>
   </n-collapse>
-  <n-space v-if="show">
-  <n-space>
+      <svg-rdkit v-bind="mol3"  style="width:20%" />
+      <svg-rdkit v-bind="mol4" style="width:20%"/>
+      <svg-rdkit v-bind="mol2" style="width:20%" />
+      <svg-rdkit v-bind="mol1" style="width:20%" />
+    <svg-rdkit v-bind="mol2" style="width:90%" />
+    <svg-rdkit v-bind="mol1" style="width:40%" />
  
-    <rdkit-sub v-bind="mol4"></rdkit-sub>
-  </n-space>
-  <n-space>
-    <rdkit-sub v-bind="mol2"></rdkit-sub>
-    <rdkit-sub v-bind="mol1"></rdkit-sub>
-  </n-space>
-  </n-space>
-  
 </div>
 </template>
