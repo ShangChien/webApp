@@ -67,13 +67,14 @@ const renderMol=(props)=>{
 //初始化高亮原子和化学键
 const initHighlight=(svg)=>{
   let strList =svg.split(/>\n</g)
+  console.log(strList)
   let out=strList.map((str)=>{
     if (str.match(/ellipse/)){
       let atomIndex = str.match(/atom-\d+/)[0].split('-')[1]
       let colorType = Object.keys(props.atoms)
                       .find((type)=>props.atoms[type].includes(+atomIndex));
       if (colorType!==undefined){
-        return str.replace(/#\d[A-z]{5}/g,Color(+colorType))
+        return str.replace(/#[A-z,0-9]{6}/g,Color(+colorType))
       }else{
         //console.log('Not matched atom svg element:',str)
         return str
@@ -83,7 +84,7 @@ const initHighlight=(svg)=>{
       let colorType = Object.keys(props.bonds)
                       .find((type)=>props.bonds[type].includes(+bondIndex));
       if (colorType!==undefined){
-        return str.replace(/#\d[A-z]{5}/g,Color(+colorType))
+        return str.replace(/#[A-z,0-9]{6}/g,Color(+colorType))
       }else{
         //console.log('Not matched bond svg element:',str)
         return str

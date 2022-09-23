@@ -91,6 +91,7 @@ const ligands=ref<number[]>()
     </n-grid-item>
   </n-grid>
 </n-thing>
+
 </div>
 </div>
 </template>
