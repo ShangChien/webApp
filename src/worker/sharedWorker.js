@@ -1,6 +1,5 @@
 // import rdkit into the worker, and export the renderMol function
 import initRDKitModule from "@rdkit/rdkit/dist/RDKit_minimal.js";
-import { DOMParser, XMLSerializer } from "@xmldom/xmldom"
 import { optimize } from 'svgo/lib/svgo.js';
 //initialize the rdkit
 initRDKitModule().then(res=>{
@@ -24,7 +23,7 @@ const preHandleProps = (props)=>{
   return props
 }
 //css高亮颜色处理
-const Color = (n) => 'hsla('+ Math.floor((n+8.6)*36) +',90%,70%,1)'
+const Color = (n) => 'hsla('+ Math.floor((n+8.6)*36) +',90%,60%,1)'
 //rdkit的renderMol函数
 const renderMol=(props)=>{
   let atomsIndex = Object.values(props.atoms??{}).reduce((pre,cur)=>pre.concat(cur),[])
@@ -40,8 +39,8 @@ const renderMol=(props)=>{
     }),
     { bonds: [], atoms: [] }
   );
-  mDetail["atoms"] = mDetail.atoms?.concat(props.atoms ?? []) ?? atomsIndex;
-  mDetail["bonds"] = mDetail.bonds?.concat(props.bonds ?? []) ?? bondsIndex;
+  mDetail["atoms"] = mDetail.atoms?.concat(atomsIndex ?? []) ?? atomsIndex;
+  mDetail["bonds"] = mDetail.bonds?.concat(atomsIndex ?? []) ?? bondsIndex;
   mDetail["addAtomIndices"] = props.addAtomIndices;
   mDetail["addBondIndices"] = props.addBondIndices;
   mDetail["lenged"] = props.legend;
@@ -52,7 +51,7 @@ const renderMol=(props)=>{
   mDetail["bondLineWidth"] = props.bondLineWidth ?? 1;
   mDetail["highlightBondWidthMultiplier"] =
     props.highlightBondWidthMultiplier ?? 15;
-  mDetail["highlightRadius"] = props.highlightRadius ?? 0.3;
+  mDetail["highlightRadius"] = props.highlightRadius ?? 0.25;
   mDetail["minFontSize"] = props.minFontSize ?? 10;
   mDetail["explicitMethyl"] = props.explicitMethyl ?? false;
   mDetail = JSON.stringify(mDetail);
@@ -67,26 +66,33 @@ const renderMol=(props)=>{
 }
 //初始化高亮原子和化学键
 const initHighlight=(svg)=>{
-  var parser = new DOMParser();
-  let xmlSvg = parser.parseFromString(svg, "text/xml");
-  console.log(props)
-  Object.keys(props?.atoms).forEach((key) => {
-    props.atoms?.[key].forEach((n)=>{
-      let ellipse = xmlSvg.getElementsByTagName('ellipse').findIndex((i)=>i.getAttribute('class').split('-')[1]==n.toString())
-      ellipse.style.fill=Color(key)
-      ellipse.style.stroke=Color(key)
-      console.log(ellipse)
-    })
+  let strList =svg.split(/>\n</g)
+  let out=strList.map((str)=>{
+    if (str.match(/ellipse/)){
+      let atomIndex = str.match(/atom-\d+/)[0].split('-')[1]
+      let colorType = Object.keys(props.atoms)
+                      .find((type)=>props.atoms[type].includes(+atomIndex));
+      if (colorType!==undefined){
+        return str.replace(/#\d[A-z]{5}/g,Color(+colorType))
+      }else{
+        console.log('Not matched atom svg element:',str)
+        return str
+      }
+    } else if (str.match(/path[\s,\S]*4.8px/)) {
+      let bondIndex = str.match(/bond-\d+/)[0].split('-')[1]
+      let colorType = Object.keys(props.bonds)
+                      .find((type)=>props.bonds[type].includes(+bondIndex));
+      if (colorType!==undefined){
+        return str.replace(/#\d[A-z]{5}/g,Color(+colorType))
+      }else{
+        console.log('Not matched bond svg element:',str)
+        return str
+      }
+    } else {
+      return str
+    }  
   })
-  Object.keys(props?.bonds).forEach((key) => {
-    props.atoms?.[key].forEach((n)=>{
-      let pathHighlight = xmlSvg.getElementsByTagName('path').findIndex((i)=>i.getAttribute('class').split('-')[1]==n.toString() && i.style.stroke=='#9FACE6')
-      pathHighlight.style.stroke=Color(key)
-      console.log(pathHighlight)
-    })
-  })
-  var serializer = new XMLSerializer()
-  return serializer.serializeToString(xmlSvg)
+  return out.join('>\n<')
 }
 //内联到css背景中
 const cssBgSvg=(svgI)=>{
@@ -112,8 +118,8 @@ self.onconnect = function(e) {
   port.onmessage = function(e) {
     props = JSON.parse(e.data)
     if (props) {
-      out = initHighlight(renderMol(preHandleProps(props)))
-      console.log('out',out)
+      out = initHighlight(renderMol(props))
+      //console.log('out',out)
       if (props.css){
         port.postMessage(cssBgSvg(out));
       }else{
