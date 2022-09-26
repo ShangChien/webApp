@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, computed,nextTick, inject } from "vue";
+import { ref, watch, onMounted, computed,onBeforeUpdate, nextTick, inject } from "vue";
 import type { Ref } from 'vue'
 import { useRefHistory } from '@vueuse/core'
 import type { molData } from "@/components/types";
 import { useGetSvg } from '@/components/rdkitComponent/composable/useGetSvg'
+const show=ref(true)
 //inject global state
 const rdkit = inject('rdkit')
 const siteType:any= inject('siteType')
@@ -25,7 +26,7 @@ const svgItem = ref(useGetSvg(highlightMap.value,rdkit))
 const { history, undo, redo, clear, canUndo, canRedo } = useRefHistory(highlightMap, { deep: true, flush: 'post' })
 
 function undoRender(){
-  if (canUndo.value ) {
+  if (canUndo.value) {
     undo()
     svgItem.value=useGetSvg(highlightMap.value,rdkit)
   } 
@@ -36,8 +37,18 @@ function redoRender(){
     svgItem.value=useGetSvg(highlightMap.value,rdkit)
   } 
 }
-defineExpose({ history, undoRender, redoRender, clear, canUndo, canRedo, highlightMap })
+function clearAll() {
+  //await nextTick()
+  console.log('clearAll',history.value,initState.value)
+  highlightMap.value = JSON.parse(JSON.stringify(initState.value))
+  svgItem.value = useGetSvg(initState.value, rdkit)
+  //emit("update-mol", highlightMap);
+}
+defineExpose({ history, undoRender, redoRender, canUndo, canRedo, highlightMap })
 //侦听props，截取props初始值，刷新渲染
+onBeforeUpdate(()=>{
+  svgItem.value = useGetSvg(highlightMap.value,rdkit)
+})
 watch(
   props,
   async (newVal,oldVal)=>{
@@ -69,47 +80,44 @@ function preHandleIndex(obj:object|undefined, atomIndex:number){
     }
   }
 }
-let timer:any
+
 function domClick($event: any) {
   
-  clearTimeout(timer)
-  timer = setTimeout(() => {
-    let itemList = $event.target.getAttribute("class").split(" ")[0].split("-");
-    if (itemList[0] == "atom") {
-      //如果点击atom
-      //改颜色
-      $event.target.style.stroke = Color(siteType.value);
-      $event.target.style.fill = Color(siteType.value);
-      $event.target.style.opacity = 0.7;
-      var atomIndex = itemList[1] / 1
-      preHandleIndex(highlightMap.value.atoms, atomIndex)
-      //添加index到数组
-      highlightMap.value.atoms[siteType.value] = highlightMap.value.atoms[siteType.value] ? 
-                                           highlightMap.value.atoms[siteType.value]:[]
-      highlightMap.value.atoms[siteType.value].push(itemList[1] / 1);
-      //highlightMap.atoms[siteType.value] = Array.from(new Set(highlightMap.atoms[siteType.value])).sort();
-      //emit("update-mol", highlightMap);
-    } else if (itemList[0] == "bond") {
-      //如果点击bond
-      $event.target.style.stroke = Color(siteType.value);
-      $event.target.style.fill = Color(siteType.value);
-      $event.target.style.opacity = 0.6;
-      var bondIndex = itemList[1] / 1
-      preHandleIndex(highlightMap.value.bonds, bondIndex)
-      //添加index到数组
-      highlightMap.value.bonds[siteType.value] = highlightMap.value.bonds[siteType.value] ? 
-                                           highlightMap.value.bonds[siteType.value]:[]
-      highlightMap.value.bonds[siteType.value].push(itemList[1] / 1);
-      //highlightMap.bonds[siteType.value] = Array.from(new Set(highlightMap.bonds[siteType.value])).sort();
-      //emit("update-mol", highlightMap);
-      //console.log(highlightMap.bonds)
-    } else {
-      console.log(itemList[0], "error");
-    }
-  }, 200);
+  let itemList = $event.target.getAttribute("class").split(" ")[0].split("-");
+  if (itemList[0] == "atom") {
+    //如果点击atom
+    //改颜色
+    $event.target.style.stroke = Color(siteType.value);
+    $event.target.style.fill = Color(siteType.value);
+    $event.target.style.opacity = 0.7;
+    var atomIndex = itemList[1] / 1
+    preHandleIndex(highlightMap.value.atoms, atomIndex)
+    //添加index到数组
+    highlightMap.value.atoms[siteType.value] = highlightMap.value.atoms[siteType.value] ? 
+                                         highlightMap.value.atoms[siteType.value]:[]
+    highlightMap.value.atoms[siteType.value].push(itemList[1] / 1);
+    //highlightMap.atoms[siteType.value] = Array.from(new Set(highlightMap.atoms[siteType.value])).sort();
+    //emit("update-mol", highlightMap);
+  } else if (itemList[0] == "bond") {
+    //如果点击bond
+    $event.target.style.stroke = Color(siteType.value);
+    $event.target.style.fill = Color(siteType.value);
+    $event.target.style.opacity = 0.6;
+    var bondIndex = itemList[1] / 1
+    preHandleIndex(highlightMap.value.bonds, bondIndex)
+    //添加index到数组
+    highlightMap.value.bonds[siteType.value] = highlightMap.value.bonds[siteType.value] ? 
+                                         highlightMap.value.bonds[siteType.value]:[]
+    highlightMap.value.bonds[siteType.value].push(itemList[1] / 1);
+    //highlightMap.bonds[siteType.value] = Array.from(new Set(highlightMap.bonds[siteType.value])).sort();
+    //emit("update-mol", highlightMap);
+    //console.log(highlightMap.bonds)
+  } else {
+    console.log(itemList[0], "error");
+  }
 }
-function domDblClick($event: any) {
-  clearTimeout(timer);
+
+function domRClick($event: any) {
   let itemList = $event.target.getAttribute("class").split(" ")[0].split("-");
   if (itemList[0] == "atom") {
     //如果点击atom
@@ -134,13 +142,7 @@ function domDblClick($event: any) {
     console.log(itemList[0], "error");
   }
 }
-function clearAll() {
-  //await nextTick()
-  console.log('clearAll',history.value,initState.value)
-  highlightMap.value = JSON.parse(JSON.stringify(initState.value))
-  svgItem.value = useGetSvg(initState.value, rdkit)
-  //emit("update-mol", highlightMap);
-}
+
 onMounted(()=>{
 //console.log(svgItem.value)
 })
@@ -178,7 +180,6 @@ onMounted(()=>{
   <svg 
     v-bind="svgItem.svg"
     class="svgstyle"
-    @click.right.prevent="clearAll"
     style="width: 100%; height: 100%"
   >
     <rect v-bind="svgItem.rect" />
@@ -197,14 +198,14 @@ onMounted(()=>{
       v-bind="item.path"
       :key="index"
       @click="domClick($event)"
-      @dblclick="domDblClick($event)"
+      @click.right.prevent="domRClick($event)"
     />
-    <ellipse
+    <ellipse 
       v-for="(item,index) in svgItem.ellipse"
       v-bind="item.ellipse"
       :key="index"
       @click="domClick($event)"
-      @dblclick="domDblClick($event)"
+      @click.right.prevent="domRClick($event)"
     />
   </svg>
 </template>

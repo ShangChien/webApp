@@ -44,6 +44,8 @@ const editMol=ref()
 const isMounted = ref(false)
 const undo = computed(() => isMounted ? editMol.value?.canUndo : false)
 const redo = computed(() => isMounted ? editMol.value?.canRedo : false)
+//刷新edit组件内部状态
+const refreshKey = ref(1);
 //定位浮动的位置
 const el1 = ref<HTMLElement | null>(null)
 const controlPin=ref<HTMLElement | null>(null)
@@ -76,7 +78,6 @@ const drawMol=()=>{
 // }
 const inputText = ref("");
 const showModal = ref(false);
-const editRdkitKey = ref(1);
 const { copy } = useClipboard();
 function copySmile(){
   console.log(undo.value.value,redo.value.value)
@@ -123,17 +124,20 @@ onMounted(()=>{
         <n-icon ><close /></n-icon>
       </n-button>
     </div>
-    <n-button-group style="position:absolute;top:2px;right:4px" ref="NBG">
-      <n-button :disabled="!undo" secondary size="small" :focusable="false" @click="editMol.undoRender()">
+    <div style="position:absolute;top:2px;right:4px" ref="NBG">
+      <n-button circle :disabled="!undo" tertiary size="small" :focusable="false" @click="refreshKey++">
+        <div class="i-ci-refresh-02 text-xl"></div> 
+      </n-button>
+      <n-button circle :disabled="!undo" tertiary size="small" :focusable="false" @click="editMol.undoRender()">
         <div class="i-flat-color-icons-undo text-xl"></div> 
       </n-button>
-      <n-button :disabled="!redo" secondary size="small" :focusable="false" @click="editMol.redoRender()">
+      <n-button circle :disabled="!redo" tertiary size="small" :focusable="false" @click="editMol.redoRender()">
         <div class="i-flat-color-icons-redo text-xl"></div> 
       </n-button>
-      <n-button secondary size="small" :focusable="false" @click="copySmile()">
+      <n-button circle size="small" tertiary :focusable="false" @click="copySmile()">
         <div class="i-icon-park-copy text-xl"></div> 
       </n-button>
-    </n-button-group>
+    </div>
     <n-scrollbar :x-scrollable="true" >
     <n-thing >
       <template #description>
@@ -184,10 +188,7 @@ onMounted(()=>{
               <!--modal画板区域结束-->
             </template>
           </n-input>
-          <n-button
-            color="#c471ed"
-            @click="drawMol"
-          >
+          <n-button color="#c471ed" @click="drawMol" >
             <n-icon :size="30">
               <color-palette />
             </n-icon>
@@ -199,10 +200,11 @@ onMounted(()=>{
               display: flex;
               align-items: center;
               justify-content: center;
+              margin-top: -8px;
             " >
         <editable-rdkit
           ref="editMol"
-          :key="editRdkitKey"
+          :key="refreshKey"
           v-bind="initMol"
           style="width: 100%; border-radius: 5px"
         />
@@ -211,14 +213,14 @@ onMounted(()=>{
       <template #footer>
       <div :style="{'width':widthBOX+'px'}"
            style="margin-top:-8px">
-        <div class="i-fluent-emoji-label text-4xl" style="float:left; width:10%" />
+        <div class="i-fluent-emoji-label text-3xl" style="float:left; width:10%" />
         <div style="float:left; width:4%" class="text-xl" >: </div>
         <div style="float:left; width:86%"><tag-mols /></div>
       </div>
-      <n-space justify="space-between" style="width:100%; padding-top:3px" >
-        <class-sites style="margin-top: 0px;" />
+      <n-space justify="space-between" style="width:100%; padding-top:2px" >
+        <class-sites style="margin-top: -4px;" />
         <n-button
-          size="medium"
+          size="small"
           strong
           round
           type="info"

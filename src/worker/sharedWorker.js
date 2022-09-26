@@ -1,13 +1,6 @@
 // import rdkit into the worker, and export the renderMol function
 import initRDKitModule from "@rdkit/rdkit/dist/RDKit_minimal.js";
 import { optimize } from 'svgo/lib/svgo.js';
-//initialize the rdkit
-initRDKitModule().then(res=>{
-	self.RDKit = res	
-  self.RDKit.prefer_coordgen(true);
-}).catch(err=>{
-	console.log(err)
-})
 
 //atoms和bonds的索引处理
 const preHandleProps = (props)=>{
@@ -25,7 +18,7 @@ const preHandleProps = (props)=>{
 //css高亮颜色处理
 const Color = (n) => 'hsla('+ Math.floor((n+8.6)*36) +',90%,60%,1)'
 //rdkit的renderMol函数
-const renderMol=(props)=>{
+const renderMol = (props)=>{
   let atomsIndex = Object.values(props.atoms??{}).reduce((pre,cur)=>pre.concat(cur),[])
   let bondsIndex = Object.values(props.bonds??{}).reduce((pre,cur)=>pre.concat(cur),[])
   let mol = self.RDKit.get_mol(props.smiles ?? "");
@@ -56,18 +49,18 @@ const renderMol=(props)=>{
   mDetail["explicitMethyl"] = props.explicitMethyl ?? false;
   mDetail = JSON.stringify(mDetail);
   out = mol.get_svg_with_highlights(mDetail);
+  //console.log(out)
   mDetail = null;
   mdetailsRaw = null;
   qmol.delete();
-  qmol = null;
   mol.delete();
-  mol = null;
   return out
 }
 //初始化高亮原子和化学键
 const initHighlight=(svg)=>{
+  //console.log(svg)
   let strList =svg.split(/>\n</g)
-  console.log(strList)
+  //console.log(strList)
   let out=strList.map((str)=>{
     if (str.match(/ellipse/)){
       let atomIndex = str.match(/atom-\d+/)[0].split('-')[1]
@@ -113,12 +106,22 @@ const cssBgSvg=(svgI)=>{
 let i = 0 //counter for the number of times the worker is connected
 let out = null //the output(svg image) of the renderMol function
 var props
-self.onconnect = function(e) {
+self.onconnect = async function(e) {
+  //initialize the rdkit
+  if (!self.RDKit) {
+    await initRDKitModule().then(res=>{
+      self.RDKit = res	
+      self.RDKit.prefer_coordgen(true);
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
   var port = e.ports[0];
   console.log("the ",i++,"th time connected")
   port.onmessage = function(e) {
     props = JSON.parse(e.data)
     if (props) {
+      //console.log('props',props)
       out = initHighlight(renderMol(props))
       //console.log('out',out)
       if (props.css){

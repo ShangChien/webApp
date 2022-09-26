@@ -7,18 +7,13 @@ import { NSpace, NButton,NCollapse,NCollapseItem } from "naive-ui";
 
 const mol1: molData = reactive({
   smiles: "CC(=O)Oc1ccccc1C(=O)O",
-  qsmiles: "CC(=O)Oc1ccccc1C(=O)O",
-  width: 200,
-  height: 200,
-  
+  qsmiles: "CC(=O)Oc1ccccc1C(=O)O",  
 });
 
 const mol2: molData = reactive({
   smiles:
     "CSCC[C@H](NC(=O)[C@H](CC1=CNC2=C1C=CC=C2)NC(=O)CCNC(=O)OC(C)(C)C)C(=O)N[C@@H](CC(O)=O)C(=O)N[C@@H](CC1=CC=CC=C1)C(N)=O",
   qsmiles: "CS.c1ccccc1.c1ccccc1",
-  width: 200,
-  height: 200,
   //highlightColor: [0.624, 0.675, 0.2],
 });
 
@@ -28,8 +23,6 @@ const mol3: molData = reactive({
   qsmiles: "[B].c1ccccc1",
   atoms:{3:[2,4,5,8],5:[12,32,23]},
   bonds:{3:[2,4,5,8]},
-  width: 200,
-  height: 200,
   css:true,
   addAtomIndices: false,
   addBondIndices: false,
@@ -38,8 +31,6 @@ const mol3: molData = reactive({
 const mol4: molData = reactive({
   smiles: "CN1C=NC2=C1C(=O)N(C(=O)N2C)",
   qsmiles: "[O].[O]",
-  width: 200,
-  height: 200,
   //highlightColor: [0.94, 0.475, 0.8],
 });
 const colorNum = ref<number>(0);
