@@ -8,12 +8,14 @@ const myWorker = new SharedWorker(new URL('../../worker/sharedWorker.js',import.
 })
 const bgStyle= ref()
 myWorker.port.onmessage = async (e:any)=>{
-  requestAnimationFrame(async()=>{
+  requestAnimationFrame(()=>{
     //console.log(e.data)
     bgStyle.value={
       background: e.data,
+      width:"100%",
+      height: "100%",
       backgroundColor: 'transparent',
-      backgroundSize: ['100%','100%'],
+      backgroundSize: ["100%","100%"],
     }
     //svg.value.innerHTML = svgText.value// URL.createObjectURL(new Blob([e.data], {type:'image/svg+xml'}))
     //console.log(svgText.value)

@@ -79,19 +79,15 @@ function handleDropOption(key: string) {
   }
 }
 onMounted(() => {
-  console.log(props);
+  //console.log(props);
 });
 </script>
 <template>
-<div ref="target" style="width:100%;height:100%" >
+<div ref="target" >
   <!-- v-if="targetIsVisible" -->
-  <n-card 
-    hoverable
-    ref="cardView"
-  >
+  <n-card ref="cardView" hoverable >
     <template #cover>
-      <n-space
-        justify="space-between"
+      <n-space justify="space-between"
         v-if="!isOutside||checked"
         style="
           padding-left: 3%;
@@ -116,7 +112,6 @@ onMounted(() => {
               </template>
             </n-button>
           </n-dropdown>
-          
         </div>
       </n-space>
       <n-popover

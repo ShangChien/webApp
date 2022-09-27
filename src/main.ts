@@ -10,6 +10,7 @@ const myWorker = new SharedWorker(new URL('./worker/sharedWorker.js',import.meta
   type: "module",
 })
 myWorker.port.postMessage(null);
+
 const siteType=ref<number>(0)
 const molTags=ref<string[]>(["芳胺","咔唑","配体"])
 const app = createApp(App);

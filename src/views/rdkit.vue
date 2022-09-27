@@ -1,38 +1,44 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import type { molData } from "@/components/types";
-import rdkitSub from "@/components/rdkitComponent/rdkitSub.vue";
-import svgRdkit from "@/components/rdkitComponent/svgRdkit.vue";
-import { NSpace, NButton,NCollapse,NCollapseItem } from "naive-ui";
+import vGridSvg from "@/components/rdkitComponent/vGridSvg.vue";
+import { NButton } from "naive-ui";
 
-const mol1: molData = reactive({
+const mol1: molData = {
   smiles: "CC(=O)Oc1ccccc1C(=O)O",
   qsmiles: "CC(=O)Oc1ccccc1C(=O)O",  
-});
-
-const mol2: molData = reactive({
+};
+const mol2: molData = {
   smiles:
     "CSCC[C@H](NC(=O)[C@H](CC1=CNC2=C1C=CC=C2)NC(=O)CCNC(=O)OC(C)(C)C)C(=O)N[C@@H](CC(O)=O)C(=O)N[C@@H](CC1=CC=CC=C1)C(N)=O",
   qsmiles: "CS.c1ccccc1.c1ccccc1",
   //highlightColor: [0.624, 0.675, 0.2],
-});
-
-const mol3: molData = reactive({
+};
+const mol3: molData = {
   smiles:
     "CC(C)(C)C(C=C1)=CC2=C1SC3=C2N(C4=CC(C5=CC=C(C(C)(C)C)C=C5)=CC6=C4B3C7=C8N6C9=C(C=CC=C9)C8=CC%10=C7C=CC=C%10)C%11=CC=C(C(C)(C)C)C=C%11",
   qsmiles: "[B].c1ccccc1",
   atoms:{3:[2,4,5,8],5:[12,32,23]},
-  bonds:{3:[2,4,5,8]},
-  css:true,
-  addAtomIndices: false,
-  addBondIndices: false,
-  highlightColor: [0.24, 0.675, 0.8],
-});
-const mol4: molData = reactive({
+  bonds:{3:[2,4,5,8]}
+};
+const mol4: molData = {
   smiles: "CN1C=NC2=C1C(=O)N(C(=O)N2C)",
-  qsmiles: "[O].[O]",
-  //highlightColor: [0.94, 0.475, 0.8],
-});
+  qsmiles: "[O].[O]"
+};
+const mol5: molData = {
+  smiles:
+    "CC(C)(C)C(C=C1)=CC2=C1SC3=C2N(C4=CC(C5=CC=C(C(C)(C)C)C=C5)=CC6=C4B3C7=C8N6C9=C(C=CC=C9)C8=CC%10=C7C=CC=C%10)C%11=CC=C(C(C)(C)C)C=C%11",
+  qsmiles: "[B].c1ccccc1",
+  atoms:{3:[2,4,5,8],5:[12,32,23]},
+  bonds:{3:[2,4,5,8]}
+};
+const mol6: molData = {
+  smiles:
+    "CC(C)(C)C(C=C1)=CC2=C1SC3=C2N(C4=CC(C5=CC=C(C(C)(C)C)C=C5)=CC6=C4B3C7=C8N6C9=C(C=CC=C9)C8=CC%10=C7C=CC=C%10)C%11=CC=C(C(C)(C)C)C=C%11",
+  qsmiles: "[B].c1ccccc1",
+  atoms:{3:[2,4,5,8],5:[12,32,23]},
+  bonds:{3:[2,4,5,8]}
+};
 const colorNum = ref<number>(0);
 
 function change() {
@@ -51,29 +57,51 @@ function change() {
     mol4.highlightColor = color2;
   }
 }
-const show=ref<boolean>(true)
+let col = 6
+const initArray = Array.from(Array(100),(v,i)=>{
+  let seed=i%6
+  if (seed===0){
+    return mol1
+  }else if (seed===1){
+    return mol2
+  }else if (seed===2){
+    return mol3
+  }else if (seed===3){  
+    return mol4
+  }else if (seed===4){
+    return mol5
+  }else if (seed===5){
+    return mol6
+  }
+})
+
+const postArray:any=initArray.map((v,i,a)=>{
+  let seed=i%col
+  if (seed===0){
+    return a.slice(i,i+6)
+  }
+}).filter((v)=>v!==undefined)
+onMounted(()=>{
+  console.log(postArray)
+})
 </script>
 
 <template>
-<div style="position:relative">
-  <NButton @click="change"> 切换颜色 </NButton>
-  <NButton @click="show=!show"> show </NButton>
-   <n-collapse :default-expanded-names="['1']" >
-    <n-collapse-item  display-directive="if" name="1" >
-    <div style="padding-left:20px;padding-right:20px">
-      <svg-rdkit v-bind="mol3"  style="width:20%" />
-      <svg-rdkit v-bind="mol4" style="width:20%"/>
-      <svg-rdkit v-bind="mol2" style="width:20%" />
-      <svg-rdkit v-bind="mol1" style="width:20%" />
-    </div>
-    </n-collapse-item>
-  </n-collapse>
-      <svg-rdkit v-bind="mol3"  style="width:20%" />
-      <svg-rdkit v-bind="mol4" style="width:20%"/>
-      <svg-rdkit v-bind="mol2" style="width:20%" />
-      <svg-rdkit v-bind="mol1" style="width:20%" />
-    <svg-rdkit v-bind="mol2" style="width:90%" />
-    <svg-rdkit v-bind="mol1" style="width:40%" />
- 
+<div>
+  <n-button @click="change"> 切换颜色 </n-button><br>
+  <div class="wrapper1">
+    <v-grid-svg
+      v-for="(item,index) in postArray"
+      :molList="item" 
+      :key="index"
+    />
+  </div>
 </div>
 </template>
+<style scoped>
+.wrapper1 {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-row-gap: 0.5em;
+}
+</style>

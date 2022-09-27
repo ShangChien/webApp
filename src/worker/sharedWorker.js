@@ -100,7 +100,7 @@ const cssBgSvg=(svgI)=>{
     .replace(/</g, '%3C')
     .replace(/>/g, '%3E')
     .replace(/atom/g,'a')
-    .replace(/bond/g,'b')+'")'
+    .replace(/bond/g,'b')+'") no-repeat center center'
 }
 
 let i = 0 //counter for the number of times the worker is connected
