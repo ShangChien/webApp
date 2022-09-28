@@ -83,7 +83,7 @@ onMounted(() => {
 });
 </script>
 <template>
-<div ref="target" >
+<div ref="target" class="w-100\% h-100\%">
   <!-- v-if="targetIsVisible" -->
   <n-card ref="cardView" hoverable >
     <template #cover>

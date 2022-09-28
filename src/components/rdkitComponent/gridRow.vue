@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { refDebounced } from '@vueuse/core'
-import { computed, ref, onMounted,onUpdated,onBeforeMount } from "vue";
+import { refDebounced,useElementSize,useVirtualList } from '@vueuse/core'
+import { computed, ref,onMounted  } from "vue";
+import type {Ref} from "vue";
 import type { molData } from "@/components/types";
 import cardRdkit from "@/components/rdkitComponent/cardRdkit.vue";
 import { NInputNumber } from "naive-ui";
@@ -41,7 +42,6 @@ const mol6: molData = {
 };
 const input=ref(6)
 const cols = refDebounced(input, 1000)
-
 const initArray:molData[] = Array.from(Array(200),(v,i)=>{
   let seed=i%7
   if (seed===1){
@@ -59,6 +59,7 @@ const initArray:molData[] = Array.from(Array(200),(v,i)=>{
   }
 })
 
+
 const postArray:any=computed(()=>{
   return initArray.map((v,i,a)=>{
            let seed=i%cols.value
@@ -70,6 +71,26 @@ const postArray:any=computed(()=>{
 
 const rows=computed(()=>postArray.value.length)
 
+const index: Ref = ref()
+const box = ref<HTMLElement> ()
+const { width }=useElementSize(box)
+const { list, containerProps, wrapperProps, scrollTo }:any = useVirtualList(
+  postArray,
+  {
+    itemHeight: () => (width.value/cols.value + 100),
+    overscan: 2,
+  },
+)
+const handleScrollTo = () => {
+  scrollTo(index.value)
+}
+onMounted(() => {
+  setTimeout(() => {
+      console.log("postlist",postArray.value)
+      console.log("outlist",list.value)
+  }, 1000);
+
+})
 </script>
 
 <template>
@@ -79,27 +100,32 @@ const rows=computed(()=>postArray.value.length)
                   :min="2"
                   class="mb-2 w-20 " 
                   button-placement="both" />
-  <div class="wrapper1" >
-    <div class="wrapper2" 
-      v-for="(itemOuter,indexOuter) in postArray" 
-      :key="indexOuter" 
-    >
-      <card-rdkit class="w-100\% h-100\%"
-        v-for="(itemInner,indexInner) of itemOuter"
-        v-bind="itemInner" 
-        :key="indexInner"
-      />
-    </div>
+  <div class="inline-block mr-4">
+    Jump to index
+    <input v-model="index" placeholder="Index" type="number">
   </div>
+  <button type="button" @click="handleScrollTo">
+    Go
+  </button>
+  <div ref="box" 
+       v-bind="containerProps"
+       class="h-78vh overflow-auto p-2 bg-gray-500/5 rounded">
+    <div v-bind="wrapperProps">
+      <div class="wrapper2" 
+        v-for="(data,index) in list" 
+        :key="index" 
+      >
+        <card-rdkit class="w-100\% h-100\%"
+          v-for="(itemInner,indexInner) in data.data"
+          v-bind="itemInner" 
+          :key="indexInner"
+        />
+      </div>
+    </div>
+  </div> 
 </div>
 </template>
 <style scoped>
-.wrapper1 {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: repeat(v-bind(rows),1fr);
-  grid-row-gap: 0.5em;
-}
 .wrapper2 {
   display: grid;
   grid-template-columns: repeat( v-bind('cols'),1fr);

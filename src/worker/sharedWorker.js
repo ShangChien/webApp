@@ -2,19 +2,9 @@
 import initRDKitModule from "@rdkit/rdkit/dist/RDKit_minimal.js";
 import { optimize } from 'svgo/lib/svgo.js';
 
-//atoms和bonds的索引处理
-const preHandleProps = (props)=>{
-  const concatIndex = (list1)=>{ 
-    let outList= []
-    for(let i in list1){
-      outList = outList.concat(list1[i])
-    }
-    return Array.from(new Set(outList)) 
-  }
-  props.atoms = concatIndex(props.atoms)
-  props.bonds = concatIndex(props.bonds)
-  return props
-}
+let i = 0 //counter for the number of times the worker is connected
+let out = null //the output(svg image) of the renderMol function
+var props
 //css高亮颜色处理
 const Color = (n) => 'hsla('+ Math.floor((n+8.6)*36) +',90%,60%,1)'
 //rdkit的renderMol函数
@@ -103,9 +93,6 @@ const cssBgSvg=(svgI)=>{
     .replace(/bond/g,'b')+'") no-repeat center center'
 }
 
-let i = 0 //counter for the number of times the worker is connected
-let out = null //the output(svg image) of the renderMol function
-var props
 self.onconnect = async function(e) {
   //initialize the rdkit
   if (!self.RDKit) {
@@ -122,23 +109,34 @@ self.onconnect = async function(e) {
     props = JSON.parse(e.data)
     if (props) {
       //console.log('props',props)
-      out = initHighlight(renderMol(props))
+      Promise.resolve(props)
+      .then(data=>cssBgSvg(initHighlight(renderMol(data))))
+      .then(svg=>{
+        if (props.css){
+          port.postMessage(svg);
+        }else{
+          port.postMessage(svg);
+        }
+      })
+      .catch(err=>{
+        console.log('promise in worker error:',err)
+      })
       //console.log('out',out)
-      if (props.css){
-        port.postMessage(cssBgSvg(out));
-      }else{
-        port.postMessage(cssBgSvg(out));
-      }
+      // if (props.css){
+        // port.postMessage(cssBgSvg(out));
+      // }else{
+        // port.postMessage(cssBgSvg(out));
+      // }
       //console.log(cssBgSvg(out))
-		  out=null;
+		  // out=null;
     }
   }
   port.onmessageerror = function(e) {
-    console.log("error", e);
+    console.log("onmessageerror", e);
   }
 }
 self.onerror = function(e) {
-  console.log("error", e);
+  console.log("onerror", e);
 }
 
 
