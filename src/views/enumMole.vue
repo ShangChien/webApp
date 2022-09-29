@@ -485,7 +485,7 @@ watch(
 </div>
 </template>
 
-<style>
+<style scoped>
 .collapse {
   padding: 20px;
   width: 100%;
