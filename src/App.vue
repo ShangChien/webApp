@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h } from "vue";
+import { h,ref } from "vue";
 import type { Component } from "vue";
 import {
   NLayout,
@@ -14,9 +14,9 @@ import { RouterLink, RouterView } from "vue-router";
 import type { MenuOption } from "naive-ui";
 import { LogoElectron } from "@vicons/ionicons5";
 import { Home, Tabler3DCubeSphere, BrandSlack } from "@vicons/tabler";
-import { Carbon, Data1, DataVis1 ,Theater} from "@vicons/carbon";
+import { Carbon, Data1, DataVis1 } from "@vicons/carbon";
 import  ReloadPrompt  from "@/components/ReloadPrompt.vue";
-
+const collapsed=ref(true)
 function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) });
 }
@@ -68,14 +68,14 @@ const menuOptions: MenuOption[] = [
 <template>
   <n-layout bordered position="absolute" style="height: 100vh" :native-scrollbar="false">
     <n-layout-header style="height: 60px; padding: 2px" bordered>
-      <img class="logo" src="/favicon.ico" width="55" />
+      <img class="logo" src="/favicon.ico" width="55" @click="collapsed=!collapsed" />
       <reload-prompt/>
     </n-layout-header>
     <n-layout has-sider position="absolute" style="top: 60px; bottom: 20px" bordered>
       <n-layout-sider
         bordered
-        show-trigger
         collapse-mode="width"
+        :collapsed="collapsed"
         :collapsed-width="70"
         :native-scrollbar="false"
         :width="200"
@@ -84,15 +84,16 @@ const menuOptions: MenuOption[] = [
           :collapsed-width="70"
           :collapsed-icon-size="28"
           :options="menuOptions"
+          :collapsed="collapsed"
         />
       </n-layout-sider>
       <n-layout
-        content-style="padding: 20px"
+        class="p-2 pr-0"
         :native-scrollbar="false"
         bordered
       >
         <n-message-provider>
-          <router-view v-slot="{ Component,route }">
+          <router-view v-slot="{ Component,route }" class="mr-3">
           <Transition name='fade' mode="out-in">
             <keep-alive>
               <Component :is="Component" />

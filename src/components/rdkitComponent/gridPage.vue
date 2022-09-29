@@ -4,8 +4,9 @@ import { computed, ref, onMounted,onUpdated,onBeforeMount } from "vue";
 import type { molData } from "@/components/types";
 import cardRdkit from "@/components/rdkitComponent/cardRdkit.vue";
 import { NInputNumber,NPagination,NPopover,NTag } from "naive-ui";
-const props=defineProps<{molData:molData[]}>()
-const initArray=computed(()=>props.molData)
+
+const props=defineProps<{mollist:molData[]}>()
+const initArray=computed(()=>props.mollist)
 const inputCols = ref(8)
 const inputRows = ref(8)
 const cols = refDebounced(inputCols, 500)
@@ -23,19 +24,19 @@ const arrayShow=computed(()=>{
 </script>
 
 <template>
-<div>
-  <div class="grid grid-cols-2">
+<div class="b-2 rd-2 b-indigo-1 ">
+  <div class="grid grid-cols-2 ">
     <div>
       <n-pagination v-model:page="currentPageInput"
                     :page-count="pageCount"
                     :page-slot="7"
-                    class="mt--2 mb-2 "
+                    class="ma-1 "
                     size="medium"
                     show-quick-jumper>
         <template #goto>跳至:</template>
       </n-pagination>
     </div>
-    <div class="justify-self-end mt--2 mb-2">
+    <div class="justify-self-end ma-1">
       <n-tag :bordered="false" class="mr-1 bg-red-50">
         <span class="text-1.2em ">Total: {{initArray.length}}</span>
       </n-tag>
@@ -83,5 +84,7 @@ const arrayShow=computed(()=>{
   grid-template-rows: repeat(v-bind(rows),1fr);
   grid-row-gap: 0.5em;
   grid-column-gap: 0.5em;
+  padding:4px;
+  padding-top: 0;
 }
 </style>
