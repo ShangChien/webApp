@@ -45,7 +45,12 @@ const arrayShow=computed(()=>{
       </n-tag>
       <n-popover trigger="click">
         <template #trigger>
-          <div class="i-fluent-table-settings-20-filled text-2.5em c-indigo-400 mt--1.2"></div>
+          <button class="i-fluent-table-settings-20-filled 
+                      text-2.5em
+                      c-indigo-400 
+                      mt--1.2
+                      hover:c-teal-400
+                      focus:(c-teal-400 transform-scale-110)" />
         </template>
         <template #default>
           <div class="grid justify-items-end grid-cols-2 gap-2">
@@ -69,7 +74,7 @@ const arrayShow=computed(()=>{
     </div>
   </div>
   <div class="wrapper1" >
-      <card-rdkit class="w-100\% h-100\%"
+      <card-rdkit class="w-100% h-100%"
         v-for="(itemInner,indexInner) of arrayShow"
         v-bind="itemInner" 
         :key="indexInner"

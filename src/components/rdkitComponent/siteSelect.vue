@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
   NSpace,
-  NButtonGroup,
   NButton,
   NIcon,
   NThing,
@@ -13,25 +12,23 @@ import {
 } from "naive-ui";
 import { 
          CloudSatellite, 
-         CopyFile, 
          Carbon,
          Move,
          Close,
          Minimize,
          ColorPalette
 } from "@vicons/carbon";
-import { useClipboard } from "@vueuse/core";
+import { useClipboard,useWindowSize } from "@vueuse/core";
 import initKetcher from "@/components/initKetcher.vue";
 import classSites from "@/components/rdkitComponent/classSites.vue";
 import tagMols from "@/components/rdkitComponent/tagMols.vue"
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
 import { reactive, ref, inject, onMounted,computed } from "vue";
-import type { Ref } from "vue";
+import type { ComputedRef } from "vue";
 import type { molData } from "@/components/types";
 import { useDraggable,useElementSize } from '@vueuse/core'
-import { useEditState } from '@/stores/editMol'
-const EditStore = useEditState()
-
+import { useEnumStore } from '@/stores/enumStore'
+const enumStore = useEnumStore()
 const initMol: molData = reactive({
   smiles: "CC(=O)Oc1ccccc1C(=O)O",
   qsmiles: "*~*",
@@ -39,31 +36,33 @@ const initMol: molData = reactive({
   bonds: {7:[3,4]},
   labels: [],
 })
+const molAddType = inject('molAdd',{molType:'mole',info:'添加分子'})
 //获取浮动编辑框子组件的方法
 const editMol=ref()
 const isMounted = ref(false)
 const undo = computed(() => isMounted ? editMol.value?.canUndo : false)
 const redo = computed(() => isMounted ? editMol.value?.canRedo : false)
+const tmpSmile = computed(() => isMounted ? editMol.value.highlightMap: {})
+//向pinia中添加分子，配体，主核
+const storeAddMol = ()=>{
+  tmpSmile.value['type'] = molAddType.molType
+  enumStore.addMol(tmpSmile.value)
+} 
 //刷新edit组件内部状态
 const refreshKey = ref(1);
 //定位浮动的位置
 const el1 = ref<HTMLElement | null>(null)
 const controlPin=ref<HTMLElement | null>(null)
 const NBG=ref<HTMLElement | null>(null)
+const { width:windowWidth } = useWindowSize()
 const { x, y, style } = useDraggable(el1, {
-  initialValue: { x: 74, y: 9 },
+  initialValue: { x: windowWidth.value-400, y: 64 },
 })
 const { width:widthBOX } = useElementSize(controlPin)
 const { width:widthNBG } = useElementSize(NBG)
 const mini=ref(true)
 const visiualBox=inject('visiualBox')
 
-const tmpSmile = editableRdkit.highlightMap
-// const tmpSmile: molData = reactive({
-//   smiles: initMol.smiles,
-//   atoms: {},
-//   bonds: {},
-// });
 const drawMol=()=>{
   initMol.smiles = inputText.value;
   initMol.atoms = {};
@@ -212,20 +211,20 @@ onMounted(()=>{
       </template>
       <template #footer>
       <div :style="{'width':widthBOX+'px'}"
-           style="margin-top:-8px">
-        <div class="i-fluent-emoji-label text-3xl" style="float:left; width:10%" />
-        <div style="float:left; width:4%" class="text-xl" >: </div>
-        <div style="float:left; width:86%"><tag-mols /></div>
+           class="mt--2">
+        <div class="i-fluent-emoji-label text-3xl float-left mr-1 inline-block" />
+        <div class="text-xl float-left inline-block" >:</div>
+        <div class="text-xl float-left ml-2" :style="{'width':widthBOX-50+'px'}"><tag-mols /></div>
       </div>
-      <n-space justify="space-between" style="width:100%; padding-top:2px" >
-        <class-sites style="margin-top: -4px;" />
+      <n-space justify="space-between" style="width:100%; padding-top:2px;margin-bottom:-5px" >
+        <class-sites class="mt--2" />
         <n-button
           size="small"
           strong
           round
           type="info"
-          @click="EditStore.addMol(tmpSmile)"
-          >添加结构</n-button>  
+          @click="storeAddMol"
+          >{{molAddType.info}}</n-button>  
       </n-space>
       </template>
     </n-thing>
@@ -245,7 +244,7 @@ onMounted(()=>{
   box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.1);
 }
 .simplify{
-  width: 50px; 
+  width: 40px; 
   height: auto; 
   aspect-ratio: 1;
   background-image: linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);

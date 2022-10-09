@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { defineComponent, ref } from 'vue'
 import { repeat } from 'seemly'
+import gridPage from "@/components/rdkitComponent/gridPage.vue";
 import type { TreeOption } from 'naive-ui'
 import { NTree } from 'naive-ui'
+import { useEnumStore } from '@/stores/enumStore'
+const enumStore = useEnumStore()
 
 const props = defineProps();
 const emit = defineEmits([]);

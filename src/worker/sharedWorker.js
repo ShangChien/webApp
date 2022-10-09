@@ -6,7 +6,7 @@ let i = 0 //counter for the number of times the worker is connected
 let out = null //the output(svg image) of the renderMol function
 var props
 //css高亮颜色处理
-const Color = (n) => 'hsla('+ Math.floor((n+8.6)*36) +',90%,60%,1)'
+const Color = (n) => 'hsla('+ (n+8.6)*36 +',90%,60%,1)'
 //rdkit的renderMol函数
 const renderMol = (props)=>{
   let atomsIndex = Object.values(props.atoms??{}).reduce((pre,cur)=>pre.concat(cur),[])

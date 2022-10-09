@@ -3,6 +3,7 @@
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "src/worker"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
+    "strict":false,
     "outDir": "./",
     "allowJs": true,
     "suppressImplicitAnyIndexErrors": true,

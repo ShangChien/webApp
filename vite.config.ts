@@ -6,6 +6,7 @@ import mkcert from "vite-plugin-mkcert";
 import Unocss from 'unocss/vite'
 import { presetAttributify, presetUno } from 'unocss'
 import presetIcons from '@unocss/preset-icons'
+import transformerVariantGroup from '@unocss/transformer-variant-group'
 import { resolve } from "path";
 
 // https://vitejs.dev/config/
@@ -26,6 +27,14 @@ export default {
             // ...
           },
         })
+      ],
+      transformers: [
+        transformerVariantGroup(),
+      ],
+      rules: [
+        // your custom rules
+        [/^hsla-(\d+)-(\d+)-(\d+)-(\d+)$/, 
+          ([_,a,b,c,d]:any) => ({'background-color': `hsla(${a}, ${b}%, ${c}%, ${d}%)`})],
       ],
     }),
     VitePWA({

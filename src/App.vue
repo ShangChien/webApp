@@ -67,12 +67,12 @@ const menuOptions: MenuOption[] = [
 
 <template>
   <n-layout bordered position="absolute" style="height: 100vh" :native-scrollbar="false">
-    <n-layout-header style="height: 60px; padding: 2px" bordered>
-      <img class="logo" src="/favicon.ico" width="55" @click="collapsed=!collapsed" />
+    <n-layout-header style="height: 6vh; padding: 2px" bordered>
+      <img class="logo" src="/favicon.ico" width="50"  />
       <reload-prompt/>
     </n-layout-header>
-    <n-layout has-sider position="absolute" style="top: 60px; bottom: 20px" bordered>
-      <n-layout-sider
+    <n-layout has-sider position="absolute" style="top: 6vh; bottom: 20px" bordered>
+      <n-layout-sider 
         bordered
         collapse-mode="width"
         :collapsed="collapsed"
@@ -80,12 +80,19 @@ const menuOptions: MenuOption[] = [
         :native-scrollbar="false"
         :width="200"
       >
-        <n-menu
+        <n-menu 
           :collapsed-width="70"
           :collapsed-icon-size="28"
           :options="menuOptions"
           :collapsed="collapsed"
         />
+        <div class="w-100% text-center position-absolute bottom-0">
+          <div class=" rd-1 ma-2 hover:(bg-violet-100 text-violet cursor-pointer duration-210 ease-in-out)"
+               @click="collapsed=!collapsed" >
+            <div v-if="collapsed" class="i-tabler-layout-sidebar-left-expand text-3xl ma-1"/>
+            <div v-else class="i-tabler-layout-sidebar-right-expand text-3xl ma-1"/>
+          </div>
+        </div>
       </n-layout-sider>
       <n-layout
         class="p-2 pr-0"

@@ -1,7 +1,7 @@
 import { reactive } from "vue";
 import type { molData } from "@/components/types";
 import { useRenderMol } from '@/components/rdkitComponent/composable/useRenderMol'
-const Color = (n:number) => 'hsla('+ Math.floor((n+8.6)*36) +',90%,70%,1)'
+const Color = (n:number) => 'hsla('+ (n+8.6)*36 +',90%,70%,1)'
 export function useGetSvg(props: molData,rdkit:any) {
 	const svgItem:any= reactive({
 		svg: {},

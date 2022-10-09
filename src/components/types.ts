@@ -3,6 +3,7 @@ export interface molData {
   smiles?: string | any;
   qsmiles?: string;
   selected?: boolean;
+  type?: 'core' | 'ligand'| 'mole';
   css?: boolean;
   atoms?: {[key: number]: number[]};
   bonds?: {[key: number]: number[]};

@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import type { molData } from "@/components/types"
 
-export const useEditState = defineStore('edit',{
+export const useEnumState = defineStore('enum',{
   state: () => ({
     mols: [] as molData[],
     nextId: 0,
@@ -13,7 +13,7 @@ export const useEditState = defineStore('edit',{
     },
     getByLabel(state) {
       return (label:string)=> state.mols.filter(
-        (mol) => label in mol?.[label]
+        (mol) => label in mol?.labels
       )
     },
     getById(state) {
@@ -29,7 +29,7 @@ export const useEditState = defineStore('edit',{
         smiles:x.smiles,
         atoms:x.atoms,
         bonds:x.bonds,
-        label:x.label,
+        labels:x.labels,
       })
     },
     addLabelById(id:number,label:string) {
@@ -54,7 +54,7 @@ export const useEditState = defineStore('edit',{
     },
     rmLabel(label:string) {
       for (var i = 0; i < this.mols.length; i++) {
-        this.mols[i].label=this.mols[i]?.[label].filter(
+        this.mols[i].labels=this.mols[i]?.labels.filter(
           (le:string|null) => le !== label
         )
       }

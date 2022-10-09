@@ -1,59 +1,35 @@
 <script setup lang="ts">
-import { NIcon, NButton, NGradientText,NPopselect } from "naive-ui";
-import { Theater } from "@vicons/carbon";
-import { h,inject } from "vue";
+import { NButtonGroup, NButton, NGradientText,NPopover } from "naive-ui";
+import { inject,computed,ref } from "vue";
 
 const siteType:any= inject('siteType')
-const options:any= Array.from(Array(10).keys()).map((i:number)=> {return {label:i,value:i}})
-                
-const Color = (n:any) => 'hsla('+ Math.floor((n+8.6)*36) +',90%,70%,1)'
-const renderItem=( option:any )=>{
-  return [h(
-            NButton,
-            { 
-              size:'small',
-              circle:true, 
-              quaternary:true,
-	  	        style:{background:Color(option.value)}
-            },
-            {
-              icon: () => {
-                return h(
-                  NIcon,
-                  {
-                    style:{size:20,color:"#0e7a0d"}
-                  },
-                  {
-                   default:()=>h( Theater)
-                  }
-                )}
-            }
-          )]
-}
+const options:any= Array.from(Array(10).keys()).map((i:number)=> {return {label:i,value:i}})         
+const Color = computed(() => 'hsla('+(siteType.value+8.6)*36 +',90%,70%,1)')
+const visiable=ref(false)
 </script>
 <template>
-<div style="margin-top:-5px">
-	<n-gradient-text 
-		style="font-weight:600; background-image: linear-gradient(80deg, #414f88, #7a6176, #a57663, #cc8b4b)">
-    Type:
-  </n-gradient-text>
-  <n-popselect
-    v-model:value="siteType"
-    :overlap="true"
-    placement="bottom-start"
-    :render-label="renderItem"
-    :options="options"
-    size="medium"
-    trigger="click"
-    scrollable
-  >  
-  <n-button circle quaternary size='small'
-	  	:style="{left:5+'px',top:4+'px', background:Color(siteType)}"
-	  	>
-      <template #icon>
-        <n-icon size="20" color="#0e7a0d" ><theater /></n-icon>
-      </template>
-    </n-button>
-  </n-popselect>
+<div >
+  <div class="i-fluent-emoji-flat-artist-palette text-3xl mb-1"></div>
+  <div class="text-xl inline-block ml-1 ma-1" >: </div>
+  <n-popover class="inline-block mb-1 cursor-pointer" trigger="manual" placement="top-start" :show="visiable" >
+    <template #trigger>
+      <div class="i-carbon-circle-filled text-3xl ma-1 rd-50% cursor-pointer outcircle 
+                    hover:(transform-scale-110 transition-transform duration-210 ease-in-out)"
+                    @click="visiable=!visiable" />
+    </template>
+    <div class="p-0 m--2 mb--1" @click="visiable=!visiable">
+      <div v-for="option in options" 
+        :key="option.value" 
+        @click="siteType=option.value"
+        :style="{color:'hsla('+(option.value+8.6)*36 +',90%,70%,1)'}"
+        class="i-ic-sharp-circle mt-1 pt-1 text-3xl rd-0.5 
+               hover:(i-carbon-circle-filled transform-scale-120 duration-210 ease-in-out)" />
+    </div>
+  </n-popover>
 </div>
 </template>
+<style scoped>
+.outcircle {
+  color: v-bind('Color');
+}
+</style>

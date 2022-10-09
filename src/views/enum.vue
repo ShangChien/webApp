@@ -1,18 +1,50 @@
 <script setup lang="ts">
-import { ref, onMounted,provide } from "vue";
+import { ref, onMounted,provide,computed } from "vue";
 import { NStep,NSteps,NCard,NButton,NButtonGroup,NIcon,NSpace,NDivider,NSwitch,NPageHeader,
 NGrid,NGridItem,NStatistic,NAvatar,NDropdown,NThing } from "naive-ui"
-import gridPage from "@/components/rdkitComponent/gridPage.vue";
 import siteSelcet from "@/components/rdkitComponent/siteSelect.vue"
-import classTree from "@/components/dataView/classTree.vue"
+import classTree from "@/components/enumMole/classTree.vue"
 import type { molData } from "@/components/types"
+import type { ComputedRef } from "vue";
+import { useEnumStore } from '@/stores/enumStore'
+import localForage from "localforage";
 
-const currentRef=ref(0)//当前步骤
+const currentStep=ref(0)//当前步骤
 const visiualBox=ref(true)//是否显示可视化框
 provide('visiualBox',visiualBox)
+//控制浮动框添加按钮的显示类型
+const molAdd = computed(()=>{
+  if (currentStep.value==1) {
+    return {molType:'ligand',info:'添加配体'}
+  } else if (currentStep.value==2) {
+    return {molType:'core',info:'添加主核'}
+  } else {
+    return {molType:'mole',info:'添加分子'}
+  }
+})
+provide('molAdd',molAdd)
 const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
 const cores=ref<molData[]|any>()
 const ligands=ref<molData[]|any>()
+
+const enumStore = useEnumStore()
+//监听pinia状态action的调用，数据持久化保存到本地
+enumStore.$onAction(
+  ({name, store, args, after, onError, }) => {
+    const startTime = Date.now()
+    console.log(`Start "${name}" with params [${args.join(', ')}].`)
+    after(() => {
+      localForage.setItem('enumStore',JSON.stringify(store))
+      console.log( `Finished "${name}" after ${Date.now() - startTime}ms.`)
+    })
+    onError((error) => {
+      console.warn(
+        `Failed "${name}" after ${Date.now() - startTime}ms.\nError: ${error}.`
+      )
+    })
+  }
+)
+
 
 </script>
 
@@ -46,36 +78,36 @@ const ligands=ref<molData[]|any>()
   <template #default>
     <site-selcet />
     <n-card embedded class="mt--3">
-      <n-steps v-model:current="currentRef">
+      <n-steps v-model:current="currentStep">
         <n-step title="配体" description="标记配体位点和分类" />
         <n-step title="主体" description="标记主核位点和分类" />
         <n-step title="位点组合" description="位点组合" />
     		<n-step title="结果展示" description="结果查看和筛选" />
       </n-steps>
     	<n-space style="padding-top:10px" >
-        <n-button @click="currentRef--" :disabled="currentRef in [0,1]" type="info">
+        <n-button @click="currentStep--" :disabled="currentStep in [0,1]" type="info">
           back
         </n-button>
-    		<n-button @click="currentRef++" :disabled="currentRef===4" type="info">
-          {{currentRef === 0 ? 'initialze' : 'next'}}
+    		<n-button @click="currentStep++" :disabled="currentStep===4" type="info">
+          {{currentStep === 0 ? 'initialze' : 'next'}}
         </n-button>
     	</n-space>
     </n-card>
   </template>  
 </n-page-header>
 
-<div v-if="currentRef === 1" style="padding-top:10px;">
+<div v-if="currentStep === 1" style="padding-top:10px;">
   <class-tree style="width:20%"/>
   <!-- <grid-page :mollist="ligands" /> -->
 </div>
-<div v-else-if="currentRef === 2">
+<div v-else-if="currentStep === 2">
   主核
   <!-- <grid-page :mollist="cores" /> -->
 </div>
-<div v-else-if="currentRef === 3">
+<div v-else-if="currentStep === 3">
   组合设置
 </div>
-<div v-else-if="currentRef === 4">
+<div v-else-if="currentStep === 4">
   结果页
 </div>
 <div v-else>

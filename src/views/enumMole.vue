@@ -33,31 +33,24 @@ import { reactive, ref, watch, computed,
          defineAsyncComponent } from "vue";
 import type { molData } from "@/components/types";
 import axios from "axios";
-//import Grid from "vue-virtual-scroll-grid";
+import Grid from "vue-virtual-scroll-grid";
 
-const Grid = defineAsyncComponent({
-  loader:() =>import('vue-virtual-scroll-grid'),
-  loadingComponent: NSpin,
-  delay: 2000,//+600*Math.random(),
-  errorComponent: NEmpty,
-  timeout: 3000,
-  suspensible:false
-})
+
 const cardRdkit = defineAsyncComponent({
-  loader:() =>import('@/components/rdkitComponent/cardRdkit.vue'),
+  loader: ()=>import('@/components/rdkitComponent/cardRdkit.vue'),
   loadingComponent: NSpin,
   delay: 2000,//+600*Math.random(),
   errorComponent: NEmpty,
   timeout: 3000,
-  suspensible:false
+  suspensible: false
 })
 const editableRdkit = defineAsyncComponent({
-  loader:() =>import('@/components/rdkitComponent/editableRdkit.vue'),
+  loader: ()=>import('@/components/rdkitComponent/editableRdkit.vue'),
   loadingComponent: NSpin,
   delay: 2000,//+600*Math.random(),
   errorComponent: NEmpty,
   timeout: 3000,
-  suspensible:false
+  suspensible: false
 })
 
 const resultData:any=ref()

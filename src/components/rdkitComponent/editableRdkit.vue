@@ -12,7 +12,7 @@ const Color = (n:any) => 'hsla('+ Math.floor((n+8.6)*36) +',90%,70%,1)'
 //截取初始的props
 const props = defineProps<molData>();
 let { qsmiles,smiles,atoms,bonds,labels } = JSON.parse(JSON.stringify(props)) 
-const highlightMap:Ref< molData>|any =ref({
+const highlightMap:Ref< molData> =ref({
   id: 0,
   qsmiles: qsmiles,
   smiles: smiles,
