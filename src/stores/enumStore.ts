@@ -4,6 +4,7 @@ import type { molData } from "@/components/types"
 export const useEnumStore = defineStore('enum',{
   state: () => ({
     mols: [] as molData[],
+    labels: [] as string[],
     nextId: 0,
   }),
   getters: {
@@ -29,7 +30,7 @@ export const useEnumStore = defineStore('enum',{
     }
   },
   actions: {
-    addMol(x:molData) {
+    async addMol(x:molData) {
       this.mols.push({
         id:this.nextId++,
         smiles:x.smiles,

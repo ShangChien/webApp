@@ -1,5 +1,7 @@
 import { createApp,ref,readonly } from "vue";
 import { createPinia } from "pinia";
+import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2'
+import localforage from 'localforage'
 import 'uno.css'
 import App from "./App.vue";
 import router from "./router";
@@ -24,8 +26,21 @@ initRDKit.then((res) => {
   app.provide('myWorker', readonly(myWorker))
 })
 
-
-
-app.use(createPinia());
+const pinia = createPinia()
+const installPersistedStatePlugin = createPersistedStatePlugin()
+pinia.use(createPersistedStatePlugin({
+  storage: {
+    getItem: async (key) => {
+      return localforage.getItem(key)
+    },
+    setItem: async (key, value) => {
+      return localforage.setItem(key, value)
+    },
+    removeItem: async (key) => {
+      return localforage.removeItem(key)
+    },
+  },
+}),)
+app.use(pinia);
 app.use(router);
 app.mount("#app")

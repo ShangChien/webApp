@@ -7,8 +7,9 @@ import classTree from "@/components/enumMole/classTree.vue"
 import type { molData } from "@/components/types"
 import type { ComputedRef } from "vue";
 import { useEnumStore } from '@/stores/enumStore'
-import localForage from "localforage";
-
+//import localForage from "localforage";
+//relavent lib
+const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
 const currentStep=ref(0)//当前步骤
 const visiualBox=ref(true)//是否显示可视化框
 provide('visiualBox',visiualBox)
@@ -23,28 +24,16 @@ const molAdd = computed(()=>{
   }
 })
 provide('molAdd',molAdd)
-const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
+
 const cores=ref<molData[]|any>()
 const ligands=ref<molData[]|any>()
 
 const enumStore = useEnumStore()
 //监听pinia状态action的调用，数据持久化保存到本地
-enumStore.$onAction(
-  ({name, store, args, after, onError, }) => {
-    const startTime = Date.now()
-    console.log(`Start "${name}" with params [${args.join(', ')}].`)
-    after(() => {
-      localForage.setItem('enumStore',JSON.stringify(store))
-      console.log( `Finished "${name}" after ${Date.now() - startTime}ms.`)
-    })
-    onError((error) => {
-      console.warn(
-        `Failed "${name}" after ${Date.now() - startTime}ms.\nError: ${error}.`
-      )
-    })
-  }
-)
 
+onMounted(()=>{
+
+})
 
 </script>
 

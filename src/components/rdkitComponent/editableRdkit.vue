@@ -59,7 +59,7 @@ watch(
       smiles: smiles,
       atoms: atoms,
       bonds: bonds,
-      label: labels,
+      labels: labels,
     }
     await nextTick()
     clear()
@@ -183,7 +183,7 @@ onMounted(()=>{
     style="width: 100%; height: 100%"
   >
     <rect v-bind="svgItem.rect" />
-    <path
+    <path 
       v-for="(item,index) in svgItem.path.symble"
       v-bind="item.path"
       :key="index"
