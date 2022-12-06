@@ -24,7 +24,6 @@ import classSites from "@/components/rdkitComponent/classSites.vue";
 import tagMols from "@/components/rdkitComponent/tagMols.vue"
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
 import { reactive, ref, inject, onMounted,computed } from "vue";
-import type { ComputedRef } from "vue";
 import type { molData } from "@/components/types";
 import { useDraggable,useElementSize } from '@vueuse/core'
 import { useEnumStore } from '@/stores/enumStore'
@@ -56,7 +55,7 @@ const controlPin=ref<HTMLElement | null>(null)
 const NBG=ref<HTMLElement | null>(null)
 const { width:windowWidth } = useWindowSize()
 const { x, y, style } = useDraggable(el1, {
-  initialValue: { x: windowWidth.value-400, y: 64 },
+  initialValue: { x: windowWidth.value-325, y: 65 },
 })
 const { width:widthBOX } = useElementSize(controlPin)
 const { width:widthNBG } = useElementSize(NBG)

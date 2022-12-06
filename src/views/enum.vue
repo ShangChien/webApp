@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted,provide,computed } from "vue";
-import { NStep,NSteps,NCard,NButton,NButtonGroup,NIcon,NSpace,NDivider,NSwitch,NPageHeader,
+import { NStep,NSteps,NCard,NButton,NSpace,NSwitch,NPageHeader,
 NGrid,NGridItem,NStatistic,NAvatar,NDropdown,NThing } from "naive-ui"
 import siteSelcet from "@/components/rdkitComponent/siteSelect.vue"
 import classTree from "@/components/enumMole/classTree.vue"
+import gridPage from "@/components/rdkitComponent/gridPage.vue"
 import type { molData } from "@/components/types"
-import type { ComputedRef } from "vue";
 import { useEnumStore } from '@/stores/enumStore'
+
 //import localForage from "localforage";
-//relavent lib
+
 const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
 const currentStep=ref(0)//当前步骤
 const visiualBox=ref(true)//是否显示可视化框
@@ -87,7 +88,7 @@ onMounted(()=>{
 
 <div v-if="currentStep === 1" style="padding-top:10px;">
   <class-tree style="width:20%"/>
-  <!-- <grid-page :mollist="ligands" /> -->
+  <grid-page :mollist="ligands" />
 </div>
 <div v-else-if="currentStep === 2">
   主核
