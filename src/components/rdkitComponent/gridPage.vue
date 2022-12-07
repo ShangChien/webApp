@@ -5,13 +5,13 @@ import type { molData } from "@/components/types";
 import cardRdkit from "@/components/rdkitComponent/cardRdkit.vue";
 import { NInputNumber,NPagination,NPopover,NTag,NScrollbar } from "naive-ui";
 import { useElementSize } from '@vueuse/core'
-const props=defineProps<{mollist:molData[]}>()
+const props=defineProps<{molList:molData[];cols:number}>()
 const outBox = ref<HTMLElement | null>(null)
 const { width:outBoxW } = useElementSize(outBox)
 const title = ref<HTMLElement | null>(null)
 const { width:pagePinW } = useElementSize(title)
-const initArray = computed(()=>props.mollist)
-const inputCols = ref(8)
+const initArray = computed(()=>props.molList)
+const inputCols = ref(props.cols)
 const inputRows = ref(8)
 const cols = refDebounced(inputCols, 500)
 const rows = refDebounced(inputRows, 500)
@@ -28,8 +28,8 @@ const arrayShow=computed(()=>{
 </script>
 
 <template>
-<div ref="outBox" class="b-2 rd-2 b-indigo-100 box min-w-230px">
-  <div class="absolute rd-2 z-10 menubg" :style="{'width':outBoxW+'px'}">
+<div ref="outBox" class="b-2 rd-2 b-indigo-100 box min-w-230px min-h-160px">
+  <div class="absolute rd-2 z-2 menubg" :style="{'width':outBoxW+'px'}">
     <div class="ma-1 title-grid">
       <div><n-pagination v-model:page="currentPageInput"
                       :page-count="pageCount"
@@ -42,7 +42,7 @@ const arrayShow=computed(()=>{
           <template #goto>跳至:</template>
         </n-pagination></div>
       <div class="justify-self-end mt-1">
-        <n-tag v-show='outBoxW > 700 ? true : false' :bordered="false" class=" menubg  ">
+        <n-tag v-show='outBoxW > 700 ? true : false' :bordered="false" class=" tagbg  ">
           <span class="text-1.2em ">Total: {{initArray.length}}</span>
           <span class="text-1.2em "> ( {{pageSize}} / page)</span>
         </n-tag>
@@ -50,10 +50,10 @@ const arrayShow=computed(()=>{
           <template #trigger>
             <button class="i-fluent-table-settings-20-filled 
                         text-2.5em
-                        c-indigo-400 
+                        c-indigo-300 
                         inline-block
                         mt--1.3
-                        hover:c-teal-400
+                        hover:c-teal-300
                         focus:(c-teal-400 transform-scale-110)" />
           </template>
           <template #default>
@@ -99,12 +99,17 @@ const arrayShow=computed(()=>{
   padding:4px;
   padding-top: 0;
 }
-.menubg { 
+.menubg {
+  border-radius: 6px 6px 0px 0px; 
   backdrop-filter: saturate(70%) blur(12px);
-  background: rgb(255 255 255 / 40%);
+  background: rgb(227,238,255,40%);
+}
+.tagbg {
+  border-radius: 6px 6px 6px 6px; 
+  backdrop-filter: saturate(70%) blur(12px);
+  background: rgb(227,238,255,10%);
 }
 .box {
-  height: auto; 
   overflow:auto;
   resize:both;
 }

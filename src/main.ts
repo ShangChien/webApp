@@ -27,20 +27,20 @@ initRDKit.then((res) => {
 })
 
 const pinia = createPinia()
-const installPersistedStatePlugin = createPersistedStatePlugin()
-pinia.use(createPersistedStatePlugin({
-  storage: {
-    getItem: async (key) => {
-      return localforage.getItem(key)
+const installPersistedStatePlugin = createPersistedStatePlugin({
+    storage: {
+      getItem: async (key) => {
+        return localforage.getItem(key)
+      },
+      setItem: async (key, value) => {
+        return localforage.setItem(key, value)
+      },
+      removeItem: async (key) => {
+        return localforage.removeItem(key)
+      },
     },
-    setItem: async (key, value) => {
-      return localforage.setItem(key, value)
-    },
-    removeItem: async (key) => {
-      return localforage.removeItem(key)
-    },
-  },
-}),)
+})
+pinia.use((context) => installPersistedStatePlugin(context))
 app.use(pinia);
 app.use(router);
 app.mount("#app")

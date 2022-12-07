@@ -87,8 +87,8 @@ onMounted(()=>{
 </script>
 
 <template>
-<div style="width:100%;z-index:1;position: fixed" v-show="visiualBox">
-  <div ref="el1" style="position: fixed;z-index:1;cursor:move" :style="style">
+<div style="width:100%;z-index:3;position: fixed" v-show="visiualBox">
+  <div ref="el1" style="position: fixed;z-index:3;cursor:move" :style="style">
     <div v-if="!mini" :style="{'width':widthBOX-widthNBG-60+'px'}">
       <n-button
         size="tiny" color="#FFA48D" circle>
@@ -114,11 +114,11 @@ onMounted(()=>{
        class="entireBox" 
        :style="{'left':x-60+'px','top':y-5+'px'}" 
        style="position:fixed"> 
-    <div ref="controlPin" style="padding-bottom:5px;z-index:1">
-      <n-button style="margin-left:0px;margin-right:5px;z-index:1" @click="mini=!mini" size="tiny" color="#7CBD99" circle>
+    <div ref="controlPin" style="padding-bottom:5px;z-index:3">
+      <n-button style="margin-left:0px;margin-right:5px;z-index:3" @click="mini=!mini" size="tiny" color="#7CBD99" circle>
         <n-icon><minimize /></n-icon>
       </n-button>
-      <n-button style="z-index:1" @click="visiualBox=false" size="tiny" color="#F39BBA" circle>
+      <n-button style="z-index:3" @click="visiualBox=false" size="tiny" color="#F39BBA" circle>
         <n-icon ><close /></n-icon>
       </n-button>
     </div>

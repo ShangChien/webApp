@@ -31,9 +31,9 @@ const ligands=ref<molData[]|any>()
 
 const enumStore = useEnumStore()
 //监听pinia状态action的调用，数据持久化保存到本地
-
+ligands.value=enumStore.getByType('ligand')
 onMounted(()=>{
-
+  console.log(ligands.value)
 })
 
 </script>
@@ -66,7 +66,7 @@ onMounted(()=>{
     </n-space>
   </template>
   <template #default>
-    <site-selcet />
+    <site-selcet  />
     <n-card embedded class="mt--3">
       <n-steps v-model:current="currentStep">
         <n-step title="配体" description="标记配体位点和分类" />
@@ -85,10 +85,9 @@ onMounted(()=>{
     </n-card>
   </template>  
 </n-page-header>
-
 <div v-if="currentStep === 1" style="padding-top:10px;">
   <class-tree style="width:20%"/>
-  <grid-page :mollist="ligands" />
+  <grid-page :molList="ligands" :cols='2' class="w-20% h-40vh" />
 </div>
 <div v-else-if="currentStep === 2">
   主核
