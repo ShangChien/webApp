@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted,provide,computed } from "vue";
-import { NStep,NSteps,NCard,NButton,NSpace,NSwitch,NPageHeader,
+import { NStep,NSteps,NButton,NSpace,NSwitch,NPageHeader,
 NGrid,NGridItem,NStatistic,NAvatar,NDropdown,NThing } from "naive-ui"
 import siteSelcet from "@/components/rdkitComponent/siteSelect.vue"
 import classTree from "@/components/enumMole/classTree.vue"
@@ -26,14 +26,17 @@ const molAdd = computed(()=>{
 })
 provide('molAdd',molAdd)
 
-const cores=ref<molData[]|any>()
 const ligands=ref<molData[]|any>()
-
+const cores=ref<molData[]|any>()
 const enumStore = useEnumStore()
-//监听pinia状态action的调用，数据持久化保存到本地
+const getligand=()=>{
+  ligands.value=enumStore.getByType('ligand')
+}
 ligands.value=enumStore.getByType('ligand')
+cores.value=enumStore.getByType('core')
+//监听pinia状态action的调用，数据持久化保存到本地
+
 onMounted(()=>{
-  console.log(ligands.value)
 })
 
 </script>
@@ -52,7 +55,7 @@ onMounted(()=>{
   </template>
   <template #extra>
     <n-space class="mr-2">
-      <n-switch v-model:value="visiualBox" >
+      <n-switch v-model:value="visiualBox" @click="getligand" >
         <template #checked>
           已显示画板
         </template>
@@ -67,14 +70,14 @@ onMounted(()=>{
   </template>
   <template #default>
     <site-selcet  />
-    <n-card embedded class="mt--3">
-      <n-steps v-model:current="currentStep">
+    <div class="b-2 rd-2 b-indigo-100 mt--3  ">
+      <div class="bg-gray-50 m-2 rd-1.5" ><n-steps v-model:current="currentStep" class="ma-2 p-2  ">
         <n-step title="配体" description="标记配体位点和分类" />
         <n-step title="主体" description="标记主核位点和分类" />
         <n-step title="位点组合" description="位点组合" />
     		<n-step title="结果展示" description="结果查看和筛选" />
-      </n-steps>
-    	<n-space style="padding-top:10px" >
+      </n-steps></div>
+    	<n-space class="m-2" >
         <n-button @click="currentStep--" :disabled="currentStep in [0,1]" type="info">
           back
         </n-button>
@@ -82,12 +85,12 @@ onMounted(()=>{
           {{currentStep === 0 ? 'initialze' : 'next'}}
         </n-button>
     	</n-space>
-    </n-card>
+    </div>
   </template>  
 </n-page-header>
-<div v-if="currentStep === 1" style="padding-top:10px;">
-  <class-tree style="width:20%"/>
-  <grid-page :molList="ligands" :cols='2' class="w-20% h-40vh" />
+<div v-if="currentStep === 1" class="pt-10px gridlayout">
+  <class-tree class='p-1'/>
+  <grid-page :molList="ligands" :cols='6' class="h-89.8vh" />
 </div>
 <div v-else-if="currentStep === 2">
   主核
@@ -120,3 +123,10 @@ onMounted(()=>{
 </div>
 </div>
 </template>
+<style>
+.gridlayout {
+  display: grid;
+  grid-column-gap: 0.5em;
+  grid-template-columns: 2fr 6fr 2fr;
+}
+</style>

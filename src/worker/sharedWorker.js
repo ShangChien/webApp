@@ -23,7 +23,7 @@ const renderMol = (props)=>{
     { bonds: [], atoms: [] }
   );
   mDetail["atoms"] = mDetail.atoms?.concat(atomsIndex ?? []) ?? atomsIndex;
-  mDetail["bonds"] = mDetail.bonds?.concat(atomsIndex ?? []) ?? bondsIndex;
+  mDetail["bonds"] = mDetail.bonds?.concat(bondsIndex ?? []) ?? bondsIndex;
   mDetail["addAtomIndices"] = props.addAtomIndices;
   mDetail["addBondIndices"] = props.addBondIndices;
   mDetail["lenged"] = props.legend;
@@ -49,10 +49,13 @@ const renderMol = (props)=>{
 //初始化高亮原子和化学键
 const initHighlight=(svg)=>{
   //console.log(svg)
-  let strList =svg.split(/>\n</g)
+  let strList=svg.split(/>\n</g)
+  let bondsLen=Object.keys(props?.bonds??{}).reduce((sum,cur)=>sum+props.bonds[cur].length,0)
+  let atomsLen=Object.keys(props?.atoms??{}).reduce((sum,cur)=>sum+props.atoms[cur].length,0)
   //console.log(strList)
   let out=strList.map((str)=>{
-    if (str.match(/ellipse/)){
+    if ( (str.search(/ellipse/)!==-1) && (atomsLen>=1) ){
+      atomsLen-=1
       let atomIndex = str.match(/atom-\d+/)[0].split('-')[1]
       let colorType = Object.keys(props?.atoms??{})
                       .find((type)=>props.atoms[type].includes(+atomIndex));
@@ -62,7 +65,8 @@ const initHighlight=(svg)=>{
         //console.log('Not matched atom svg element:',str)
         return str
       }
-    } else if (str.match(/path[\s,\S]*4.8px/)) {
+    } else if ( (str.search(/path[\s,\S]*bond-\d+\satom-\d/)!==-1) && (bondsLen>=1) ) {
+      bondsLen-=1
       let bondIndex = str.match(/bond-\d+/)[0].split('-')[1]
       let colorType = Object.keys(props?.bonds??{})
                       .find((type)=>props.bonds[type].includes(+bondIndex));

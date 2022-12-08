@@ -58,7 +58,7 @@ const initArray:molData[] = Array.from(Array(20000),(v,i)=>{
 
 <template>
 <div>
-  <grid-page :molList="initArray" :cols='8'/>
+  <grid-page :molList="initArray" :cols='8' class='h-85vh'/>
 </div>
 </template>
 <style scoped>

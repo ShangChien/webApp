@@ -28,8 +28,8 @@ const arrayShow=computed(()=>{
 </script>
 
 <template>
-<div ref="outBox" class="b-2 rd-2 b-indigo-100 box min-w-230px min-h-160px">
-  <div class="absolute rd-2 z-2 menubg" :style="{'width':outBoxW+'px'}">
+<div ref="outBox" class="b-2 rd-2 b-indigo-100 relative resize of-auto min-w-230px min-h-160px">
+  <div class="absolute rd-2 z-2 top-0 menubg" :style="{'width':outBoxW+'px'}">
     <div class="ma-1 title-grid">
       <div><n-pagination v-model:page="currentPageInput"
                       :page-count="pageCount"
@@ -78,9 +78,9 @@ const arrayShow=computed(()=>{
       </div>
     </div>
   </div>
-  <n-scrollbar style="max-height: 85vh" >
-    <div class="wrapper1 mr-2.5 mt-11 w100\% h100\%" >
-      <card-rdkit class="w100\% h100\%"
+  <n-scrollbar class="max-h-100vh" >
+    <div class="wrapper1 mr-2.5 mt-12 h-100\%" >
+      <card-rdkit class="w-100\% h-100\%"
         v-for="(itemInner,indexInner) of arrayShow"
         v-bind="itemInner" 
         :key="indexInner"

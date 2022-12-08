@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import type { molData } from "@/components/types"
-
 export const useEnumStore = defineStore('enum',{
   state: () => ({
     mols: [
@@ -23,7 +22,6 @@ export const useEnumStore = defineStore('enum',{
       {id:17,smiles:"C12NC3C(C=CC=C3)=C1C=CC=C2",labels:["咔唑","芳环结构"],type:'core'},
       {id:18,smiles:"C12OC3C(C=CC=C3)=C1C=CC=C2",labels:["二苯并呋喃","芳环结构"],type:'core'},
     ] as molData[],
-    labels: [] as string[],
     nextId: 19,
   }),
   getters: {
@@ -46,6 +44,11 @@ export const useEnumStore = defineStore('enum',{
       return (type:'core'|'ligand'|'mole',label:string)=> state.mols.filter(
         (mol) => mol.type === type && label in mol?.labels
       )
+    },
+    getAllLabels(state) {
+      const init=[]
+      state.mols.forEach((item)=>init.concat(item.labels))
+      return Array.from(new Set(init))
     }
   },
   actions: {
@@ -56,6 +59,7 @@ export const useEnumStore = defineStore('enum',{
         atoms:x.atoms,
         bonds:x.bonds,
         labels:x.labels,
+        type:x.type,
       })
     },
     addLabelById(id:number,label:string) {
@@ -85,5 +89,9 @@ export const useEnumStore = defineStore('enum',{
         )
       }
     }, 
-  },  
+  },
+  persistedState:{
+    key:'st',
+    includePaths:['mols','nextId']
+  } 
 });

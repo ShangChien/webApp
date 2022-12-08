@@ -35,7 +35,7 @@ const initMol: molData = reactive({
   bonds: {7:[3,4]},
   labels: [],
 })
-const molAddType = inject('molAdd',{molType:'mole',info:'添加分子'})
+const molAddType = inject('molAdd',{molType:'ligand',info:'添加分子'})
 //获取浮动编辑框子组件的方法
 const editMol=ref()
 const isMounted = ref(false)
@@ -44,8 +44,9 @@ const redo = computed(() => isMounted ? editMol.value?.canRedo : false)
 const tmpSmile = computed(() => isMounted ? editMol.value.highlightMap: {})
 //向pinia中添加分子，配体，主核
 const storeAddMol = ()=>{
-  tmpSmile.value['type'] = molAddType.molType
+  tmpSmile.value['type'] = 'ligand'
   enumStore.addMol(tmpSmile.value)
+  console.log(tmpSmile.value)
 } 
 //刷新edit组件内部状态
 const refreshKey = ref(1);
@@ -87,7 +88,7 @@ onMounted(()=>{
 </script>
 
 <template>
-<div style="width:100%;z-index:3;position: fixed" v-show="visiualBox">
+<div style="z-index:3;position: fixed" v-show="visiualBox">
   <div ref="el1" style="position: fixed;z-index:3;cursor:move" :style="style">
     <div v-if="!mini" :style="{'width':widthBOX-widthNBG-60+'px'}">
       <n-button
