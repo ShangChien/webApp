@@ -87,7 +87,7 @@ const menuOptions: MenuOption[] = [
           :collapsed="collapsed"
         />
         <div class="w-100% text-center position-absolute bottom-0">
-          <div class=" rd-1 ma-2 hover:(bg-violet-100 text-violet cursor-pointer duration-210 ease-in-out)"
+          <div class="rd-1 ma-2 hover:(bg-violet-100 text-violet cursor-pointer duration-210 ease-in-out)"
                @click="collapsed=!collapsed" >
             <div v-if="collapsed" class="i-tabler-layout-sidebar-left-expand text-3xl ma-1"/>
             <div v-else class="i-tabler-layout-sidebar-right-expand text-3xl ma-1"/>

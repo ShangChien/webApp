@@ -1,5 +1,6 @@
 export interface molData {
   id?: number;
+  name?: string;
   smiles?: string | any;
   qsmiles?: string;
   selected?: boolean;

@@ -88,8 +88,8 @@ onMounted(()=>{
 </script>
 
 <template>
-<div style="z-index:3;position: fixed" v-show="visiualBox">
-  <div ref="el1" style="position: fixed;z-index:3;cursor:move" :style="style">
+<div class='z-3 fixed' v-show="visiualBox">
+  <div ref="el1" class='z-3 fixed cursor-move' :style="style">
     <div v-if="!mini" :style="{'width':widthBOX-widthNBG-60+'px'}">
       <n-button
         size="tiny" color="#FFA48D" circle>
@@ -97,8 +97,7 @@ onMounted(()=>{
       </n-button>
     </div>
     <n-button v-else
-              class="simplify" 
-              style="position: fixed;cursor:grab"
+              class="z-3 fixed cursor-move simplify"
               :style="{left:x-60+'px',top:y-5+'px'}"
               @dblclick="mini=!mini"
               circle 
@@ -112,18 +111,17 @@ onMounted(()=>{
     </n-button>
   </div>
   <div v-show="!mini" 
-       class="entireBox" 
-       :style="{'left':x-60+'px','top':y-5+'px'}" 
-       style="position:fixed"> 
-    <div ref="controlPin" style="padding-bottom:5px;z-index:3">
-      <n-button style="margin-left:0px;margin-right:5px;z-index:3" @click="mini=!mini" size="tiny" color="#7CBD99" circle>
+       class="entireBox fixed" 
+       :style="{'left':x-60+'px','top':y-5+'px'}" > 
+    <div ref="controlPin" class="pb-5px z-3" >
+      <n-button style="margin-right:5px;z-index:3" @click="mini=!mini" size="tiny" color="#7CBD99" circle>
         <n-icon><minimize /></n-icon>
       </n-button>
       <n-button style="z-index:3" @click="visiualBox=false" size="tiny" color="#F39BBA" circle>
         <n-icon ><close /></n-icon>
       </n-button>
     </div>
-    <div style="position:absolute;top:2px;right:4px" ref="NBG">
+    <div class='absolute top-2px right-4px' ref="NBG">
       <n-button circle :disabled="!undo" tertiary size="small" :focusable="false" @click="refreshKey++">
         <div class="i-ci-refresh-02 text-xl"></div> 
       </n-button>
@@ -143,7 +141,7 @@ onMounted(()=>{
         <n-input-group >
           <n-input
             v-model:value="inputText"
-            style="font-size: 20px;max-width: 100%"
+            class="text-20px max-w-100%"
             type="text"
             clearable
             placeholder="type smiles here"
@@ -164,8 +162,7 @@ onMounted(()=>{
               </n-button>
               <!--modal画板区域-->
               <n-modal v-model:show="showModal" display-directive="show">
-                    <n-card
-                      style="width: 1300px; height: 96vh"
+                    <n-card class="w-1300px h-96vh" 
                       :bordered="false"
                       size="huge"
                       role="dialog"
@@ -195,17 +192,12 @@ onMounted(()=>{
         </n-input-group>
       </template>
       <template #default>
-      <div style="
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              margin-top: -8px;
-            " >
+      <div class="flex place-content-center mt--1" >
         <editable-rdkit
           ref="editMol"
           :key="refreshKey"
           v-bind="initMol"
-          style="width: 100%; border-radius: 5px"
+          class="w-100% rd-5px"
         />
       </div>
       </template>
@@ -216,7 +208,7 @@ onMounted(()=>{
         <div class="text-xl float-left inline-block" >:</div>
         <div class="text-xl float-left ml-2" :style="{'width':widthBOX-50+'px'}"><tag-mols /></div>
       </div>
-      <n-space justify="space-between" style="width:100%; padding-top:2px;margin-bottom:-5px" >
+      <n-space justify="space-between" class="w-100% pt-2px mt--5px">
         <class-sites class="mt--2" />
         <n-button
           size="small"

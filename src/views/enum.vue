@@ -11,7 +11,7 @@ import { useEnumStore } from '@/stores/enumStore'
 //import localForage from "localforage";
 
 const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
-const currentStep=ref(0)//当前步骤
+const currentStep=ref(1)//当前步骤
 const visiualBox=ref(true)//是否显示可视化框
 provide('visiualBox',visiualBox)
 //控制浮动框添加按钮的显示类型
@@ -88,9 +88,9 @@ onMounted(()=>{
     </div>
   </template>  
 </n-page-header>
-<div v-if="currentStep === 1" class="pt-10px gridlayout">
-  <class-tree class='p-1'/>
-  <grid-page :molList="ligands" :cols='6' class="h-89.8vh" />
+<div v-if="currentStep === 1" >
+  <class-tree />
+  
 </div>
 <div v-else-if="currentStep === 2">
   主核
@@ -124,9 +124,5 @@ onMounted(()=>{
 </div>
 </template>
 <style>
-.gridlayout {
-  display: grid;
-  grid-column-gap: 0.5em;
-  grid-template-columns: 2fr 6fr 2fr;
-}
+
 </style>

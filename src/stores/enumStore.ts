@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { toRaw } from 'vue'
 import type { molData } from "@/components/types"
 export const useEnumStore = defineStore('enum',{
   state: () => ({
@@ -27,7 +28,9 @@ export const useEnumStore = defineStore('enum',{
   getters: {
     getByLabel(state) {
       return (label:string)=> state.mols.filter(
-        (mol) => label in mol?.labels
+        (mol) => {
+          return mol.labels.includes(label)
+        }
       )
     },
     getById(state) {
@@ -37,7 +40,7 @@ export const useEnumStore = defineStore('enum',{
     },
     getByType(state) {
       return (type:'core'|'ligand'|'mole')=> state.mols.filter(
-        (mol) => mol.type === type
+        (mol) => mol.type == type
       )
     },
     getByTypeAndLabel(state) {
@@ -46,8 +49,10 @@ export const useEnumStore = defineStore('enum',{
       )
     },
     getAllLabels(state) {
-      const init=[]
-      state.mols.forEach((item)=>init.concat(item.labels))
+      let init = []
+      state.mols.forEach((item:molData)=>{
+        init = init.concat(item.labels)
+      })
       return Array.from(new Set(init))
     }
   },
