@@ -86,7 +86,6 @@ const railStyle=({focused,checked}:{focused:boolean;checked:boolean})=>{
 }
 const switchClass=()=>{
   expandedKeys.value=[]
-  console.log('ss')
 }
 const onCheck=(key:string[])=>{
   checkedKeys.value=key
