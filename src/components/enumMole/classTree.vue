@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref,h,computed } from 'vue'
-import type {CSSProperties} from 'vue'
+import { ref,h,computed,nextTick,toRaw } from 'vue'
+import type {CSSProperties,VNode} from 'vue'
 import gridPage from "@/components/rdkitComponent/gridPage.vue";
 import type { TreeOption } from 'naive-ui'
 import { NTree,NSwitch,NSpace } from 'naive-ui'
@@ -13,48 +13,55 @@ const emit = defineEmits([]);
 const siderBox=ref(null)
 const { isOutside } = useMouseInElement(siderBox)
 const checkStrategy = ref<'label'|'type'>('label')
-const defExpandedKeys = ref([])
+const expandedKeys = ref([])
+const checkedKeys = ref([])
+const gridData=ref([])
 const labels:string[] = enumStore.getAllLabels
 const types=['mole','ligand','core']
-const useData =computed<TreeOption[]|undefined>(()=>{
+const siderData =computed<TreeOption[]|undefined>(()=>{
   if (checkStrategy.value=='label'){
     return labels.map((label,index)=>{
-      const key = index
-      const prefix =()=> h(defExpandedKeys.value.includes(key) ? 
-        h('div',{class:'i-fxemoji-openfolder text-xl'}) 
-        :h('div',{class:'i-fxemoji-folder text-xl '}))
+      const key = ''+index
       const children= enumStore.getByLabel(label).map((mol,indexInner)=>{
         return{
           label : (mol?.name)??(''+mol.id),
-          key : ''+index+indexInner,
-          prefix : () => h('div',{ class:'i-flat-color-icons-mind-map' })
+          key : key+'-'+indexInner,
         }
       })
-      return { label,key,prefix,children }
+      return { label,key,children }
     })
   } else {
     return types.map((type:'core'|'ligand'|'mole',index)=>{
-      const key = index
-      const prefix =()=> h(defExpandedKeys.value.includes(key) ? 
-        h('div',{class:'i-fxemoji-openfolder text-xl'}) 
-        :h('div',{class:'i-fxemoji-folder text-xl '}))
+      const key = ''+index
       const children= enumStore.getByType(type).map((mol,indexInner)=>{
         return{
           label : (mol?.name)??(''+mol.id),
-          key  :''+index+indexInner,
-          prefix : () => h('div',{ class:'i-flat-color-icons-mind-map' })
+          key  : key+'-'+indexInner,
         }
       })
-      return { label:type,key,prefix,children }
+      return { label:type,key,children }
     })
   }
 })
+const renderPrefix=({ option }: { option: TreeOption }):VNode=>{
+  let render:VNode
+  if ((option.key as string).includes('-')) {
+    render = h('div',{ class:'i-flat-color-icons-mind-map' })
+  }else if (expandedKeys.value.includes(option.key)) {
+    render = h('div',{class:'i-fxemoji-openfolder text-xl'}) 
+  }else{
+    render = h('div',{class:'i-fxemoji-folder text-xl '})
+  }
+  return render
+}
 const nodeProps=({ option }: { option: TreeOption }) => {
         return {
-          onClick () {
-            defExpandedKeys.value.includes(option.key)?
-            defExpandedKeys.value.splice(defExpandedKeys.value.indexOf(option.key),1):
-            defExpandedKeys.value.push(option.key)
+          onDblclick () {
+            if (!(option.key as string).includes('-')) {
+            expandedKeys.value.includes(option.key)?
+            expandedKeys.value.splice(expandedKeys.value.indexOf(option.key),1):
+            expandedKeys.value.push(option.key)
+            console.log( expandedKeys.value)}
           },
           onContextmenu (e: MouseEvent): void {
             e.preventDefault()
@@ -77,14 +84,15 @@ const railStyle=({focused,checked}:{focused:boolean;checked:boolean})=>{
   }
   return style
 }
-const sort=(value:string)=>{
-  console.log()
+const switchClass=()=>{
+  expandedKeys.value=[]
+  console.log('ss')
+}
+const onCheck=(key:string[])=>{
+  checkedKeys.value=key
+  console.log('checkkey:',key)
 }
 
-const ligands=ref<molData[]|any>()
-const cores=ref<molData[]|any>()
-ligands.value=enumStore.getByType('ligand')
-cores.value=enumStore.getByType('core')
 </script>
 
 <template>
@@ -97,36 +105,39 @@ cores.value=enumStore.getByType('core')
               checked-value="type"
               unchecked-value="label"
               v-model:value=checkStrategy
-              @click="sort(checkStrategy)" >
+              @click="switchClass" >
       <template #checked>types</template>
       <template #checked-icon><div class="i-fluent-emoji-bubbles text-xl" /></template>
       <template #unchecked>labels</template>
       <template #unchecked-icon><div class="i-fluent-emoji-flat-label text-2xl" /></template>
     </n-switch>
     <div v-show="!isOutside" class="grid grid-cols-4 ">
-      <div class="text-center rd-1 w-5 hover:bg-gray-200">
+      <div class="text-center rd-1 w-5 hover:(bg-gray-200 cursor-pointer)">
         <div class="i-codicon-new-file text-4"></div>
       </div>
-      <div class="text-center rd-1 w-5 hover:bg-gray-200">
+      <div class="text-center rd-1 w-5 hover:(bg-gray-200 cursor-pointer)">
          <div class="i-codicon-new-folder text-4"></div>
       </div>
-      <div class="text-center rd-1 w-5 hover:bg-gray-200">
+      <div class="text-center rd-1 w-5 hover:(bg-gray-200 cursor-pointer)">
         <div class="i-codicon-refresh text-4"></div>
       </div>
-      <div class="text-center rd-1 w-5 hover:bg-gray-200">
+      <div class="text-center rd-1 w-5 hover:(bg-gray-200 cursor-pointer)" @click="expandedKeys=[]">
         <div class="i-codicon-collapse-all text-4"></div>
       </div>
     </div>
   </n-space>
-  <n-tree 
+  <n-tree class="h-86vh"
   	:block-line='true' :block-node='true'
-    :data="useData"
-    :default-expanded-keys="defExpandedKeys"
+    :data="siderData"
+    :expanded-keys="expandedKeys"
+    :render-prefix="renderPrefix"
     :render-switcher-icon="renderSwitcherIcon"
     :node-props="nodeProps"
-    selectable />
+    @update:checked-keys="onCheck"
+    cascade checkable virtual-scroll
+     />
   </div>
-  <grid-page :molList="ligands" :cols='6' class="h-89.8vh" />
+  <grid-page v-if="gridData" :molList="gridData" :cols='6' class="h-89.8vh" />
 </div>
 </template>
 <style>

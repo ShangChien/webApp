@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { toRaw } from 'vue'
 import type { molData } from "@/components/types"
 export const useEnumStore = defineStore('enum',{
   state: () => ({
@@ -58,29 +57,23 @@ export const useEnumStore = defineStore('enum',{
   },
   actions: {
     async addMol(x:molData) {
-      this.mols.push({
-        id:this.nextId++,
-        smiles:x.smiles,
-        atoms:x.atoms,
-        bonds:x.bonds,
-        labels:x.labels,
-        type:x.type,
-      })
+      Promise.resolve(x).then((res)=>{
+        res.id=this.nextId++
+        this.mols.push(res)
+      }).catch(e=>console.log('error:',e)) 
     },
-    addLabelById(id:number,label:string) {
-      const item = this.mols.find(
-        (mol) => mol.id === id
-      )
-      if (item?.[label].indexOf(label) === -1) {
-        item?.[label].push(label)
-      } else {
-        console.log('label already exists') 
-      }  
+    async updateMol(x:molData) {
+      Promise.resolve(x).then((res:molData)=>{
+        const index = this.mols.findIndex((mol) => mol.id == res.id)
+        if (index!=-1) {
+          this.mols[index]=res
+        }
+      }).catch((e)=>console.log(e,':id do not exist in enumMol'))
     },
-    rmMolById(id:number) {
-      this.mols = this.mols.filter(
-        (mol) => mol.id !== id
-      )
+    async rmMolById(id:number) {
+      Promise.resolve(id).then((res)=>{
+        this.mols = this.mols.filter((mol) => mol.id != res)
+      }).catch((e)=>console.log(e,'error'))
     },
     rmMolByLabel(label:string) {
       this.mols = this.mols.filter(

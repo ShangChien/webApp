@@ -127,7 +127,7 @@ onMounted(() => {
           </div> 
         </template>
         <span style="word-break: break-word">
-          {{ props.smiles }}<br />
+          id:{{ props.id }}<br />
           atoms:{{ props.atoms }}<br />
           bonds:{{ props.bonds }}
         </span>
