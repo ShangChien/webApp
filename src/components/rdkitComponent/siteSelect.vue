@@ -82,6 +82,9 @@ function copySmile(){
   console.log(undo.value.value,redo.value.value)
   copy(initMol.smiles)
 }
+
+const currentType=ref<string>('mole')
+const types=['ligand','core','mole']
 onMounted(()=>{
   isMounted.value=true
 })
@@ -97,7 +100,7 @@ onMounted(()=>{
       </n-button>
     </div>
     <n-button v-else
-              class="z-3 fixed cursor-move simplify"
+              class="z-3 fixed cursor-grab simplify"
               :style="{left:x-60+'px',top:y-5+'px'}"
               @dblclick="mini=!mini"
               circle 
@@ -202,22 +205,23 @@ onMounted(()=>{
       </div>
       </template>
       <template #footer>
-      <div :style="{'width':widthBOX+'px'}"
-           class="mt--2">
-        <div class="i-fluent-emoji-label text-3xl float-left mr-1 inline-block" />
-        <div class="text-xl float-left inline-block" >:</div>
-        <div class="text-xl float-left ml-2" :style="{'width':widthBOX-50+'px'}"><tag-mols /></div>
-      </div>
-      <n-space justify="space-between" class="w-100% pt-2px mt--5px">
-        <class-sites class="mt--2" />
-        <n-button
-          size="small"
-          strong
-          round
-          type="info"
-          @click="storeAddMol"
-          >{{molAddType.info}}</n-button>  
-      </n-space>
+        <div class="gdview place-content-center mt--3">
+          <class-sites />
+          <div class="m-auto" ><button
+             v-for="(v,i) in types"
+             :key="v"
+             :class="['tab-button', { active: currentType == v }]"
+             @click="currentType = v" >
+            {{ v }}
+          </button></div>
+          <n-button size="small" strong  type="info" class="m-auto mr-1" 
+            @click="storeAddMol" >{{molAddType.info}}</n-button>
+        </div>
+        <div :style="{'width':widthBOX+'px'}" >
+          <div class="i-fluent-emoji-label text-3xl float-left mr-1 inline-block" />
+          <div class="text-xl float-left inline-block" >:</div>
+          <div class="text-xl float-left ml-2" :style="{'width':widthBOX-50+'px'}"><tag-mols /></div>
+        </div>
       </template>
     </n-thing>
     </n-scrollbar>
@@ -242,5 +246,9 @@ onMounted(()=>{
   background-image: linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);
   border-radius: 10px;
   box-shadow: 2px 2px 5px 3px rgba(0, 0, 0, 0.1);
+}
+.gdview {
+  display: grid;
+  grid-template-columns: 90px 1fr 90px;
 }
 </style>

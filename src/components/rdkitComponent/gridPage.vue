@@ -8,8 +8,6 @@ import { useElementSize } from '@vueuse/core'
 const props=defineProps<{molList:molData[];cols:number}>()
 const outBox = ref<HTMLElement | null>(null)
 const { width:outBoxW } = useElementSize(outBox)
-const title = ref<HTMLElement | null>(null)
-const { width:pagePinW } = useElementSize(title)
 const initArray = computed(()=>props.molList)
 const inputCols = ref(props.cols)
 const inputRows = ref(8)
@@ -28,7 +26,7 @@ const arrayShow=computed(()=>{
 </script>
 
 <template>
-<div ref="outBox" class="b-2 rd-2 b-indigo-100 relative resize of-auto min-w-230px min-h-160px">
+<div ref="outBox" class="b-2 rd-2  b-indigo-100 relative min-w-230px min-h-160px">
   <div class="absolute rd-2 z-2 top-0 menubg" :style="{'width':outBoxW+'px'}">
     <div class="ma-1 title-grid">
       <div><n-pagination v-model:page="currentPageInput"
@@ -46,7 +44,7 @@ const arrayShow=computed(()=>{
           <span class="text-1.2em ">Total: {{initArray.length}}</span>
           <span class="text-1.2em "> ( {{pageSize}} / page)</span>
         </n-tag>
-        <n-popover trigger="click">
+        <n-popover placement="bottom-end" trigger="click">
           <template #trigger>
             <button class="i-fluent-table-settings-20-filled 
                         text-2.5em
@@ -102,17 +100,17 @@ const arrayShow=computed(()=>{
 .menubg {
   border-radius: 6px 6px 0px 0px; 
   backdrop-filter: saturate(70%) blur(12px);
-  background: rgb(227,238,255,40%);
+  background: rgb(227,238,255,20%);
 }
 .tagbg {
   border-radius: 6px 6px 6px 6px; 
   backdrop-filter: saturate(70%) blur(12px);
   background: rgb(227,238,255,10%);
 }
-.box {
+/* .box {
   overflow:auto;
   resize:both;
-}
+} */
 .title-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

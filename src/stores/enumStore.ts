@@ -47,7 +47,7 @@ export const useEnumStore = defineStore('enum',{
         (mol) => mol.type === type && label in mol?.labels
       )
     },
-    getAllLabels(state) {
+    getAllLabels(state):string[]|null[] {
       let init = []
       state.mols.forEach((item:molData)=>{
         init = init.concat(item.labels)
@@ -89,7 +89,6 @@ export const useEnumStore = defineStore('enum',{
     }, 
   },
   persistedState:{
-    key:'st',
     includePaths:['mols','nextId']
   } 
 });
