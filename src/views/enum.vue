@@ -64,7 +64,7 @@ watch(
     </n-space>
   </template>
   <template #default>
-    <site-selcet  />
+    <site-selcet />
     <div class="b-2 rd-2 b-indigo-100 mt--3 step ">
       <div class="bg-gray-50 m-2 rd-1.5" ><n-steps v-model:current="currentStep" class="ma-2 p-2  ">
         <n-step title="配体" description="标记配体位点和分类" />

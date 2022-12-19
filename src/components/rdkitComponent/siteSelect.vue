@@ -83,11 +83,13 @@ function copySmile(){
   copy(initMol.smiles)
 }
 
+//分子类型
 const currentType=ref<string>('mole')
 const types=['ligand','core','mole']
 onMounted(()=>{
   isMounted.value=true
 })
+
 </script>
 
 <template>
@@ -207,15 +209,21 @@ onMounted(()=>{
       <template #footer>
         <div class="gdview place-content-center mt--3">
           <class-sites />
-          <div class="m-auto" ><button
-             v-for="(v,i) in types"
-             :key="v"
-             :class="['tab-button', { active: currentType == v }]"
-             @click="currentType = v" >
-            {{ v }}
-          </button></div>
-          <n-button size="small" strong  type="info" class="m-auto mr-1" 
-            @click="storeAddMol" >{{molAddType.info}}</n-button>
+          <div class="flex ma space-x-1 rd-2 bg-blue-900/20 p-1 " >
+            <div v-for="(v,i) in types"
+                    class="rd-1 text-sm p-1 leading-3 text-white 
+                           focus:(outline-none ring-2) 
+                           hover:(bg-white/[0.12] text-blue-400)"
+                    :key="v"
+                    :class="['tab-button shadow', { active: currentType === v }]"
+                    @click="currentType= v" >
+              {{ v }}
+            </div>
+          </div>
+          <n-button size="small" type="info" secondary class="m-auto mr-1" @click="storeAddMol" >
+            <template #icon> <div class="i-ion-plus-round text-teal-500" /></template>
+            {{currentType}}
+          </n-button>
         </div>
         <div :style="{'width':widthBOX+'px'}" >
           <div class="i-fluent-emoji-label text-3xl float-left mr-1 inline-block" />
@@ -250,5 +258,9 @@ onMounted(()=>{
 .gdview {
   display: grid;
   grid-template-columns: 90px 1fr 90px;
+}
+.tab-button.active {
+  background-color: rgba(255, 255, 255, 1);
+  color: rgba(37, 99, 235, 1)
 }
 </style>
