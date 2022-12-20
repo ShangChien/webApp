@@ -13,7 +13,7 @@ export function useGetSvg(props: molData,rdkit:any) {
 			bond: [],
 		},
 	});
-	const svg=useRenderMol(props,rdkit)
+	const svg = useRenderMol(props,rdkit)
   //console.log(svg)
 	const parser = new DOMParser();
   let xmlDoc = parser.parseFromString(svg, "text/xml");
@@ -77,7 +77,7 @@ export function useGetSvg(props: molData,rdkit:any) {
     }
   }
   //如果props.atoms存在非空属性，则高亮
-  Object.keys(props?.atoms as {[key: number]: number[]}).forEach((key:string) => {
+  Object.keys((props?.atoms ?? []) as {[key: number]: number[]}).forEach((key:string) => {
     props.atoms?.[key].forEach((n:number)=>{
       let item = svgItem.ellipse.findIndex((v:any)=>v.ellipse.class.split('-')[1] == n.toString())
       svgItem.ellipse[item].ellipse.style = svgItem.ellipse[item].ellipse.style
@@ -86,7 +86,7 @@ export function useGetSvg(props: molData,rdkit:any) {
     })
   })
   //如果props.bonds存在非空属性，则高亮
-  Object.keys(props?.bonds as {[key: number]: number[]}).forEach((key:string) => {
+  Object.keys((props?.bonds ?? []) as {[key: number]: number[]}).forEach((key:string) => {
     props.bonds?.[key].forEach((n:number)=>{
       let item = svgItem.path.hightBonds.findIndex((v:any)=>v.path.class.split(/[' ']|-/gi)[1] == n.toString())
       svgItem.path.hightBonds[item].path.style = svgItem.path.hightBonds[item].path.style

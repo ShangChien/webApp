@@ -5,12 +5,12 @@ import type { molData } from "@/components/types";
 import cardRdkit from "@/components/rdkitComponent/cardRdkit.vue";
 import { NInputNumber,NPagination,NPopover,NTag,NScrollbar } from "naive-ui";
 import { useElementSize } from '@vueuse/core'
-const props=defineProps<{molList:molData[];cols:number}>()
+const props=defineProps<{molList:molData[];cols:number;rows:number}>()
 const outBox = ref<HTMLElement | null>(null)
 const { width:outBoxW } = useElementSize(outBox)
 const initArray = computed(()=>props.molList)
 const inputCols = ref(props.cols)
-const inputRows = ref(8)
+const inputRows = ref(props.rows)
 const cols = refDebounced(inputCols, 500)
 const rows = refDebounced(inputRows, 500)
 const pageSize = computed(()=>cols.value*rows.value)

@@ -4,7 +4,6 @@ import type { Ref } from 'vue'
 import { useRefHistory } from '@vueuse/core'
 import type { molData } from "@/components/types";
 import { useGetSvg } from '@/components/rdkitComponent/composable/useGetSvg'
-const show=ref(true)
 //inject global state
 const rdkit = inject('rdkit')
 const siteType:any= inject('siteType')
@@ -37,13 +36,6 @@ function redoRender(){
     svgItem.value=useGetSvg(highlightMap.value,rdkit)
   } 
 }
-function clearAll() {
-  //await nextTick()
-  console.log('clearAll',history.value,initState.value)
-  highlightMap.value = JSON.parse(JSON.stringify(initState.value))
-  svgItem.value = useGetSvg(initState.value, rdkit)
-  //emit("update-mol", highlightMap);
-}
 defineExpose({ history, undoRender, redoRender, canUndo, canRedo, highlightMap })
 //侦听props，截取props初始值，刷新渲染
 onBeforeUpdate(()=>{
@@ -51,7 +43,7 @@ onBeforeUpdate(()=>{
 })
 watch(
   props,
-  async (newVal,oldVal)=>{
+  async (newVal)=>{
     let { qsmiles,smiles,atoms,bonds,labels } = JSON.parse(JSON.stringify(newVal))
     highlightMap.value = {
       id: 0,

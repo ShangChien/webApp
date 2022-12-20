@@ -23,19 +23,25 @@ import initKetcher from "@/components/initKetcher.vue";
 import classSites from "@/components/rdkitComponent/classSites.vue";
 import tagMols from "@/components/rdkitComponent/tagMols.vue"
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
-import { reactive, ref, inject, onMounted,computed } from "vue";
+import { reactive, ref, inject, onMounted, computed, watchEffect } from "vue";
 import type { molData } from "@/components/types";
 import { useDraggable,useElementSize } from '@vueuse/core'
 import { useEnumStore } from '@/stores/enumStore'
+const props=defineProps<{id?:number}>()
 const enumStore = useEnumStore()
-const initMol: molData = reactive({
-  smiles: "CC(=O)Oc1ccccc1C(=O)O",
-  qsmiles: "*~*",
-  atoms: {1:[2,3]},
-  bonds: {7:[3,4]},
-  labels: [],
-})
-const molAddType = inject('molAdd',{molType:'ligand',info:'添加分子'})
+const initMol: molData = reactive({qsmiles:'*~*'})
+const id = computed(()=>props.id)
+watchEffect(()=>{
+    const molInEnum= ref(enumStore.getById(id.value)[0])
+    initMol.smiles = molInEnum.value?.smiles ?? 'c1ccccc1'
+    initMol.atoms  = molInEnum.value?.atoms ?? {}
+    initMol.bonds  = molInEnum.value?.bonds ?? {}
+    initMol.labels = molInEnum.value?.labels ?? []
+    initMol.type   = molInEnum.value?.type ?? 'mole'
+    //refreshKey.value++
+    console.log(molInEnum.value)
+  }
+)
 //获取浮动编辑框子组件的方法
 const editMol=ref()
 const isMounted = ref(false)
@@ -60,7 +66,7 @@ const { x, y, style } = useDraggable(el1, {
 })
 const { width:widthBOX } = useElementSize(controlPin)
 const { width:widthNBG } = useElementSize(NBG)
-const mini=ref(true)
+const mini=ref(false)
 const visiualBox=inject('visiualBox')
 
 const drawMol=()=>{
@@ -69,12 +75,7 @@ const drawMol=()=>{
   initMol.bonds = {};
   //console.log(initMol)
 }
-// const onReceiveMol=(mol:Ref<molData>)=>{
-//   tmpSmile.smiles = mol.value.smiles;
-//   tmpSmile.atoms = mol.value.atoms;
-//   tmpSmile.bonds = mol.value.bonds;
-//   //console.log(tmpSmile);
-// }
+
 const inputText = ref("");
 const showModal = ref(false);
 const { copy } = useClipboard();
@@ -84,7 +85,7 @@ function copySmile(){
 }
 
 //分子类型
-const currentType=ref<string>('mole')
+const currentType = computed(()=>initMol.type)
 const types=['ligand','core','mole']
 onMounted(()=>{
   isMounted.value=true
@@ -116,7 +117,7 @@ onMounted(()=>{
     </n-button>
   </div>
   <div v-show="!mini" 
-       class="entireBox fixed" 
+       class="entireBox fixed min-w-333px" 
        :style="{'left':x-60+'px','top':y-5+'px'}" > 
     <div ref="controlPin" class="pb-5px z-3" >
       <n-button style="margin-right:5px;z-index:3" @click="mini=!mini" size="tiny" color="#7CBD99" circle>
@@ -128,7 +129,7 @@ onMounted(()=>{
     </div>
     <div class='absolute top-2px right-4px' ref="NBG">
       <n-button circle :disabled="!undo" tertiary size="small" :focusable="false" @click="refreshKey++">
-        <div class="i-ci-refresh-02 text-xl"></div> 
+        <div class="i-ic-twotone-settings-backup-restore text-xl"></div> 
       </n-button>
       <n-button circle :disabled="!undo" tertiary size="small" :focusable="false" @click="editMol.undoRender()">
         <div class="i-flat-color-icons-undo text-xl"></div> 
@@ -215,20 +216,23 @@ onMounted(()=>{
                            focus:(outline-none ring-2) 
                            hover:(bg-white/[0.12] text-blue-400)"
                     :key="v"
-                    :class="['tab-button shadow', { active: currentType === v }]"
-                    @click="currentType= v" >
+                    :class="['tab-button shadow', { active: initMol.type == v }]"
+                    @click="(initMol.type as string)=v" >
               {{ v }}
             </div>
           </div>
           <n-button size="small" type="info" secondary class="m-auto mr-1" @click="storeAddMol" >
-            <template #icon> <div class="i-ion-plus-round text-teal-500" /></template>
+            <div v-if="id==0" class="i-material-symbols-add-box-outline text-teal-500 text-2xl mr-1 ml--1" />
+            <div v-else class="i-fluent-save-sync-20-regular text-teal-500 text-2xl mr-1 ml--1" />
             {{currentType}}
           </n-button>
         </div>
         <div :style="{'width':widthBOX+'px'}" >
           <div class="i-fluent-emoji-label text-3xl float-left mr-1 inline-block" />
           <div class="text-xl float-left inline-block" >:</div>
-          <div class="text-xl float-left ml-2" :style="{'width':widthBOX-50+'px'}"><tag-mols /></div>
+          <div class="text-xl float-left ml-2" :style="{'width':widthBOX-50+'px'}">
+            <tag-mols v-model:tags="initMol.labels" />
+          </div>
         </div>
       </template>
     </n-thing>

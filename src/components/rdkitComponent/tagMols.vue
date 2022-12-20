@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { NTag,NSelect, type SelectRenderTag } from "naive-ui";
-import { inject,ref,computed,onMounted,h } from "vue";
+import { ref,computed,onMounted,h } from "vue";
+import { useVModel } from '@vueuse/core'
 import { useEnumStore } from '@/stores/enumStore'
+const props=defineProps<{tags:string[]}>()
+const emit=defineEmits(['update:tags'])
+const tagsValue = useVModel(props,'tags',emit)
+
 const enumStore = useEnumStore()
-const tagSelected =ref ([])
-const tagsOption=computed<{label:string,value:string}[]>(()=>enumStore.getAllLabels.map((v:string)=>({label:v,value:v})))
-//const labels =computed<{label:string,value:string}[]>(()=>enumStore.getAllLabels.map((v:string)=>({label:v,value:v})))
-//const tags=ref([])
-const labels=enumStore.getAllLabels
-//tagsOption.value=labels.map((v:string,i:number)=>({label:i+1+' '+v,value:v}))
+const tagsOption=computed<{label:string,value:string}[]>(()=>{
+	return enumStore.getAllLabels.map((v:string)=>({label:v,value:v}))
+})
 const renderTag:SelectRenderTag=({ option, handleClose })=>{
 	return h(NTag,
         	{
@@ -26,12 +28,11 @@ const renderTag:SelectRenderTag=({ option, handleClose })=>{
 }
 onMounted(()=>{
 	
-	console.log(labels,tagsOption.value)
 })
 </script>
 <template>
 	<n-select type="info" 
-						v-model="tagSelected"
+						v-model:value="tagsValue"
 						size="small" 
 						:options="tagsOption"
 						:render-tag="renderTag"

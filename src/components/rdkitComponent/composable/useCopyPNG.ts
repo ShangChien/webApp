@@ -28,5 +28,5 @@ export async function useCopyPNG(svgText:any) {
 	 ]);
 	} catch (err:any) {
 	 console.error(err.name, err.message);
-	} 
+	}
 }

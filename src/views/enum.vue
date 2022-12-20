@@ -13,18 +13,11 @@ const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
 const hasMounted=ref(false)
 const currentStep=ref(1)//当前步骤
 const visiualBox=ref(true)//是否显示可视化框
-provide('visiualBox',visiualBox)
 //控制浮动框添加按钮的显示类型
-const molAdd = computed(()=>{
-  if (currentStep.value==1) {
-    return {molType:'ligand',info:'添加配体'}
-  } else if (currentStep.value==2) {
-    return {molType:'core',info:'添加主核'}
-  } else {
-    return {molType:'mole',info:'添加分子'}
-  }
-})
-provide('molAdd',molAdd)
+provide('visiualBox',visiualBox)
+//位点选取组件所显示分子的id
+const currentEditMolId = ref<number>(0)
+provide('currentEditMolId',currentEditMolId)
 
 const ligandsDom=ref()
 const coresDom=ref()
@@ -64,7 +57,7 @@ watch(
     </n-space>
   </template>
   <template #default>
-    <site-selcet />
+    <site-selcet :id='currentEditMolId' />
     <div class="b-2 rd-2 b-indigo-100 mt--3 step ">
       <div class="bg-gray-50 m-2 rd-1.5" ><n-steps v-model:current="currentStep" class="ma-2 p-2  ">
         <n-step title="配体" description="标记配体位点和分类" />

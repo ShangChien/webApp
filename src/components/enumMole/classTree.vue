@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref,h,computed } from 'vue'
-import type {CSSProperties,VNode} from 'vue'
+import { inject,ref,h,computed } from 'vue'
+import type {CSSProperties,VNode,Ref} from 'vue'
 import gridPage from "@/components/rdkitComponent/gridPage.vue";
 import type { TreeOption } from 'naive-ui'
 import { NTree,NSwitch,NSpace } from 'naive-ui'
@@ -15,6 +15,7 @@ const checkStrategy = ref<'label'|'type'>('label')
 const expandedKeys = ref([])
 const checkedKeys = ref([])
 const gridData=ref([])
+const currentEditMolId:Ref<number>=inject('currentEditMolId')
 const labels:string[] = enumStore.getAllLabels
 const types=['mole','ligand','core']
 const siderData =computed<TreeOption[]|undefined>(()=>{
@@ -102,13 +103,22 @@ const onCheck = (key:string[])=>{
     //console.log(gridData.value)
   }).catch(e=>console.log('error',e))
 }
+const onSelect = (key:string[])=>{
+  let v = key[0]
+  if ((key[0]?.includes('-'))) {
+    currentEditMolId.value= +v.split('-').at(-1)
+  }else{
+    currentEditMolId.value=0
+  }
+  console.log('currentEditMolId:',currentEditMolId.value)
+}
 defineExpose({gridData})
 </script>
 
 <template>
 <splitpanes class="pt-1 splitpanes" style="height: 100%;background-color: #ffffff">
   <pane size="15" min-size="11">
-    <div ref="siderBox" class="b-2 rd-2 b-indigo-100 min-w-170px h-89vh">
+    <div ref="siderBox" class="b-2 rd-2 b-indigo-100 min-w-180px h-89vh">
       <n-space justify="space-between" class="p-1" >
         <n-switch size="medium"
                   :rail-style="railStyle" 
@@ -146,11 +156,12 @@ defineExpose({gridData})
         :render-switcher-icon="renderSwitcherIcon"
         :node-props="nodeProps"
         @update:checked-keys="onCheck"
+        @update:selected-keys="onSelect"
         cascade checkable virtual-scroll />
     </div>
   </pane>
   <pane size="60" min-size="16" >
-    <grid-page v-if="gridData" :molList="gridData" :cols='6' class="h-89vh" />
+    <grid-page v-if="gridData" :molList="gridData" :cols='6' :rows="6" class="h-89vh" />
   </pane>
   <pane size="25" min-size="10" >
     placehoder
