@@ -16,8 +16,8 @@ const visiualBox=ref(true)//是否显示可视化框
 //控制浮动框添加按钮的显示类型
 provide('visiualBox',visiualBox)
 //位点选取组件所显示分子的id
-const currentEditMolId = ref<number>(0)
-provide('currentEditMolId',currentEditMolId)
+const currentEdit = ref<{id:number;state:number}>({id:0,state:0})
+provide('currentEdit',currentEdit)
 
 const ligandsDom=ref()
 const coresDom=ref()
@@ -29,8 +29,8 @@ onMounted(()=>{
 watch(
   [ligands,cores],
   (n,o)=>{
-    console.log('old: ',o)
-    console.log('new: ',n)
+    //console.log('old: ',o)
+    //console.log('new: ',n)
   }
 )
 
@@ -57,7 +57,7 @@ watch(
     </n-space>
   </template>
   <template #default>
-    <site-selcet :id='currentEditMolId' />
+    <site-selcet :id='currentEdit.id' />
     <div class="b-2 rd-2 b-indigo-100 mt--3 step ">
       <div class="bg-gray-50 m-2 rd-1.5" ><n-steps v-model:current="currentStep" class="ma-2 p-2  ">
         <n-step title="配体" description="标记配体位点和分类" />

@@ -24,24 +24,15 @@ import classSites from "@/components/rdkitComponent/classSites.vue";
 import tagMols from "@/components/rdkitComponent/tagMols.vue"
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
 import { reactive, ref, inject, onMounted, computed, watchEffect } from "vue";
+import type { Ref } from "vue";
 import type { molData } from "@/components/types";
 import { useDraggable,useElementSize } from '@vueuse/core'
 import { useEnumStore } from '@/stores/enumStore'
-const props=defineProps<{id?:number}>()
+const currentEdit:Ref<{id:number;state:number}>=inject('currentEdit')
 const enumStore = useEnumStore()
 const initMol: molData = reactive({qsmiles:'*~*'})
-const id = computed(()=>props.id)
-watchEffect(()=>{
-    const molInEnum= ref(enumStore.getById(id.value)[0])
-    initMol.smiles = molInEnum.value?.smiles ?? 'c1ccccc1'
-    initMol.atoms  = molInEnum.value?.atoms ?? {}
-    initMol.bonds  = molInEnum.value?.bonds ?? {}
-    initMol.labels = molInEnum.value?.labels ?? []
-    initMol.type   = molInEnum.value?.type ?? 'mole'
-    //refreshKey.value++
-    console.log(molInEnum.value)
-  }
-)
+const id = computed(()=>currentEdit.value.id)
+
 //获取浮动编辑框子组件的方法
 const editMol=ref()
 const isMounted = ref(false)
@@ -49,11 +40,43 @@ const undo = computed(() => isMounted ? editMol.value?.canUndo : false)
 const redo = computed(() => isMounted ? editMol.value?.canRedo : false)
 const tmpSmile = computed(() => isMounted ? editMol.value.highlightMap: {})
 //向pinia中添加分子，配体，主核
-const storeAddMol = ()=>{
-  tmpSmile.value['type'] = 'ligand'
-  enumStore.addMol(tmpSmile.value)
+const buttonAnimate=ref(true)
+//分子类型
+const types=['ligand','core','mole']
+const types4Store=ref<"core" | "ligand" | "mole">()
+const labels4Store = ref<string[]>([])
+const updateMol = async ()=>{
+  const mol4Store = tmpSmile.value
+  mol4Store['type'] = types4Store.value
+  mol4Store['qsmiles'] = ''
+  mol4Store['labels'] = labels4Store.value
+  if (id.value==0) {
+    enumStore.addMol(mol4Store)
+  } else {
+    mol4Store['id'] = id.value
+    await enumStore.updateMol( mol4Store)
+    //change state to update checked-list
+    currentEdit.value.state = 1
+  }
+  buttonAnimate.value=false
+  setTimeout(() => {
+    buttonAnimate.value=true
+  }, 800);
   console.log(tmpSmile.value)
-} 
+}
+watchEffect(()=>{
+    const molInEnum    = ref(enumStore.getById(id.value)[0])
+    initMol.smiles     = molInEnum.value?.smiles ?? ''
+    initMol.atoms      = molInEnum.value?.atoms ?? {}
+    initMol.bonds      = molInEnum.value?.bonds ?? {}
+    initMol.labels     = molInEnum.value?.labels ?? []
+    initMol.type       = molInEnum.value?.type ?? 'mole'
+    types4Store.value  = initMol.type
+    labels4Store.value = initMol.labels
+    //refreshKey.value++
+    console.log(molInEnum.value)
+  }
+)
 //刷新edit组件内部状态
 const refreshKey = ref(1);
 //定位浮动的位置
@@ -84,9 +107,6 @@ function copySmile(){
   copy(initMol.smiles)
 }
 
-//分子类型
-const currentType = computed(()=>initMol.type)
-const types=['ligand','core','mole']
 onMounted(()=>{
   isMounted.value=true
 })
@@ -101,6 +121,7 @@ onMounted(()=>{
         size="tiny" color="#FFA48D" circle>
         <n-icon><move /></n-icon>
       </n-button>
+      {{id==0 ? 'mode: add new': `mode: update (id=${id})`}}
     </div>
     <n-button v-else
               class="z-3 fixed cursor-grab simplify"
@@ -138,7 +159,7 @@ onMounted(()=>{
         <div class="i-flat-color-icons-redo text-xl"></div> 
       </n-button>
       <n-button circle size="small" tertiary :focusable="false" @click="copySmile()">
-        <div class="i-icon-park-copy text-xl"></div> 
+        <div class="i-icon-park-copy text-xl "></div> 
       </n-button>
     </div>
     <n-scrollbar :x-scrollable="true" >
@@ -216,22 +237,25 @@ onMounted(()=>{
                            focus:(outline-none ring-2) 
                            hover:(bg-white/[0.12] text-blue-400)"
                     :key="v"
-                    :class="['tab-button shadow', { active: initMol.type == v }]"
-                    @click="(initMol.type as string)=v" >
+                    :class="['tab-button shadow', { active: types4Store == v }]"
+                    @click="(types4Store as string)=v" >
               {{ v }}
             </div>
           </div>
-          <n-button size="small" type="info" secondary class="m-auto mr-1" @click="storeAddMol" >
-            <div v-if="id==0" class="i-material-symbols-add-box-outline text-teal-500 text-2xl mr-1 ml--1" />
-            <div v-else class="i-fluent-save-sync-20-regular text-teal-500 text-2xl mr-1 ml--1" />
-            {{currentType}}
+          <n-button  size="small" type="info" secondary class="m-auto mr-1" @click="updateMol" >
+            <div v-show="buttonAnimate">
+              <div v-if="id==0" class="i-material-symbols-add-box-outline text-teal-500 text-2xl mr-1 ml--1" />
+              <div v-else class="i-fluent-save-sync-20-regular text-teal-500 text-2xl mr-1 ml--1" />
+            </div>
+            <div v-show="!buttonAnimate" class="i-carbon-checkmark-outline text-green  text-2xl mr-1 ml--1"></div>
+             {{types4Store}}
           </n-button>
         </div>
         <div :style="{'width':widthBOX+'px'}" >
           <div class="i-fluent-emoji-label text-3xl float-left mr-1 inline-block" />
           <div class="text-xl float-left inline-block" >:</div>
           <div class="text-xl float-left ml-2" :style="{'width':widthBOX-50+'px'}">
-            <tag-mols v-model:tags="initMol.labels" />
+            <tag-mols v-model:tags="labels4Store" />
           </div>
         </div>
       </template>

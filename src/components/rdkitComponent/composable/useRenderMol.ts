@@ -35,5 +35,9 @@ export function useRenderMol(props: molData,rdkit:any) {
   mol=null;
   qmol.delete();
   qmol=null;
+  if (svg=='') {
+    svg=`<svg><rect></rect></svg>`
+    console.log('无效的smile式',props.smiles)
+  }
   return svg;
 }

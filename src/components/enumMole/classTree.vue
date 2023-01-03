@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { inject,ref,h,computed } from 'vue'
-import type {CSSProperties,VNode,Ref} from 'vue'
+import { inject,ref,h,computed,watch } from 'vue'
+import type {CSSProperties,VNode,Ref,ComputedRef} from 'vue'
 import gridPage from "@/components/rdkitComponent/gridPage.vue";
 import type { TreeOption } from 'naive-ui'
 import { NTree,NSwitch,NSpace } from 'naive-ui'
@@ -14,13 +14,34 @@ const { isOutside } = useMouseInElement(siderBox)
 const checkStrategy = ref<'label'|'type'>('label')
 const expandedKeys = ref([])
 const checkedKeys = ref([])
-const gridData=ref([])
-const currentEditMolId:Ref<number>=inject('currentEditMolId')
-const labels:string[] = enumStore.getAllLabels
+function unique(arr:any[],val:string) {
+    const res = new Map();
+    return arr.filter(item => item!=undefined ? (!res.has(item[val]) && res.set(item[val],1)) : false)
+  }
+const gridData = computed(()=>{
+    let out:molData[] = checkedKeys.value.map((v) => v.includes('-') ?
+      enumStore.getById(+v.split('-').at(-1))[0] : undefined
+    )
+    return unique(out,'id')
+})
+const currentEdit:Ref<{id:number;state:number}>=inject('currentEdit')
+//refresh checkedKey
+watch(
+  ()=>currentEdit.value.state,
+  ()=>{
+    if (currentEdit.value.state==1) {
+      //console.log('watch currentid-1',currentEdit.value.state,checkedKeys.value)
+      checkedKeys.value = checkedKeys.value.filter((v) => v.includes('-'))
+      currentEdit.value.state=0
+    }
+  }
+)
+const labels:ComputedRef<string[]>=computed(()=>enumStore.getAllLabels)
+//const labels=enumStore.getAllLabels
 const types=['mole','ligand','core']
 const siderData =computed<TreeOption[]|undefined>(()=>{
   if (checkStrategy.value=='label') {
-    return labels.map((label,index)=>{
+    return labels.value.map((label,index)=>{
       const key = ''+index
       const children= enumStore.getByLabel(label).map((mol,indexInner)=>{
         return{
@@ -87,30 +108,22 @@ const railStyle=({focused,checked}:{focused:boolean;checked:boolean})=>{
 const switchClass=()=>{
   expandedKeys.value = []
   checkedKeys.value = []
-  gridData.value = []
+  currentEdit.value.id=0
+  currentEdit.value.state=0
 }
 const onCheck = (key:string[])=>{
-  const unique=(arr:any[],val:string)=>{
-    const res = new Map();
-    return arr.filter(item => item!=undefined ? (!res.has(item[val]) && res.set(item[val],1)) : false)
-  }
   checkedKeys.value=key
-  Promise.resolve(key).then((res)=>{
-    let out:molData[] = res.map((v) => v.includes('-') ?
-      enumStore.getById(+v.split('-').at(-1))[0] : undefined
-    )
-    gridData.value=unique(out,'smiles')
-    //console.log(gridData.value)
-  }).catch(e=>console.log('error',e))
+  console.log(checkedKeys.value)
 }
 const onSelect = (key:string[])=>{
+  currentEdit.value.state=0
   let v = key[0]
   if ((key[0]?.includes('-'))) {
-    currentEditMolId.value= +v.split('-').at(-1)
+    currentEdit.value.id= +v.split('-').at(-1)
   }else{
-    currentEditMolId.value=0
+    currentEdit.value.id=0
   }
-  console.log('currentEditMolId:',currentEditMolId.value)
+  console.log('currentEdit:',currentEdit.value)
 }
 defineExpose({gridData})
 </script>
@@ -139,7 +152,7 @@ defineExpose({gridData})
           <div class="text-center rd-1 w-5 hover:(bg-gray-200 cursor-pointer)">
              <div class="i-codicon-new-folder text-4"></div>
           </div>
-          <div class="text-center rd-1 w-5 hover:(bg-gray-200 cursor-pointer)">
+          <div class="text-center rd-1 w-5 hover:(bg-gray-200 cursor-pointer)" @click="">
             <div class="i-codicon-refresh text-4"></div>
           </div>
           <div class="text-center rd-1 w-5 hover:(bg-gray-200 cursor-pointer)" @click="expandedKeys=[]">
@@ -175,7 +188,7 @@ defineExpose({gridData})
 .splitpanes__splitter {
   background-color:#ecfeff;
   position: relative;
-  width:5px;
+  width:3px;
   border-radius: 0.2rem;
   margin: 0.2rem;
 }
@@ -186,7 +199,7 @@ defineExpose({gridData})
   top: 0;
   border-radius: 0.4rem;
   transition: opacity 0.4s;
-  background-color: #cffafe;
+  background-color: #6bd8fca3;
   opacity: 0;
   z-index: 1;
 }

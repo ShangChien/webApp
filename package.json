@@ -9,7 +9,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@rdkit/rdkit": "^2022.3.5-1.0.2",
+    "@rdkit/rdkit": "^2022.9.3-1.0.0",
     "@vitejs/plugin-vue": "^3.0.1",
     "@vitejs/plugin-vue-jsx": "^2.0.0",
     "@volar/pug-language-service": "^0.37.9",

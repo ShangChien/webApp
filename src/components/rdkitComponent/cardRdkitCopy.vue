@@ -36,7 +36,7 @@ const emit = defineEmits(["update:smiles",
                           "update:label",
                           "itemDeleted"]);
 const props = defineProps<molData>();
-const { smiles,atoms,bonds,selected,label } = useVModels(props, emit)
+//const { smiles,atoms,bonds,selected,label } = useVModels(props, emit)
 //可视加载组件
 const checked = ref(false);
 const cardView=ref()

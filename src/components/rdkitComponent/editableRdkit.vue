@@ -38,9 +38,9 @@ function redoRender(){
 }
 defineExpose({ history, undoRender, redoRender, canUndo, canRedo, highlightMap })
 //侦听props，截取props初始值，刷新渲染
-onBeforeUpdate(()=>{
-  svgItem.value = useGetSvg(highlightMap.value,rdkit)
-})
+// onBeforeUpdate(()=>{
+//   svgItem.value = useGetSvg(highlightMap.value,rdkit)
+// })
 watch(
   props,
   async (newVal)=>{
@@ -168,13 +168,12 @@ onMounted(()=>{
 // }
 </script>
 
-<template class="svg">
+<template >
   <svg 
     v-bind="svgItem.svg"
-    class="svgstyle"
-    style="width: 100%; height: 100%"
+    class="w-100% h-100% svg bg-white "
+    viewBox="0 0 200 200"
   >
-    <rect v-bind="svgItem.rect" />
     <path 
       v-for="(item,index) in svgItem.path.symble"
       v-bind="item.path"
@@ -203,11 +202,8 @@ onMounted(()=>{
 </template>
 <style>
 .svg {
-  display: inline-block;
-  position: relative;
-  width: 100%;
-  padding-bottom: 100%;
-  vertical-align: middle;
-  overflow: hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 </style>

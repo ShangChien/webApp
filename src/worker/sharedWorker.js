@@ -39,7 +39,7 @@ const renderMol = (props)=>{
   mDetail["explicitMethyl"] = props.explicitMethyl ?? false;
   mDetail = JSON.stringify(mDetail);
   out = mol.get_svg_with_highlights(mDetail);
-  //console.log(out)
+  console.log(out)
   mDetail = null;
   mdetailsRaw = null;
   qmol.delete();

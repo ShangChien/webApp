@@ -48,10 +48,10 @@ onUnmounted(()=>{
 <div>
   <svg v-if="!bgStyle.background" 
        :style='{width:"100%", height:"100%"}'
-       viewBox="0,0,100,100"
+       viewBox="0,0,200,200"
        class="i-eos-icons-atom-electron c-blue-200"
        ></svg >
-  <svg v-else viewBox="0,0,100,100" :style="bgStyle"></svg>
+  <svg v-else viewBox="0,0,200,200" :style="bgStyle"></svg>
 </div>
 </template>
 <style>

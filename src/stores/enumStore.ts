@@ -60,7 +60,7 @@ export const useEnumStore = defineStore('enum',{
       Promise.resolve(x).then((res)=>{
         res.id=this.nextId++
         this.mols.push(res)
-      }).catch(e=>console.log('error:',e)) 
+      }).catch(e=>console.log('add mol error:',e)) 
     },
     async updateMol(x:molData) {
       Promise.resolve(x).then((res:molData)=>{
