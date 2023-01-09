@@ -66,7 +66,7 @@ const menuOptions: MenuOption[] = [
 </script>
 
 <template>
-  <n-layout bordered position="absolute" style="height: 100vh" :native-scrollbar="false">
+  <n-layout bordered position="absolute" style="height: 100vh" :native-scrollbar="false"  @contextmenu.prevent >
     <n-layout-header style="height: 6vh; padding: 2px" bordered>
       <img class="logo" src="/favicon.ico" width="50"  />
       <reload-prompt/>

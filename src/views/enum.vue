@@ -4,6 +4,7 @@ import { NStep,NSteps,NButton,NSpace,NSwitch,NPageHeader,
 NGrid,NGridItem,NStatistic,NAvatar,NDropdown,NThing } from "naive-ui"
 import siteSelcet from "@/components/rdkitComponent/siteSelect.vue"
 import classTree from "@/components/enumMole/classTree.vue"
+import combo from "@/components/enumMole/combo.vue"
 import type { molData } from "@/components/types"
 import { useEnumStore } from '@/stores/enumStore'
 
@@ -11,11 +12,13 @@ import { useEnumStore } from '@/stores/enumStore'
 
 const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
 const hasMounted=ref(false)
-const currentStep=ref(1)//当前步骤
+const currentStep=ref(3)//当前步骤
 const visiualBox=ref(true)//是否显示可视化框
 //控制浮动框添加按钮的显示类型
 provide('visiualBox',visiualBox)
 //位点选取组件所显示分子的id
+//currentEdit.value.state:
+//0:没有操作的状态; 1:处于预览状态; 2:处于编辑状态;3:处于编辑结束
 const currentEdit = ref<{id:number;state:number}>({id:0,state:0})
 provide('currentEdit',currentEdit)
 
@@ -83,7 +86,7 @@ watch(
   <class-tree  ref='coresDom'/>
 </div>
 <div v-show="currentStep === 3">
-  组合设置
+  <combo :cores="cores" :ligands="ligands"></combo> 
 </div>
 <div v-show="currentStep === 4">
   结果页

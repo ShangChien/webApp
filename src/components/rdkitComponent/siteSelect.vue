@@ -23,7 +23,7 @@ import initKetcher from "@/components/initKetcher.vue";
 import classSites from "@/components/rdkitComponent/classSites.vue";
 import tagMols from "@/components/rdkitComponent/tagMols.vue"
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";
-import { reactive, ref, inject, onMounted, computed, watchEffect } from "vue";
+import { reactive, ref, inject, onMounted, computed, watchEffect,watch,toRaw } from "vue";
 import type { Ref } from "vue";
 import type { molData } from "@/components/types";
 import { useDraggable,useElementSize } from '@vueuse/core'
@@ -32,7 +32,6 @@ const currentEdit:Ref<{id:number;state:number}>=inject('currentEdit')
 const enumStore = useEnumStore()
 const initMol: molData = reactive({qsmiles:'*~*'})
 const id = computed(()=>currentEdit.value.id)
-
 //获取浮动编辑框子组件的方法
 const editMol=ref()
 const isMounted = ref(false)
@@ -40,23 +39,23 @@ const undo = computed(() => isMounted ? editMol.value?.canUndo : false)
 const redo = computed(() => isMounted ? editMol.value?.canRedo : false)
 const tmpSmile = computed(() => isMounted ? editMol.value.highlightMap: {})
 //向pinia中添加分子，配体，主核
-const buttonAnimate=ref(true)
-//分子类型
 const types=['ligand','core','mole']
 const types4Store=ref<"core" | "ligand" | "mole">()
 const labels4Store = ref<string[]>([])
+const buttonAnimate=ref(true)
 const updateMol = async ()=>{
   const mol4Store = tmpSmile.value
   mol4Store['type'] = types4Store.value
   mol4Store['qsmiles'] = ''
   mol4Store['labels'] = labels4Store.value
-  if (id.value==0) {
+  if (id.value==0) {//新增结构
     enumStore.addMol(mol4Store)
-  } else {
+    currentEdit.value.state = 3
+  } else {//更新结构
     mol4Store['id'] = id.value
     await enumStore.updateMol( mol4Store)
-    //change state to update checked-list
-    currentEdit.value.state = 1
+    //change to complited state for updating checked-list
+    currentEdit.value.state = 3
   }
   buttonAnimate.value=false
   setTimeout(() => {
@@ -74,7 +73,22 @@ watchEffect(()=>{
     types4Store.value  = initMol.type
     labels4Store.value = initMol.labels
     //refreshKey.value++
-    console.log(molInEnum.value)
+    //console.log(molInEnum.value)
+  }
+)
+watch(
+  [undo,types4Store,labels4Store],
+  ([nUndo,nType,nLabel])=>{
+    if (nUndo || (nType!=initMol.type) || (nLabel.toString() != initMol.labels.toString())) {
+      currentEdit.value.state = 2
+      //console.log('state editing:',currentEdit.value.state )
+    } else {
+      currentEdit.value.state = 1
+      //console.log('state view:',currentEdit.value.state )
+    }
+  },
+  {
+    flush: 'post'
   }
 )
 //刷新edit组件内部状态
@@ -85,7 +99,7 @@ const controlPin=ref<HTMLElement | null>(null)
 const NBG=ref<HTMLElement | null>(null)
 const { width:windowWidth } = useWindowSize()
 const { x, y, style } = useDraggable(el1, {
-  initialValue: { x: windowWidth.value-325, y: 65 },
+  initialValue: { x: windowWidth.value-400, y: 230 },
 })
 const { width:widthBOX } = useElementSize(controlPin)
 const { width:widthNBG } = useElementSize(NBG)
@@ -121,7 +135,7 @@ onMounted(()=>{
         size="tiny" color="#FFA48D" circle>
         <n-icon><move /></n-icon>
       </n-button>
-      {{id==0 ? 'mode: add new': `mode: update (id=${id})`}}
+      {{id==0 ? 'mode: add new': `mode: update-${id}`}}
     </div>
     <n-button v-else
               class="z-3 fixed cursor-grab simplify"

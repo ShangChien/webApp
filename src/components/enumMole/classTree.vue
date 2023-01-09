@@ -11,7 +11,7 @@ import type { molData } from "@/components/types"
 const enumStore = useEnumStore();
 const siderBox=ref(null)
 const { isOutside } = useMouseInElement(siderBox)
-const checkStrategy = ref<'label'|'type'>('label')
+const checkStrategy = ref<'label'|'type'>('type')
 const expandedKeys = ref([])
 const checkedKeys = ref([])
 function unique(arr:any[],val:string) {
@@ -29,9 +29,10 @@ const currentEdit:Ref<{id:number;state:number}>=inject('currentEdit')
 watch(
   ()=>currentEdit.value.state,
   ()=>{
-    if (currentEdit.value.state==1) {
-      //console.log('watch currentid-1',currentEdit.value.state,checkedKeys.value)
+    if (currentEdit.value.state==3) {
+      console.log('watch currentid-1',currentEdit.value.id,currentEdit.value.state,checkedKeys.value)
       checkedKeys.value = checkedKeys.value.filter((v) => v.includes('-'))
+      console.log('watch currentid-2',currentEdit.value.id,currentEdit.value.state,checkedKeys.value)
       currentEdit.value.state=0
     }
   }
@@ -113,13 +114,14 @@ const switchClass=()=>{
 }
 const onCheck = (key:string[])=>{
   checkedKeys.value=key
-  console.log(checkedKeys.value)
+  //console.log(checkedKeys.value)
 }
 const onSelect = (key:string[])=>{
   currentEdit.value.state=0
   let v = key[0]
   if ((key[0]?.includes('-'))) {
     currentEdit.value.id= +v.split('-').at(-1)
+    currentEdit.value.state=1
   }else{
     currentEdit.value.id=0
   }
@@ -129,7 +131,7 @@ defineExpose({gridData})
 </script>
 
 <template>
-<splitpanes class="pt-1 splitpanes" style="height: 100%;background-color: #ffffff">
+<splitpanes class="pt-1 splitpanes h-full " style="background-color: #ffffff">
   <pane size="15" min-size="11">
     <div ref="siderBox" class="b-2 rd-2 b-indigo-100 min-w-180px h-89vh">
       <n-space justify="space-between" class="p-1" >
@@ -177,7 +179,11 @@ defineExpose({gridData})
     <grid-page v-if="gridData" :molList="gridData" :cols='6' :rows="6" class="h-89vh" />
   </pane>
   <pane size="25" min-size="10" >
-    placehoder
+    <div class="w-full h-full text-center">
+      <div class="v-mid leading-700px" >
+        <div class="i-vscode-icons-file-type-flareact text-5xl"></div>
+      </div>
+    </div>
   </pane>
 </splitpanes>
 </template>
