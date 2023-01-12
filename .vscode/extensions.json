@@ -1,6 +1,5 @@
 {
   "recommendations": [
-    //by antFu
     "antfu.browse-lite",
     "antfu.iconify",
     "antfu.slidev",
@@ -8,19 +7,14 @@
     "antfu.vite",
     "antfu.where-am-i",
     "lokalise.i18n-ally",
-
-    // themes & icons
     "antfu.icons-carbon",
     "antfu.theme-vitesse",
     "file-icons.file-icons",
     "sainnhe.gruvbox-material",
-
-    // life savers!
     "dbaeumer.vscode-eslint",
-    "Vue.volar",
-    "GitHub.copilot",
+    "vue.volar",
+    "github.copilot",
     "usernamehw.errorlens",
-
-  
+    "antfu.smart-clicks"
   ],
 }
