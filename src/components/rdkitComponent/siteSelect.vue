@@ -104,7 +104,7 @@ const { x, y, style } = useDraggable(el1, {
 const { width:widthBOX } = useElementSize(controlPin)
 const { width:widthNBG } = useElementSize(NBG)
 const mini=ref(false)
-const visiualBox=inject('visiualBox')
+const visiualBox=false//inject('visiualBox')
 
 const drawMol=()=>{
   initMol.smiles = inputText.value;
