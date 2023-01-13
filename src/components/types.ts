@@ -23,3 +23,11 @@ export interface molData {
   editable?: boolean;
   extraData?: any;
 }
+export interface enumData {
+	[key: number]:{
+		list : number[],
+		range : [number,number],
+		keepSame2Index : number[],
+		connect2index  : number[],
+	}
+}
