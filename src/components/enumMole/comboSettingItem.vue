@@ -1,30 +1,34 @@
 <script setup lang='ts'>
-import { ref } from "vue"
+import { ref,watch,computed,watchEffect } from "vue"
 import { NSlider } from 'naive-ui'
 import type { enumData } from "@/components/types"
 
 const props=defineProps<{enumD:enumData}>()
-const indexN=ref(0)
+const keys=computed(()=>Object.keys(props.enumD))
 const options:any= Array.from(Array(10).keys()).map((i:number)=> {return {label:i,value:i}}) 
-
+//初始化显示的索引
+const indexN=ref()
+watchEffect(()=>{
+	indexN.value = (+keys.value[0])
+})
 </script>
 <template>
 <div >
 <div v-for="(v,k,i) in props.enumD" :key="i" 
 	:class="[indexN==k ? 'h-full':'h-0']" >
 	<div v-if="indexN==k" 
-		class="bg-slate-1 rd-2 b-2 b-sky-2 m-1 p-1 mt-0 flex-col flex"
+		class="bg-slate-1 rd-2 b-2 b-sky-2 m-1 mt-0 flex-col flex"
 		:class="[indexN==k ? 'h-full':'h-0']">
 		<div class="flex-none flex flex-nowrap justify-begin" >
 			<div class="flex flex-nowarp mt-1 ml-3">
-				<div v-for="option in Object.keys(props.enumD)"
+				<div v-for="option in keys"
 					:style="{color:'hsla('+(+option+8.6)*36+',90%,60%,1)'}" 
 					@click="indexN=+option">
 					<div v-if="+option == indexN" class="rd-t-1.5 rd-b-0 bg-white">
 						<div class="i-carbon-circle-filled text-3xl opacity-100 m-1"></div>
 					</div>
 					<div v-else >
-						<div class="i-ic-sharp-circle text-3xl opacity-20 m-1 " ></div>
+						<div class="i-ic-sharp-circle text-3xl opacity-50 m-1 " ></div>
 					</div>
 				</div>
 			</div>
@@ -45,7 +49,7 @@ const options:any= Array.from(Array(10).keys()).map((i:number)=> {return {label:
 			</div>
 			<span class="font-400">相同设置:</span>
 			<div  class="b-2 rd-2 b-indigo-50 bg-slate-50 flex flex-nowrap">
-				<div v-for="option in Object.keys(props.enumD)"
+				<div v-for="option in keys"
 					:key="+option" 
 					:style="{color:'hsla('+(+option+8.6)*36+',90%,60%,1)'}"
 					@click="v.keepSame2Index.includes(+option) ? 

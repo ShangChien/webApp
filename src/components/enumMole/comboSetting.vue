@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { ref, computed, onMounted } from "vue"
-import settingItem from "@/components/enumMole/settingItem.vue"
+import comboSettingItem from "@/components/enumMole/comboSettingItem.vue"
 import type { enumData } from "@/components/types"
 //use&dataState
 const props=defineProps<{dataList:{
@@ -11,7 +11,7 @@ const setting=['enumAtoms','enumBonds']
 const settingName=ref('enumAtoms')
 </script>
 <template>
-	<div class="flex-col flex h-full ">
+	<div class="flex-col flex h-full">
 		<div class="flex-none flex flex-nowrap justify-begin m-1 mb-0 ml-2 text-center" :style="{transform:'translate(0,2px)'}">
 			<div class="font-600 text-1.2em p-1 inline-block ">组合设置 :</div>
 			<div class="flex flex-nowrap justify-begin">
@@ -23,7 +23,10 @@ const settingName=ref('enumAtoms')
 				</div>
 			</div>
 		</div>
-		<setting-item class="flex-auto mb-4" :enumD="props.dataList[settingName]"></setting-item>
+		<combo-setting-item v-for="item in setting" 
+			class="flex-auto mb-2" 
+			v-show="settingName===item" 
+			:enumD="props.dataList[item]"></combo-setting-item>
 	</div>
 </template>
 <style>

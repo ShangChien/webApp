@@ -101,11 +101,11 @@ const menuOptions: MenuOption[] = [
       >
         <n-message-provider>
           <router-view v-slot="{ Component,route }" class="mr-3">
-          <Transition name='fade' mode="out-in">
-            <keep-alive>
-              <Component :is="Component" />
-            </keep-alive>
-          </Transition>
+            <Transition name='fade' mode="out-in">
+              <keep-alive>
+                <component :is="Component"></component>
+              </keep-alive>
+            </Transition>
           </router-view>
         </n-message-provider>
       </n-layout>
@@ -138,6 +138,7 @@ const menuOptions: MenuOption[] = [
 	-khtml-user-select:none; /*早期浏览器*/   
 	-moz-user-select:none;/*火狐*/   
 	-ms-user-select:none; /*IE10*/   
-	user-select:none;   
+	user-select:none;
+   
 }
 </style>

@@ -33,14 +33,14 @@ watch(
 					connect2index  : [],
 				})
 			})
-			console.log(mol)
-			console.log(Nmol)
+			console.log('mol:',mol)
+			console.log('Nmol:',Nmol)
 			return Nmol
 		})
 	}
 )
 watch(coresData,()=>{
-	console.log(coresData.value)
+	console.log('coreData',coresData.value)
 },{deep:true})
 
 </script>
@@ -56,5 +56,4 @@ watch(coresData,()=>{
 </div>
 </template>
 <style scoped>
-
 </style>
