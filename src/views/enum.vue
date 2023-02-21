@@ -5,6 +5,8 @@ NGrid,NGridItem,NStatistic,NAvatar,NDropdown,NThing } from "naive-ui"
 import siteSelcet from "@/components/rdkitComponent/siteSelect.vue"
 import classTree from "@/components/enumMole/classTree.vue"
 import combo from "@/components/enumMole/combo.vue"
+import result from "@/components/enumMole/result.vue"
+import gridPage from "@/components/rdkitComponent/gridPage.vue";
 import type { molData } from "@/components/types"
 import { useEnumStore } from '@/stores/enumStore'
 
@@ -12,8 +14,8 @@ import { useEnumStore } from '@/stores/enumStore'
 
 const options = [{ label: "Ketcher: 2.4.0" }, { label: "RDKit: 2022.3.2" }];
 const hasMounted=ref(false)
-const currentStep=ref(3)//当前步骤
-const visiualBox=ref(true)//是否显示可视化框
+const currentStep=ref(2)//当前步骤
+const visiualBox=ref(false)//是否显示可视化框
 //控制浮动框添加按钮的显示类型
 provide('visiualBox',visiualBox)
 //位点选取组件所显示分子的id
@@ -21,6 +23,9 @@ provide('visiualBox',visiualBox)
 //0:没有操作的状态; 1:处于预览状态; 2:处于编辑状态;3:处于编辑结束
 const currentEdit = ref<{id:number;state:number}>({id:0,state:0})
 provide('currentEdit',currentEdit)
+//注入结果
+const enumResult=ref<molData[]>([])
+provide('enumResult',enumResult)
 
 const ligandsDom=ref()
 const coresDom=ref()
@@ -89,7 +94,7 @@ watch(
   <combo :cores="cores" :ligands="ligands"></combo> 
 </div>
 <div v-show="currentStep === 4">
-  结果页
+  <result :mols="enumResult" />
 </div>
 <div v-show="![1,2,3,4].includes(currentStep)">
 <n-thing>

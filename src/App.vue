@@ -62,11 +62,17 @@ const menuOptions: MenuOption[] = [
     key: "view-enum",
     icon: renderIcon(DataVis1),
   },
+  {
+    label: () =>
+      h(RouterLink, { to: { name: "python" } },{ default: () => "python" }),
+    key: "view-python",
+    icon: () => h(NIcon, null, { default: () => h('div', { class: 'i-tabler-brand-python' }) }),
+  },
 ];
 </script>
 
 <template>
-  <n-layout bordered position="absolute" style="height: 100vh" :native-scrollbar="false"  @contextmenu.prevent >
+  <n-layout class="font-lx-b" bordered position="absolute" style="height: 100vh" :native-scrollbar="false"  @contextmenu.prevent >
     <n-layout-header style="height: 6vh; padding: 2px" bordered>
       <img class="logo" src="/favicon.ico" width="50"  />
       <reload-prompt/>
@@ -100,10 +106,10 @@ const menuOptions: MenuOption[] = [
         bordered
       >
         <n-message-provider>
-          <router-view v-slot="{ Component,route }" class="mr-3">
+          <router-view v-slot="{ Component,route }" class="mr-3 ">
             <Transition name='fade' mode="out-in">
               <keep-alive>
-                <component :is="Component"></component>
+                <component :is="Component" ></component>
               </keep-alive>
             </Transition>
           </router-view>
@@ -141,4 +147,5 @@ const menuOptions: MenuOption[] = [
 	user-select:none;
    
 }
+
 </style>

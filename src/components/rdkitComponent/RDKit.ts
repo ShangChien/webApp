@@ -14,7 +14,7 @@ const initRDKit = (() => {
       rdkitLoadingPromise = new Promise((resolve, reject) => {
         initRDKitModule()
           .then((RDKit: any) => {
-            window.RDKit = RDKit;
+            // window.RDKit = RDKit;
             resolve(RDKit);
           })
           .catch((e: any) => {

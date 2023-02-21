@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { refDebounced } from '@vueuse/core'
-import { computed, ref, onMounted,onUpdated,onBeforeMount } from "vue";
+import { computed, ref } from "vue";
 import type { molData } from "@/components/types";
+import exportMol from '@/components/rdkitComponent/exportMol.vue'
 import cardRdkit from "@/components/rdkitComponent/cardRdkit.vue";
 import { NInputNumber,NPagination,NPopover,NTag,NScrollbar } from "naive-ui";
 import { useElementSize } from '@vueuse/core'
-const props=defineProps<{molList:molData[];cols:number;rows:number}>()
+const props=defineProps<{
+  molList:molData[];
+  cols:number;
+  rows:number;
+  maxH?:number;
+}>()
 const outBox = ref<HTMLElement | null>(null)
 const { width:outBoxW } = useElementSize(outBox)
 const initArray = computed(()=>props.molList)
@@ -26,8 +32,8 @@ const arrayShow=computed(()=>{
 </script>
 
 <template>
-<div ref="outBox" class="b-2 rd-2  b-indigo-100 relative min-w-230px min-h-160px">
-  <div class="absolute rd-2 z-2 top-0 menubg" :style="{'width':outBoxW+'px'}">
+<div ref="outBox" class="b-2 rd-2 b-indigo-100 relative min-w-230px min-h-160px">
+  <div class="flex-none absolute rd-2 z-2 top-0 menubg" :style="{'width':outBoxW+'px'}">
     <div class="ma-1 title-grid">
       <div><n-pagination v-model:page="currentPageInput"
                       :page-count="pageCount"
@@ -39,18 +45,29 @@ const arrayShow=computed(()=>{
                       show-quick-jumper>
           <template #goto>跳至:</template>
         </n-pagination></div>
-      <div class="justify-self-end mt-1">
+      <div class="flex flex-nowrap justify-end">
         <n-tag v-show='outBoxW > 700 ? true : false' :bordered="false" class=" tagbg  ">
           <span class="text-1.2em ">Total: {{initArray.length}}</span>
           <span class="text-1.2em "> ( {{pageSize}} / page)</span>
         </n-tag>
+        <n-popover placement="bottom-end" trigger="click" display-directive="show">
+          <template #trigger>
+            <div class="i-icon-park-twotone:database-download
+                        text-3xl
+                        c-indigo-300 
+                        inline-block
+                        hover:c-teal-300" />
+          </template>
+          <template #default>
+            <export-mol :molList="initArray"></export-mol>
+          </template>
+        </n-popover>
         <n-popover placement="bottom-end" trigger="click">
           <template #trigger>
             <button class="i-fluent-table-settings-20-filled 
-                        text-2.5em
+                        text-3xl
                         c-indigo-300 
                         inline-block
-                        mt--1.3
                         hover:c-teal-300
                         focus:(c-teal-400 transform-scale-110)" />
           </template>
@@ -76,9 +93,9 @@ const arrayShow=computed(()=>{
       </div>
     </div>
   </div>
-  <n-scrollbar class="max-h-100vh" >
-    <div class="wrapper1 mr-2.5 mt-12 h-100\%" >
-      <card-rdkit class="w-100\% h-100\%"
+  <n-scrollbar :style="{maxHeight:props.maxH+'vh'}">
+    <div class="wrapper1 mr-2.5 mt-12 h-full" >
+      <card-rdkit class="w-full h-full"
         v-for="(itemInner,indexInner) of arrayShow"
         v-bind="itemInner" 
         :key="indexInner"

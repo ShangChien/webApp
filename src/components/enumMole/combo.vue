@@ -18,7 +18,7 @@ watch(
 				const step = (100/mol.atoms[colorIndex].length).toFixed(2)
 				Nmol.enumAtoms[colorIndex] = reactive({
 					list : mol.atoms[colorIndex],
-					range : [+step, 100],
+					range : [0, mol.atoms[colorIndex].length],
 					keepSame2Index : [],
 					connect2index  : [],
 				})
@@ -28,7 +28,7 @@ watch(
 				const step=(+100/mol.bonds[colorIndex].length).toFixed(2)
 				Nmol.enumBonds[colorIndex] = reactive({
 					list : mol.bonds[colorIndex],
-					range : [+step, 100],
+					range : [0, mol.bonds[colorIndex].length],
 					keepSame2Index : [],
 					connect2index  : [],
 				})
@@ -49,7 +49,7 @@ watch(coresData,()=>{
 	<div v-for="core in coresData" class="flex flex-nowarp justify-between m-1" >
 		<div class="w-25% flex-grow-1 m-1 ml-0"><card-rdkit min-w-200px v-bind="core" ></card-rdkit></div>
 		<div class="w-25% justify-around flex-grow-1 place-items-center b-2 rd-2 min-w-420px bg-slate-2 b-indigo-2 m-1 mr-0">
-			<combo-setting :dataList="core"></combo-setting>
+			<combo-setting :core="core" :ligands="props.ligands" ></combo-setting>
 		</div>
 		<div class="w-70%"></div>
 	</div>

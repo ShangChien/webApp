@@ -2,5 +2,6 @@
 	"python.analysis.extraPaths": [
 		"./sql_app"
 	],
-	"python.pythonPath": "D:\\conda\\python.exe"
+	"python.pythonPath": "D:\\conda\\python.exe",
+	"editor.tabSize": 2
 }

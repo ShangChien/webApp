@@ -131,9 +131,9 @@ defineExpose({gridData})
 </script>
 
 <template>
-<splitpanes class="pt-1 splitpanes h-full " style="background-color: #ffffff">
+<splitpanes class="pt-1 splitpanes " style="background-color: #ffffff">
   <pane size="15" min-size="11">
-    <div ref="siderBox" class="b-2 rd-2 b-indigo-100 min-w-180px h-89vh">
+    <div ref="siderBox" class="b-2 rd-2 b-indigo-100 min-w-180px h-70vh">
       <n-space justify="space-between" class="p-1" >
         <n-switch size="medium"
                   :rail-style="railStyle" 
@@ -162,7 +162,7 @@ defineExpose({gridData})
           </div>
         </div>
       </n-space>
-      <n-tree class="h-86vh"
+      <n-tree class="h-full"
       	:block-line='true' :block-node='true'
         :data="siderData"
         :expanded-keys="expandedKeys"
@@ -176,7 +176,7 @@ defineExpose({gridData})
     </div>
   </pane>
   <pane size="60" min-size="16" >
-    <grid-page v-if="gridData" :molList="gridData" :cols='6' :rows="6" class="h-89vh" />
+    <grid-page class="h-70vh" v-if="gridData" :molList="gridData" :cols='6' :rows="3" :maxH='70'/>
   </pane>
   <pane size="25" min-size="10" >
     <div class="w-full h-full text-center">
@@ -187,14 +187,13 @@ defineExpose({gridData})
   </pane>
 </splitpanes>
 </template>
-<style >
+<style>
 @import "splitpanes/dist/splitpanes.css";
 .splitpanes {background-color: #f8f8f8;}
 
 .splitpanes__splitter {
   background-color:#ecfeff;
   position: relative;
-  width:3px;
   border-radius: 0.2rem;
   margin: 0.2rem;
 }
@@ -211,5 +210,4 @@ defineExpose({gridData})
 }
 .splitpanes__splitter:hover:before {opacity: 1;}
 .splitpanes--vertical > .splitpanes__splitter:before {left: -2px;right: -2px;height: 100%;}
-.splitpanes--horizontal > .splitpanes__splitter:before {top: -2px;bottom: -2px;width: 100%;}
 </style>

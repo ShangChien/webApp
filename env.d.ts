@@ -1,10 +1,14 @@
 /// <reference types="vite/client" />
 declare module "@rdkit/rdkit/dist/RDKit_minimal.js"
+declare module "pyodide/pyodide.js"
+declare module 'pyodide/pyodide.mjs'
 declare module "ngl/dist/ngl.js";
 declare module 'svgo/lib/svgo.js';
 declare module 'splitpanes';
 declare interface Window {
   RDKit: any;
+  py:any;
+  MonacoEnvironment:any
 }
 declare module "*.vue" {
   import { defineComponent } from "vue";

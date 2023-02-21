@@ -1,0 +1,56 @@
+@font-face {
+  font-family: 'LX-B';
+  src: url('./LXGWWenKaiGB-Bold.ttf');
+}
+@font-face {
+  font-family: 'LX-L';
+  src: url('./LXGWWenKaiGB-Light.ttf');
+}
+@font-face {
+  font-family: 'LX-R';
+  src: url('./LXGWWenKaiGB-Regular.ttf');
+}
+@font-face {
+  font-family: 'LXM-B';
+  src: url('./LXGWWenKaiMonoGB-Bold.ttf')
+}
+@font-face {
+  font-family: 'LXM-L';
+  src: url('./LXGWWenKaiMonoGB-Light.ttf');
+}
+@font-face {
+  font-family: 'LXM-R';
+  src: url('./LXGWWenKaiMonoGB-Regular.ttf');
+}
+@font-face {
+  font-family: 'XlM-R';
+  src: url('./XiaolaiMonoSC-Regular.ttf');
+}
+@font-face {
+  font-family: 'Xl-R';
+  src: url('./XiaolaiSC-Regular.ttf');
+}
+@font-face {
+  font-family: 'YZ-B';
+  src: url('./Yozai-Bold.ttf');
+}
+@font-face {
+  font-family: 'YZ-R';
+  src: url('./Yozai-Light.ttf');
+}
+@font-face {
+  font-family: 'YZ-R';
+  src: url('./Yozai-Medium.ttf');
+}
+@font-face {
+  font-family: 'YZ-R';
+  src: url('./Yozai-Regular.ttf');
+}
+@font-face {
+  font-family: 'LXMG-R';
+  src: url('./LXGWMarkerGothic-Regular.ttf');
+}
+@font-face {
+  font-family: 'TJ-R';
+  src: url('./TiejiliSC-Regular.ttf');
+}

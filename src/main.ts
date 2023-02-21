@@ -4,24 +4,33 @@ import { createPinia } from "pinia";
 import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2'
 import localforage from "localforage"
 import 'uno.css'
+import '@/assets/font/font.css'
 import App from "./App.vue";
 import router from "./router";
+import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import initRDKit from "@/components/rdkitComponent/RDKit";
 //init SharedWorker(rdkit)
 const myWorker = new SharedWorker(new URL('./worker/sharedWorker.js',import.meta.url),{name: 'vastLabSharedWorker',type: "module"})
 myWorker.port.postMessage(null);
+
+self.MonacoEnvironment = {
+  getWorker() {
+    return new editorWorker()
+  }
+};
 
 const siteType=ref<number>(0)
 const molTags=ref<string[]>(["芳胺","咔唑","配体"])
 const app = createApp(App);
 app.provide('molTags',molTags)
 app.provide('siteType',siteType)
+app.provide('myWorker', readonly(myWorker))
 const rdkit = ref<any>();
 initRDKit.then((res) => {
   rdkit.value = res; 
   rdkit.value.prefer_coordgen(true);
   app.provide('rdkit', readonly(rdkit.value))
-  app.provide('myWorker', readonly(myWorker))
+  console.log('rdkit.js has loaded')
 })
 
 const pinia = createPinia()

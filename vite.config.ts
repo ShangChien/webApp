@@ -33,8 +33,14 @@ export default {
       ],
       rules: [
         // your custom rules
-        [/^hsla-(\d+)-(\d+)-(\d+)-(\d+)$/, 
-          ([_,a,b,c,d]:any) => ({'background-color': `hsla(${a}, ${b}%, ${c}%, ${d}%)`})],
+        [
+          /^hsla-(\d+)-(\d+)-(\d+)-(\d+)$/, 
+          ([_,a,b,c,d]:any) => ({'background-color': `hsla(${a}, ${b}%, ${c}%, ${d}%)`})
+        ],
+        [
+          /^font-([a-zA-Z]+)-([a-zA-Z]+)$/,
+          ([_,a,b]:any)=>({'font-family': `${a}-${b}` })
+        ]
       ],
     }),
     VitePWA({
@@ -71,17 +77,25 @@ export default {
     }),
   ],
   server: {
-    host: "0.0.0.0",
+    host: '0.0.0.0',
     https: true,
     cors: true, // 默认启用并允许任何源
     port: 8080,
     //反向代理配置，注意rewrite写法，开始没看文档在这里踩了坑
     proxy: {
-      "^/api": {
-        target: "http://192.168.2.160:8000", //代理接口
+      "/api/": {
+        target: "http://192.168.2.233:5050", //代理接口
         changeOrigin: true,
-        rewrite: (path:string) => path.replace(/^\/api/, ""),
+        rewrite: (path:string) => path.replace(/^\/api/, "")
       },
+      // "^/src/worker/pyodide/.*\.whl$": {
+      //   target: "https://cdn.jsdelivr.net/pyodide/v0.22.1/full", //代理接口
+      //   changeOrigin: true,
+      //   rewrite: (path:string) => {
+      //     console.log(path.replace(/^\/src\/worker\/pyodide/, ''))
+      //     return path.replace(/^\/src\/worker\/pyodide/, '')
+      //   }
+      // },
     },
   },
   resolve: {

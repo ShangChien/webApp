@@ -42,6 +42,11 @@ const router = createRouter({
       name: "enum",
       component: () => import("../views/enum.vue"),
     },
+    {
+      path: "/python",
+      name: "python",
+      component: () => import("../views/pythonView.vue"),
+    },
   ],
 });
 
