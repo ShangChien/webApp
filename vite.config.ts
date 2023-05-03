@@ -71,7 +71,7 @@ export default {
       },
       workbox: {
         maximumFileSizeToCacheInBytes: 10000000,
-        globPatterns: ['**/*{js,css,html,ico,png,svg,pdb,sdf,wasm}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,pdb,sdf,wasm}'],
         navigateFallbackDenylist: [/^\/api/],
       }
     }),

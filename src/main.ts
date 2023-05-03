@@ -21,7 +21,9 @@ self.MonacoEnvironment = {
 
 const siteType=ref<number>(0)
 const molTags=ref<string[]>(["芳胺","咔唑","配体"])
+const currentEdit = ref<{id:number;state:number}>({id:0,state:0})
 const app = createApp(App);
+app.provide('currentEdit',currentEdit)
 app.provide('molTags',molTags)
 app.provide('siteType',siteType)
 app.provide('myWorker', readonly(myWorker))

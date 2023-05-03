@@ -1,4 +1,4 @@
-export async function useCopyPNG(svgText:any) {
+export async function useCopy(svgText:any) {
 	const convertPngBlob = async (blobSvg:any) => {
 		return new Promise((resolve) => {
 		 var img =new Image();
@@ -17,10 +17,10 @@ export async function useCopyPNG(svgText:any) {
 	const blobSvg = new Blob([svgText], {type:'image/svg+xml'})
 	const blobText = new Blob([svgText], {type:'text/plain'})
 	clipboardData[blobSvg.type] = blobSvg
-	clipboardData[blobText.type] = blobText
-	await convertPngBlob(blobSvg).then((pngBlob:any)=>{
-		clipboardData[pngBlob.type] = pngBlob
-	 })
+	//clipboardData[blobText.type] = blobText
+	// await convertPngBlob(blobSvg).then((pngBlob:any)=>{
+	// 	clipboardData[pngBlob.type] = pngBlob
+	// })
 	try {
 	 console.log(clipboardData)
 	 await navigator.clipboard.write([

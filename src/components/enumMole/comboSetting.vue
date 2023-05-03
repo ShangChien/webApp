@@ -20,18 +20,17 @@ const enumResult:any = inject('enumResult')
 function enumMol(){
 	console.log('axios',props)
 	//axios.get('api/todos/1').then(json => console.log(json))
-  axios.post(
+	axios.post(
 		'api/enum', 
 		props,
-		// 
 	).then(function (response:any) {
 		let data=response.data.data
     enumResult.value=data.map((el,index)=>{
-			return {
-				id:index,
-				smiles:el
-			}
-		});
+		return {
+			id:index,
+			smiles:el
+		}
+	});
     console.log(response)
   }).catch(function (error) {
     console.log(error);
@@ -47,8 +46,8 @@ function enumMol(){
 				<div class="flex flex-nowrap justify-begin">
 					<div v-for="item in setting">
 						<div class="p-1 rd-t-2 b-2 b-b-0 text-1.2em"
-								 :class="[settingName===item ? 'bg-slate-1 b-sky-2' : 'b-slate-2/0']"
-								 @click="settingName=item">{{item.substring(4)}}
+							:class="[settingName===item ? 'bg-slate-1 b-sky-2' : 'b-slate-2/0']"
+							@click="settingName=item">{{item.substring(4)}}
 						</div>
 					</div>
 				</div>

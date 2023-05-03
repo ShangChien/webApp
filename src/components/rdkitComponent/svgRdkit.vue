@@ -41,7 +41,6 @@ watch(props, (newVal) => {
 onUnmounted(()=>{
   myWorker.port.close()
 })
-
 </script>
 
 <template >

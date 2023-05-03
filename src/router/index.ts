@@ -18,9 +18,9 @@ const router = createRouter({
       component: () => import("../views/ketcher.vue"),
     },
     {
-      path: "/rdkit",
-      name: "rdkit",
-      component: () => import("../views/rdkit.vue"),
+      path: "/molStore",
+      name: "molStore",
+      component: () => import("../views/molStore.vue"),
     },
     {
       path: "/3d",

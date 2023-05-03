@@ -4,6 +4,7 @@ from rdkit import Chem
 from pycdxml import cdxml_slide_generator, cdxml_converter
 from itertools import combinations,product
 from joblib import Parallel, delayed
+import copy
 
 from pydantic import BaseModel
 from typing import Union,Iterable,List,Set,Dict,Any
@@ -134,7 +135,7 @@ def convert_smi(i:str)->str:
 	return Chem.CanonSmiles(smi)
 
 def parallel_convert_smis(smis_link:List[str])->List[str]:
-	smis=Parallel(n_jobs=-1)(delayed(convert_smi)(i) for i in smis_link)
+	smis=Parallel(n_jobs=8)(delayed(convert_smi)(i) for i in smis_link)
 	return smis
 
 async def enum_atoms_smiles(enumData:enumData)->List[str]:
@@ -144,22 +145,22 @@ async def enum_atoms_smiles(enumData:enumData)->List[str]:
 	smis=list(set(smis_p))
 	return smis
 
-def layout_cdxml(cdxmls:List[Any],cols:int,rows:int=-1,single_page:bool=True)->List[Any]:
+def layout_cdxml(cdxmls:List[Any],cols:int,rows:int=-1,single_page:bool=True,scale:float=1.0)->List[Any]:
 	##when single_page=false, must explicitly pass rows with value>0
 	import math
 	length = len(cdxmls)
 	props = [[cdxml_slide_generator.TextProperty('index', i+1)] for i in range(length)]
 	real_rows = math.ceil(length/cols) if single_page else rows
-	sg = cdxml_slide_generator.CDXMLSlideGenerator(
-		style="ACS 1996", 
-		number_of_properties=1, 
-		columns=cols, rows=real_rows, 
-		slide_width=cols*10, 
-		slide_height=real_rows*10
-	)
 	#logic
 	slides=[]
 	if single_page:
+		sg = cdxml_slide_generator.CDXMLSlideGenerator(
+			style="ACS 1996", 
+			number_of_properties=1, 
+			columns=cols, rows=real_rows, 
+			slide_width=cols*10*scale, 
+			slide_height=real_rows*10*scale
+		)
 		slides.append(sg.generate_slide(cdxmls, props))
 	else:
 		if rows<0:
@@ -167,7 +168,23 @@ def layout_cdxml(cdxmls:List[Any],cols:int,rows:int=-1,single_page:bool=True)->L
 		else:
 			per_page_nums=cols*rows
 			total_pages=math.ceil(length/per_page_nums)
-			sub_cdxmls=[cdxmls[i*per_page_nums:(i+1)*per_page_nums] for i in range(total_pages)]
-			sub_props=[props[i*per_page_nums:(i+1)*per_page_nums] for i in range(total_pages)]
-			slides=[sg.generate_slide(sub_cdxmls[i], sub_props[i]) for i,_v in enumerate(sub_props)]
+			def getSlide(pageIndex:int):
+				##必须将初始化sg放到并行函数内部才能运行
+				sg = cdxml_slide_generator.CDXMLSlideGenerator(
+					style="ACS 1996", 
+					number_of_properties=1, 
+					columns=cols, rows=real_rows, 
+					slide_width=cols*10*scale, 
+					slide_height=real_rows*10*scale
+				)
+				start = pageIndex * per_page_nums
+				end   = start + per_page_nums
+				cdxml = cdxmls[start:end]
+				prop = props[start:end]
+				slide = sg.generate_slide(cdxml, prop)
+				return slide
+			#sub_cdxmls=[cdxmls[i*per_page_nums:(i+1)*per_page_nums] for i in range(total_pages)]
+			#sub_props=[props[i*per_page_nums:(i+1)*per_page_nums] for i in range(total_pages)]
+			#slides=[sg.generate_slide(sub_cdxmls[i], sub_props[i]) for i,_v in enumerate(sub_props)]
+			slides=Parallel(n_jobs=10)(delayed(getSlide)(i) for i in range(total_pages))
 	return slides

@@ -2,13 +2,14 @@
 import { ref, computed, onMounted } from "vue"
 import axios from "axios";
 import type { molData } from "@/components/types";
-import { NScrollbar,NPopover,NInputNumber } from "naive-ui";
+import { NScrollbar,NPopover,NInputNumber,NSwitch } from "naive-ui";
 const props=defineProps<{molList:molData[]}>()
 const cdxml4export=ref<string[]>([])
 const downloaded=ref<number[]>([])
 const cols=ref<number>(10)
 const rows=ref<number>(20)
 const scale=ref<number>(1)
+const singlePage=ref<boolean>(false) 
 function dloadCDX(data:string,index:number){
 	const now = new Date();
 	const fileName = `${index}-${now.getFullYear()}${now.getMonth()+1}${now.getDate()}${now.getHours()}${now.getMinutes()}${now.getSeconds()}.cdxml`;
@@ -23,10 +24,20 @@ function dloadCDX(data:string,index:number){
 
 function getCdxFile(){
 	console.log('POSTing to get cdxfile...',)
-	let data = props.molList.map((el)=>el.smiles);
+	let data =computed(()=>{
+		return {
+			smiles : props.molList.map((el)=>el.smiles),
+			layout : {
+				cols  		 :	cols.value,
+				rows			 :	rows.value,
+				scale 		 :	scale.value,
+				singlePage :  singlePage.value
+			}
+		}
+	}) ;
   axios.post(
 		'api/cdxml', 
-		data,
+		data.value,
 	).then((res:any)=>{
     console.log('receve res')
 		cdxml4export.value=res.data.data
@@ -59,26 +70,30 @@ function getCdxFile(){
       				<div class='i-ic:outline-settings-suggest text-2xl rd-5 c-rose-6'/>
 						</template>
 						<template #default>
-							<div class="grid justify-items-end grid-cols-2 gap-2 w-12vw">
-              	<span class=" pr-1 pl-2 text-xl">cols:</span>
-              	<n-input-number v-model:value="cols" 
-              	                :min="1"
-              	                size="small"
-              	                class="w-20 " 
-              	                button-placement="both" />
-              	<span class=" pr-1 pl-2 text-xl ">rows:</span>
-              	<n-input-number v-model:value="rows" 
-              	                :min="1"
-              	                size="small"
-              	                class="w-20" 
-              	                button-placement="both" />
-								<span class=" pr-1 pl-2 text-xl ">scale:</span>
-              	<n-input-number v-model:value="scale"
-																:min="0" 
-              	                size="small"
-              	                class="w-20" 
-              	                button-placement="both" />			
-            	</div>
+							<div class="font-LX-B m--2 mb--1 mt--1">
+								<div class="text-1.2em bg-slate-1 text-center rd-1 mb-1"
+									>cdxml文件布局设置：</div>
+								<div class="grid justify-center grid-cols-2 gap-1 w-170px">
+              		<span class="self-center justify-self-end">cols:</span>
+              		<n-input-number v-model:value="cols" 
+              		                :min="1"
+              		                size="tiny"
+              		                button-placement="both" />
+              		<span class="self-center justify-self-end">rows:</span>
+              		<n-input-number v-model:value="rows" 
+              		                :min="1"
+              		                size="tiny"
+              		                button-placement="both" />
+									<span class="self-center justify-self-end">scale:</span>
+              		<n-input-number v-model:value="scale"
+																	:min="0" 
+              		                size="tiny"
+              		                button-placement="both" />
+									<span class="self-center justify-self-end">singePage:</span>
+              		<n-switch v-model:value="singlePage"
+              		                size="small" />			
+            		</div>
+							</div>
 						</template>
 					</n-popover>
 				</div>
@@ -87,7 +102,7 @@ function getCdxFile(){
 		<div class="flex flex-nowrap flex-col m-0 p-0 mt-1 rd-2 bg-slate-50">
 			<div v-if="cdxml4export.length === 0"
 				class="flex flex-col justify-center items-center">
-				<div class="i-fxemoji-expressionless text-5xl"></div>
+				<div class="i-fxemoji-expressionless text-5xl m-5"></div>
 				no data
 			</div>
 			<div v-else>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted,provide,computed,watch } from "vue";
+import { ref, onMounted,provide,computed,watch,inject } from "vue";
+import type { Ref } from 'vue'
 import { NStep,NSteps,NButton,NSpace,NSwitch,NPageHeader,
 NGrid,NGridItem,NStatistic,NAvatar,NDropdown,NThing } from "naive-ui"
 import siteSelcet from "@/components/rdkitComponent/siteSelect.vue"
@@ -21,8 +22,7 @@ provide('visiualBox',visiualBox)
 //位点选取组件所显示分子的id
 //currentEdit.value.state:
 //0:没有操作的状态; 1:处于预览状态; 2:处于编辑状态;3:处于编辑结束
-const currentEdit = ref<{id:number;state:number}>({id:0,state:0})
-provide('currentEdit',currentEdit)
+const currentEdit:Ref<{id:number;state:number}>=inject('currentEdit')
 //注入结果
 const enumResult=ref<molData[]>([])
 provide('enumResult',enumResult)

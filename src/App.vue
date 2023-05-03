@@ -35,8 +35,8 @@ const menuOptions: MenuOption[] = [
   },
   {
     label: () =>
-      h(RouterLink, { to: { name: "rdkit" } }, { default: () => "RDKit" }),
-    key: "view-RDKit",
+      h(RouterLink, { to: { name: "molStore" } }, { default: () => "molStore" }),
+    key: "view-molStore",
     icon: renderIcon(LogoElectron),
   },
   {

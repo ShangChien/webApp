@@ -4,7 +4,7 @@ import { useElementSize,watchDebounced } from '@vueuse/core'
 import { Splitpanes, Pane } from 'splitpanes'
 import MonacoEditor from 'monaco-editor-vue3';
 import { NButton,NScrollbar } from 'naive-ui'
-const python =await import('@/worker/pyodide' )
+const python =await import('@/worker/pyodide' /* @vite-ignore */)
 //python setting
 const py=ref<any>()
 const codeStr=ref<string>(`

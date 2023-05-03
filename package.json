@@ -15,7 +15,7 @@
     "@volar/pug-language-service": "^0.37.9",
     "@volar/typescript-language-service": "^0.37.9",
     "@volar/vue-language-service": "^0.37.9",
-    "@vueuse/core": "^9.12.0",
+    "@vueuse/core": "^10.1.2",
     "axios": "^0.26.1",
     "core-js": "^3.21.1",
     "dexie": "^3.2.2",
@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@arco-design/web-vue": "^2.39.1",
-    "@iconify/json": "^2.1.100",
+    "@iconify/json": "^2.2.59",
     "@rollup/plugin-inject": "^4.0.4",
     "@rushstack/eslint-patch": "^1.1.0",
     "@types/jsdom": "^20.0.0",
