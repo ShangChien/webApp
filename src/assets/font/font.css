@@ -12,7 +12,8 @@
 }
 @font-face {
   font-family: 'LXM-B';
-  src: url('./LXGWWenKaiMonoGB-Bold.ttf')
+  src: url('./LXGWWenKaiMonoGB-Bold.ttf');
+  font-weight: 'bold';
 }
 @font-face {
   font-family: 'LXM-L';
