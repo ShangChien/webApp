@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed,ref,reactive } from 'vue'
-import { NButton,NCheckbox,NSwitch } from 'naive-ui'
-import { createReusableTemplate } from '@vueuse/core'
+import { computed,ref,reactive,onMounted,watch } from 'vue'
+import { NButton,NCheckbox } from 'naive-ui'
+import {  useElementBounding,createReusableTemplate } from '@vueuse/core'
 import { useMolStore } from '@/stores/molStore'
 import type { molData } from "@/components/types"
 import gridPage from "@/components/rdkitComponent/gridPage.vue";
@@ -11,7 +11,14 @@ interface dataPick {
   expend:boolean
   enabled:boolean
 }
+const mounted=ref<boolean>(false)
 const angle=ref(0)
+const el_label = ref(null)
+const { height:labels_h,right:labels_r } = useElementBounding(el_label)
+const showExpand = computed(()=>{
+  return el_label.value?.lastElementChild.getBoundingClientRect().right > labels_r.value 
+    || labels_h.value > 32
+    ? true : false})
 const [DefineTag, ReuseTag] = createReusableTemplate<{label:string }>()
 const store = useMolStore()
 const labels = computed(()=>store.getAllLabels)
@@ -22,6 +29,7 @@ const mols4view = computed(()=>{
 })
 async function selection(data:dataPick) {
   let len = await Promise.resolve(data.items.length)
+  console.log( el_label.value.lastElementChild.getBoundingClientRect().right,labels_r.value,showExpand.value)
   if (len !== 0){
     data.selected=(data.selected.length!==0) ? [] : [...data.items]
   }else{
@@ -34,7 +42,10 @@ async function reverse(data:dataPick) {
   let arr= await Promise.resolve(data.items)
   data.selected = arr.filter(item => !data.selected.includes(item))
 }
-
+onMounted(()=>{
+  mounted.value=true
+  console.log(showExpand.value)
+})
 </script>
 
 <template>
@@ -55,11 +66,11 @@ async function reverse(data:dataPick) {
       : 'bg-indigo-300 b-indigo-400 hover:(bg-indigo-400 b-indigo-300)']"
       @click="dataLabels.enabled=!dataLabels.enabled">
         <div class="text-2xl mt--0.5 mb-0.5"
-        :class="[dataLabels.enabled ? 'i-fluent-emoji-flat-label' : 'i-fluent-emoji-flat-label?mask text-zinc-100']"></div>
-        <span class="text-center text-zinc-100">标签</span>
+        :class="[dataLabels.enabled ? 'i-fluent-emoji-flat-label' : 'i-fluent-emoji-flat-label?mask text-gray-200']"></div>
+        <span class="text-center text-zinc-50">标签</span>
       </div>
       <Transition name="fade">
-        <div v-if="dataLabels.enabled" class="flex flex-nowrap justify-begin overflow-hidden flex-auto items-start">
+        <div v-show="dataLabels.enabled" class="flex flex-nowrap justify-begin overflow-clip flex-auto items-start">
           <div class="rd-2 mt-0.5 bg-blue-100 flex-none flex flex-nowrap justify-around items-center hover:bg-blue-200 ">
             <n-checkbox class=" ml-1.5 mr-1" size="small"
             :checked="dataLabels.selected.length!==0 && dataLabels.selected.length===dataLabels.items.length"
@@ -70,12 +81,15 @@ async function reverse(data:dataPick) {
             :style="{ 'transform': `rotateY(${angle}deg)` }"
             @click="reverse(dataLabels)"></div>
           </div>  
-          <div class="flex justify-begin overflow-hidden flex-auto"
+          <div class="overflow-clip flex-auto transition-height-210"
+          :style="{height:labels_h+'px'}">
+            <div ref="el_label" class="flex justify-begin"
             :class="[dataLabels.expend ? 'flex-wrap':'flex-nowrap']">
-            <reuse-tag v-for="label in dataLabels.items" :label="label"></reuse-tag>
+              <reuse-tag v-for="label in dataLabels.items" :label="label"></reuse-tag>
+            </div>
           </div>
-          <div class="rd-2 ml-2 p-0.5 mt-0.5 bg-blue-100 flex-none hover:bg-blue-200">
-            <div @click="dataLabels.expend = !dataLabels.expend"
+          <div v-if="showExpand" class="rd-2 ml-2 p-0.5 mt-0.5 bg-blue-100 flex-none hover:bg-blue-200">
+            <div @click="()=>{dataLabels.expend = !dataLabels.expend;}"
             :class="[dataLabels.expend ? 'i-ion-chevron-collapse' : 'i-ion-chevron-expand']"
             class=" text-l p-1 c-zinc-400 hover:(c-slate-600 cursor-pointer)" />
           </div>
@@ -88,14 +102,14 @@ async function reverse(data:dataPick) {
       ? 'bg-indigo-400 b-indigo-300 hover:(bg-indigo-300 b-indigo-400)'
       : 'bg-indigo-300 b-indigo-400 hover:(bg-indigo-400 b-indigo-300)']"
       @click="dataLabels.enabled=!dataLabels.enabled">
-        <div class="text-xl mb-0.5"
-        :class="[dataLabels.enabled ? 'i-logos-atomic-icon' : 'i-logos-atomic-icon?mask text-zinc-100']"></div>
-        <span class="text-center text-zinc-100">类型</span>
+        <div class="text-xl mb-0.4 mr-1"
+        :class="[dataLabels.enabled ? 'i-logos-atomic-icon' : 'i-logos-atomic-icon?mask text-gray-200']"></div>
+        <span class="text-center text-zinc-50">类型</span>
       </div>
     </div>
     <div class="sortedby"></div>
   </div>
-  <grid-page v-if="mols4view" :molList="mols4view" :cols='8' :rows="6" class='h-85vh'/>
+  <grid-page v-if="mols4view" :molList="mols4view" :cols='8' :rows="6" class='h-200vh'/>
 </div>
 </template>
 <style scoped>
@@ -107,5 +121,8 @@ async function reverse(data:dataPick) {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+.dy-h {
+  height: v-bind(labels_h+'px');
 }
 </style>
