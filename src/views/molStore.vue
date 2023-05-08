@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed,ref,reactive,onMounted,watch } from 'vue'
+import { computed,ref,reactive,onMounted} from 'vue'
 import { NButton,NCheckbox } from 'naive-ui'
-import {  useElementBounding,createReusableTemplate } from '@vueuse/core'
+import { useElementBounding,createReusableTemplate } from '@vueuse/core'
 import { useMolStore } from '@/stores/molStore'
 import type { molData } from "@/components/types"
 import gridPage from "@/components/rdkitComponent/gridPage.vue";
@@ -20,16 +20,21 @@ const showExpand = computed(()=>{
     || labels_h.value > 32
     ? true : false})
 const [DefineTag, ReuseTag] = createReusableTemplate<{label:string }>()
+const [DefineRadio, ReuseRadio] = createReusableTemplate<{label:string }>()
 const store = useMolStore()
 const labels = computed(()=>store.getAllLabels)
+const types = ['all','molecule','ligand','core']
 const dataLabels:dataPick=reactive({items:labels,selected:[],expend:false,enabled:false})
-const dataTypes:dataPick=reactive({items:['molecule','ligand','core'],selected:[],expend:false,enabled:false})
+const dataTypes:dataPick=reactive({items:types,selected:['all'],expend:false,enabled:false})
 const mols4view = computed(()=>{
   return store.getByTypesAndLabels(dataTypes.selected,dataLabels.selected)
 })
-async function selection(data:dataPick) {
+async function single_select(data:dataPick) {
+
+  
+}
+async function select_all_or_none(data:dataPick) {
   let len = await Promise.resolve(data.items.length)
-  console.log( el_label.value.lastElementChild.getBoundingClientRect().right,labels_r.value,showExpand.value)
   if (len !== 0){
     data.selected=(data.selected.length!==0) ? [] : [...data.items]
   }else{
@@ -44,7 +49,6 @@ async function reverse(data:dataPick) {
 }
 onMounted(()=>{
   mounted.value=true
-  console.log(showExpand.value)
 })
 </script>
 
@@ -71,19 +75,19 @@ onMounted(()=>{
       </div>
       <Transition name="fade">
         <div v-show="dataLabels.enabled" class="flex flex-nowrap justify-begin overflow-clip flex-auto items-start">
-          <div class="rd-2 mt-0.5 bg-blue-100 flex-none flex flex-nowrap justify-around items-center hover:bg-blue-200 ">
+          <div class="rd-1.5 mt-0.5 bg-blue-100 flex-none flex flex-nowrap justify-around items-center hover:bg-blue-200 ">
             <n-checkbox class=" ml-1.5 mr-1" size="small"
             :checked="dataLabels.selected.length!==0 && dataLabels.selected.length===dataLabels.items.length"
             :indeterminate="dataLabels.selected.length!==0 && dataLabels.selected.length!==dataLabels.items.length"
-            @click="selection(dataLabels)" >
+            @click="select_all_or_none(dataLabels)" >
             </n-checkbox>
-            <div class="i-carbon-contrast rd-2 m-1 ml-2  bg-indigo-400 cursor-pointer text-xl transition-210 hover:(bg-indigo-600)"
+            <div class="i-carbon-contrast m-1 ml-2 bg-indigo-400 cursor-pointer text-xl transition-210 hover:(bg-indigo-600)"
             :style="{ 'transform': `rotateY(${angle}deg)` }"
             @click="reverse(dataLabels)"></div>
           </div>  
           <div class="overflow-clip flex-auto transition-height-210"
           :style="{height:labels_h+'px'}">
-            <div ref="el_label" class="flex justify-begin"
+            <div ref="el_label" class="flex"
             :class="[dataLabels.expend ? 'flex-wrap':'flex-nowrap']">
               <reuse-tag v-for="label in dataLabels.items" :label="label"></reuse-tag>
             </div>
@@ -96,16 +100,26 @@ onMounted(()=>{
         </div>
       </Transition>
     </div>
-    <div class="flex flex-nowrap justify-between items-start">
-      <div class="flex-none flex items-center mr-2 rd-2 pr-1 pl-1 mb-0.5 mt-0.5 bg-blue-100 cursor-pointer box-border b-2 transition-210"
-      :class="[dataLabels.enabled 
+    <div class="flex flex-nowrap justify-start items-center">
+      <div class="flex-none flex items-center mr-2 rd-2 pr-1 pl-1 mb-0.6 mt-0.6 bg-blue-100 cursor-pointer box-border b-2 transition-210"
+      :class="[dataTypes.enabled 
       ? 'bg-indigo-400 b-indigo-300 hover:(bg-indigo-300 b-indigo-400)'
       : 'bg-indigo-300 b-indigo-400 hover:(bg-indigo-400 b-indigo-300)']"
-      @click="dataLabels.enabled=!dataLabels.enabled">
+      @click="dataTypes.enabled=!dataTypes.enabled">
         <div class="text-xl mb-0.4 mr-1"
-        :class="[dataLabels.enabled ? 'i-logos-atomic-icon' : 'i-logos-atomic-icon?mask text-gray-200']"></div>
+        :class="[dataTypes.enabled ? 'i-logos-atomic-icon' : 'i-logos-atomic-icon?mask text-gray-200']"></div>
         <span class="text-center text-zinc-50">类型</span>
       </div>
+      <Transition name="fade">
+        <div v-show="dataTypes.enabled" class="flex flex-none flex-nowrap bg-gray-100 rd-1.5 m-0.3 p-0.3 ">
+          <div v-for="(item, index) in dataTypes.items"
+          class="m-0.4 mr-1 ml-1 pr-1 pl-1 rd-1.2 line-height-0 box-border transition-210 cursor-pointer"
+          :class="[dataTypes.selected.includes(item) ? 'bg-blue-300' : 'hover:bg-blue-100']"
+          @click="dataTypes.selected=[item]">
+            {{item}}
+          </div>
+        </div>
+      </Transition>
     </div>
     <div class="sortedby"></div>
   </div>
