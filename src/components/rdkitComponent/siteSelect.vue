@@ -19,7 +19,7 @@ import {
          ColorPalette
 } from "@vicons/carbon";
 import { useClipboard,useWindowSize } from "@vueuse/core";
-import initKetcher from "@/components/initKetcher.vue";
+import initKetcher from "@/components/ketcher/initKetcher.vue";
 import classSites from "@/components/rdkitComponent/classSites.vue";
 import tagMols from "@/components/rdkitComponent/tagMols.vue"
 import editableRdkit from "@/components/rdkitComponent/editableRdkit.vue";

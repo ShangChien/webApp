@@ -27,7 +27,7 @@ import { ColorPaletteOutline } from "@vicons/ionicons5";
 import { CloudSatellite, CopyFile } from "@vicons/carbon";
 import { BrandAppleArcade } from "@vicons/tabler";
 import { useClipboard } from "@vueuse/core";
-import initKetcher from "../components/initKetcher.vue";
+import initKetcher from "@/components/ketcher/initKetcher.vue";
 //import editableRdkit from "@/components/editableRdkit.vue";
 import { reactive, ref, watch, computed,
          defineAsyncComponent } from "vue";

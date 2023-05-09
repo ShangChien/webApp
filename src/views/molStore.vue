@@ -2,6 +2,7 @@
 import { computed,ref,reactive,onMounted} from 'vue'
 import { NButton,NCheckbox } from 'naive-ui'
 import { useElementBounding,createReusableTemplate } from '@vueuse/core'
+import search from '@/components/ketcher/search.vue'
 import { useMolStore } from '@/stores/molStore'
 import type { molData } from "@/components/types"
 import gridPage from "@/components/rdkitComponent/gridPage.vue";
@@ -20,7 +21,6 @@ const showExpand = computed(()=>{
     || labels_h.value > 32
     ? true : false})
 const [DefineTag, ReuseTag] = createReusableTemplate<{label:string }>()
-const [DefineRadio, ReuseRadio] = createReusableTemplate<{label:string }>()
 const store = useMolStore()
 const labels = computed(()=>store.getAllLabels)
 const types = ['all','molecule','ligand','core']
@@ -29,10 +29,7 @@ const dataTypes:dataPick=reactive({items:types,selected:['all'],expend:false,ena
 const mols4view = computed(()=>{
   return store.getByTypesAndLabels(dataTypes.selected,dataLabels.selected)
 })
-async function single_select(data:dataPick) {
 
-  
-}
 async function select_all_or_none(data:dataPick) {
   let len = await Promise.resolve(data.items.length)
   if (len !== 0){
@@ -63,6 +60,7 @@ onMounted(()=>{
     </n-button>
   </define-tag>
   <div class="filter">
+    <search></search>
     <div class="flex flex-nowrap justify-between items-start">
       <div class="flex-none flex items-center mr-2 rd-2 pr-1 pl-1 mb-0.5 mt-0.5 bg-blue-100 cursor-pointer box-border b-2 transition-210"
       :class="[dataLabels.enabled 
@@ -121,6 +119,7 @@ onMounted(()=>{
         </div>
       </Transition>
     </div>
+    <div class='font-1300'>回家</div>
     <div class="sortedby"></div>
   </div>
   <grid-page v-if="mols4view" :molList="mols4view" :cols='8' :rows="6" class='h-200vh'/>
