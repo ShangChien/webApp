@@ -135,7 +135,4 @@ onMounted(()=>{
 .fade-leave-to {
   opacity: 0;
 }
-.dy-h {
-  height: v-bind(labels_h+'px');
-}
 </style>
