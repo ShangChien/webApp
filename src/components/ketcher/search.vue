@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted,h } from "vue";
-import type { VNode,VNodeChild,Component } from 'vue'
+import { ref, reactive, computed, onMounted,h,createVNode } from "vue";
+import type { VNode,VNodeChild,Component,Ref } from 'vue'
 import { useIDBKeyval } from '@vueuse/integrations/useIDBKeyval';
 import { createReusableTemplate,useElementSize,useElementBounding,useFocus } from '@vueuse/core';
 import { useSortable } from '@vueuse/integrations/useSortable'
-import { NButton,NModal,NCard,NDropdown } from "naive-ui";
+import { NButton,NModal,NCard,NDropdown,NDatePicker,NPopover } from "naive-ui";
 import type { DropdownOption } from 'naive-ui'
 import initKetcher from './initKetcher.vue';
 import type { molData } from "@/components/types";
@@ -32,11 +32,16 @@ interface option{
 interface condition extends Omit<option,'value'>{
   id:number;
   logic:logicType;
+  label?:string;
   type?:string;
-  value?: string[] | number[];
+  logic_icon?:VNode|Component;
+  label_icon?:VNode|Component;
+  value?: string[]|number[]|Ref<number>[];
 }
 
-const [DefineC, ReuseC] = createReusableTemplate<{data:condition }>()
+const [DefineA, ReuseA] = createReusableTemplate<{ data:condition }>()
+const [DefineTime, ReuseTime] = createReusableTemplate<{ data:{value:Ref<number>} }>()
+const [DefineC, ReuseC] = createReusableTemplate<{ data:{label:string} }>()
 const el_condition =  ref(null)
 const input        =  ref(null)
 const filter_c     =  ref(null)
@@ -54,25 +59,22 @@ useSortable(filter_c, conditions, {
   animation:150,
 })
 const logic_options=[
-  {label:'And',key:logicType.And},
-  {label:'Or' ,key:logicType.Or},
-  {label:'Not',key:logicType.Not},
+  {label:'and',key:logicType.And,icon:(()=>h('div',{class:'i-carbon-shape-intersect bg-blue ml-1 text-2xl'}))},
+  {label:'or' ,key:logicType.Or,icon:(()=>h('div',{class:'i-carbon-shape-unite bg-blue ml-1 text-2xl'}))},
+  {label:'not',key:logicType.Not,icon:(()=>h('div',{class:'i-carbon-send-to-back bg-blue ml-1 text-2xl'}))},
 ]
-function render_label (option: DropdownOption) {
-  return h('div',{class:'mr--2.5'},{default: () => option.label as VNodeChild})
-}
 const options = ref<option[]>([
   {label:'搜索方式',key:'methods',editable:false,
-    icon:(()=>h('div',{class:'i-tabler-settings-search bg-blue mr--2 text-2xl'})),
+    icon:(()=>h('div',{class:'i-solar-card-search-bold-duotone bg-blue mr--2 text-2xl'})),
     children:[
       {label:'子结构',key:'substructure',icon:(()=>h('div',{class:'i-carbon-assembly bg-blue mr--2 text-2xl'}))},
       {label:'相似度',key:'similarity',icon:(()=>h('div',{class:'i-carbon-assembly-reference bg-blue mr--2 text-2xl'}))}
     ],
   },
   {label:'材料名称',key:'name',
-    icon:(()=>h('div',{class:'i-solar-card-2-bold-duotone bg-blue mr--2 text-2xl'})),
+    icon:(()=>h('div',{class:'i-solar-hashtag-square-bold-duotone bg-blue mr--2 text-2xl'})),
     children:[
-      {label:'计算编号',key:'name_cal',icon:(()=>h('div',{class:'i-fluent-number-symbol-square-24-regular bg-blue mr--2 text-2xl'})),},
+      {label:'计算编号',key:'name_cal',icon:(()=>h('div',{class:'i-tabler-number bg-blue mr--2 text-2xl'})),},
       {label:'材料编号',key:'name_mat',icon:(()=>h('div',{class:'i-fluent-text-number-format-20-filled bg-blue mr--2 text-2xl'}))},
     ]
   },
@@ -80,8 +82,8 @@ const options = ref<option[]>([
     icon:(()=>h('div',{class:'i-solar-atom-bold-duotone bg-blue mr--2 text-2xl'})),
     children:[
       {label:'分子量',key:'mw',icon:(()=>h('div',{class:'i-ph-scales-duotone bg-blue mr--2 text-2xl'}))},
-      {label:'HOMO',key:'homo',icon:(()=>h('div',{class:'i-ic-sharp-wb-cloudy bg-blue mr--2 text-2xl'}))},
       {label:'LUMO',key:'lumo',icon:(()=>h('div',{class:'i-ic-twotone-cloud bg-blue mr--2 text-2xl'}))},
+      {label:'HOMO',key:'homo',icon:(()=>h('div',{class:'i-ic-sharp-wb-cloudy bg-blue mr--2 text-2xl'}))},
       {label:'Eg',key:'eg',icon:(()=>h('div',{class:'i-material-symbols-align-space-around-rounded bg-blue mr--2 text-2xl'}))},
       {label:'极化率',key:'polar',icon:(()=>h('div',{class:'i-solar-magnet-bold-duotone bg-blue mr--2 text-2xl'}))},
       {label:'电子传输',key:'transport',icon:(()=>h('div',{class:'i-solar-square-transfer-horizontal-bold-duotone bg-blue mr--2 text-2xl'}))}
@@ -129,10 +131,12 @@ async function add_condition() {
   conditions.value.push({
     id:id_condition.value,
     logic:logicType.And,
-    label:'-select-'
+    logic_icon:(()=>h('div',{class:'i-carbon-shape-intersect bg-blue ml-1 text-2xl'})),
+    label:'-select-',
+    label_icon:(()=>h('div',{class:'i-solar-alt-arrow-down-linear bg-blue text-2xl'})),
   })
   id_condition.value+=1
-  console.log(conditions.value)
+  //console.log('add',conditions.value)
 }
 async function del_condition(id:number){
   let index =await Promise.resolve(conditions.value.findIndex((el)=>el.id==id))
@@ -141,8 +145,7 @@ async function del_condition(id:number){
   }else{
     console.log(id,'not found,internal error!')
   }
-  console.log(id,'delete!')
-  console.log(conditions.value)
+  //console.log('delete',conditions.value)
 }
 function search(){
   initMol.smiles = inputText.value
@@ -150,64 +153,97 @@ function search(){
   initMol.bonds = {}
   //console.log(initMol)
 }
+const check=(value:number)=>{
+  console.log(value)
+}
 onMounted(()=>{
-  console.log(h_filter_c.value)
+  //console.log(h_filter_c.value)
 })
 </script>
 <template>
 <div>
-<define-c v-slot="{data}">
+<define-time v-slot="{data}">
+  <n-popover trigger="click" raw :show-arrow="false" class="p-0 m-0 rd-2">
+    <template #trigger>      
+      <div class="flex-auto flex items-center justify-start cursor-pointer 
+        rd-1 box-border p-0.4
+        hover:bg-slate-2">
+        <div class="i-carbon-event-schedule bg-gray-5" ></div>
+        <div>{{data.value}}</div>
+      </div>
+    </template>
+    <n-date-picker panel type="datetime" v-model:value="data.value.value"  @update:value="check(data.value.value)"/>
+  </n-popover>
+</define-time>
+<define-c v-slot="{data}"></define-c>
+<define-a v-slot="{data}">
 <div class="flex flex-nowrap items-center justify-between gap-2 pr-2 bg-slate-1 pt-1 pb-1 rd-2 w-full pl-8 ml--6">
-  <div class="flex-none w-66px">
+  <div class="flex-none w-70px">
     <n-dropdown
       width="trigger"
       :options="logic_options"
+      :render-label="(option:any)=>h('div',{class:'w-20px'},option.label)"
       placement="bottom-start"
       trigger="click"
-      @select="(key)=>data.logic=key">
-      <div class="flex justify-between items-center 
+      @select="(key,option)=>{data.logic=key; data.logic_icon=option.icon}">
+      <div class="flex flex-nowarp justify-start items-center gap-1
         transition-210 cursor-pointer
-        rd-1 h-28px b-blue-2 box-border bg-light-1 b-2 p-0 pl-1 m-0 text-lg
+        rd-1 h-28px b-blue-2 box-border bg-light-1 b-2 p-0 m-0 text-lg
         hover:(b-blue-4 bg-slate-2)
         focus-within:(outline outline-2px outline-blue-2 b-blue-4 bg-slate-2)"
         tabindex="0">
+        <component :is="data.logic_icon" />
         <div class='p-0 m-0 text-l' >{{data.logic}}</div>
-        <div class="i-ic-round-keyboard-arrow-down text-2xl p-0 m-0 c-zinc-500 inline-block" ></div>
       </div>
     </n-dropdown>
   </div>
-  <div class="flex-none w-110px">
+  <div class="flex-none w-120px">
     <n-dropdown
       width="trigger"
       :options="(options as any)"
-      :render-label="render_label"
+      :render-label="(option:any)=>h('div',{class:'mr--2 ml-1'},option.label)"
       placement="bottom-start"
       trigger="click"
-      @select="(_key,option:option)=>data.label=option.label">
-      <div class="flex justify-between items-center 
+      @select="(_key,option)=>{
+        data.label=option.label as string; 
+        data.label_icon=option.icon;
+        if (option.key=='during'){
+          data.type='during'
+          data.value=[ref(Date.now()),ref(Date.now())] 
+        }
+      }">
+      <div class="flex flex-nowarp justify-start pl-2 items-center gap-3
         transition-210 cursor-pointer
-        rd-1 h-28px b-blue-2 box-border bg-light-1 b-2 p-0 pl-1 m-0 text-lg
+        rd-1 h-28px b-blue-2 box-border bg-light-1 b-2 p-0 m-0 text-lg
         hover:(b-blue-4 bg-slate-2)
         focus-within:(outline outline-2px outline-blue-2 b-blue-4 bg-slate-2)"
         tabindex="0">
+        <component :is="data.label_icon" />
         <div :class="[data.label=='-select-' ? 'text-gray-5' : '']"
           class='p-0 m-0 text-l'>{{data.label}}</div>
-        <div class="i-ic-round-keyboard-arrow-down text-2xl p-0 m-0 c-zinc-500 inline-block" ></div>
       </div>
     </n-dropdown>
   </div>
-  <div class="flex-auto">
-    <input id='input' class ='h-28px w-full rd-1 b-blue-2 box-border b-2 transition-210 bg-light-1
+  <div class="flex-auto flex items-center justify-between 
+      h-28px w-full rd-1 b-blue-2 box-border b-2 transition-210 bg-light-1
       active:(outline outline-2px outline-blue-2)
       focus-within:(outline outline-2px outline-blue-2 b-blue-4)
-      hover:b-blue-4'
-      placeholder="text"/>
+      hover:b-blue-4">
+    <div v-if="data.type=='during'" class="data_time flex-auto flex items-center justify-start">
+      <reuse-time :data="({value:data.value[0] as Ref<number>})"></reuse-time>
+      <reuse-time :data="({value:data.value[1] as Ref<number>})"></reuse-time>
+    </div>
+    <div v-else-if="true"></div>
+    <div v-else-if="true"></div>
+    <div v-else-if="true"></div>
+    <div v-else-if="true"></div>
+    <div v-else-if="true"></div>
   </div>
   <div class="flex-none i-solar-close-square-bold-duotone text-3xl text-blue cursor-pointer
     hover:text-blue-5"
     @click="del_condition(data.id)"></div>
 </div>
-</define-c>
+</define-a>
 <div class="flex flex-nowrap flex-col items-center text-lg c-black gap-2 ">
   <div class="flex-none flex flex-nowrap justify-between items-center w-60vw relative 
     h-36px m-0.5 pr-0 rd-1 b-blue-2 box-border b-2 transition-210
@@ -265,7 +301,7 @@ onMounted(()=>{
             hover:(b-blue-3 bg-blue-3) handle'>
             <div class="flex-none i-charm-grab-vertical cursor-grab bg-blue"></div>
           </div>
-          <reuse-c class="flex-auto " :data="item" ></reuse-c>
+          <reuse-a class="flex-auto " :data="item" ></reuse-a>
         </div>
       </TransitionGroup>
     </div>
