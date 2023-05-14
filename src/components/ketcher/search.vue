@@ -2,9 +2,11 @@
 import { ref, reactive, computed, onMounted,h,createVNode } from "vue";
 import type { VNode,VNodeChild,Component,Ref } from 'vue'
 import { useIDBKeyval } from '@vueuse/integrations/useIDBKeyval';
-import { createReusableTemplate,useElementSize,useElementBounding,useFocus } from '@vueuse/core';
+import { createReusableTemplate,useElementSize,refDebounced,useDebounceFn,useFocus } from '@vueuse/core';
 import { useSortable } from '@vueuse/integrations/useSortable'
+import dayjs from 'dayjs'
 import { NButton,NModal,NCard,NDropdown,NDatePicker,NPopover } from "naive-ui";
+import { DatePicker as TDatePicker } from 'tdesign-vue-next';
 import type { DropdownOption } from 'naive-ui'
 import initKetcher from './initKetcher.vue';
 import type { molData } from "@/components/types";
@@ -36,11 +38,17 @@ interface condition extends Omit<option,'value'>{
   type?:string;
   logic_icon?:VNode|Component;
   label_icon?:VNode|Component;
-  value?: string[]|number[]|Ref<number>[];
+  value?: string[]|number[]|Ref<number>[]|Ref<string>[];
+  valueFormat?:string[]|Ref<string>[];
+  showDetail?:Ref<boolean>[];
 }
 
-const [DefineA, ReuseA] = createReusableTemplate<{ data:condition }>()
-const [DefineTime, ReuseTime] = createReusableTemplate<{ data:{value:Ref<number>} }>()
+const [DefineFilter, ReuseFilter] = createReusableTemplate<{ data:condition }>()
+const [DefineTime, ReuseTime] = createReusableTemplate<{data:{
+  value:Ref<number>;
+  valueFormat:Ref<string>;
+  showDetail:Ref<boolean>
+}}>()
 const [DefineC, ReuseC] = createReusableTemplate<{ data:{label:string} }>()
 const el_condition =  ref(null)
 const input        =  ref(null)
@@ -147,36 +155,85 @@ async function del_condition(id:number){
   }
   //console.log('delete',conditions.value)
 }
+//
+const debouncedFn = useDebounceFn((newVal,data) => {
+  const stmp = dayjs(newVal, 'YYYY.MM.DD HH:mm:ss').valueOf()
+  if (!isNaN(stmp)) {
+    data.value = stmp;
+  }
+}, 1000)
+function onSelect(option:option,data:condition) {
+  data.label=option.label as string; 
+  data.label_icon=option.icon;
+  if (option.key=='during'){
+    data.type='during'
+    data.value=[ref(Date.now()),ref(Date.now())]
+    data.valueFormat=[
+      computed<string>({
+        get(){
+          return dayjs((data.value[0] as Ref<number>).value).format('YYYY.MM.DD HH:mm:ss')
+        },
+        set(newVal){
+          //@ts-ignore
+          debouncedFn(newVal,data.value[0])
+        }
+      }),
+      computed<string>({
+        get(){
+          return dayjs((data.value[1] as Ref<number>).value).format('YYYY.MM.DD HH:mm:ss')
+        },
+        set(newVal){
+          //@ts-ignore
+          debouncedFn(newVal,data.value[1])
+        }
+      }),
+    ]
+    data.showDetail=[ref(false),ref(false)]
+  }
+}
+
 function search(){
   initMol.smiles = inputText.value
   initMol.atoms = {}
   initMol.bonds = {}
   //console.log(initMol)
 }
-const check=(value:number)=>{
-  console.log(value)
+const check=(value:any)=>{
+  const text=dayjs(Date.now()).format('YYYY.MM.DD HH:mm:ss')
+  const stmp = dayjs(text, 'YYYY.MM.DD HH:mm:ss').valueOf()
+  console.log(text,stmp)
 }
+
+
 onMounted(()=>{
+  check('s')
   //console.log(h_filter_c.value)
 })
 </script>
 <template>
 <div>
 <define-time v-slot="{data}">
-  <n-popover trigger="click" raw :show-arrow="false" class="p-0 m-0 rd-2">
-    <template #trigger>      
-      <div class="flex-auto flex items-center justify-start cursor-pointer 
-        rd-1 box-border p-0.4
-        hover:bg-slate-2">
-        <div class="i-carbon-event-schedule bg-gray-5" ></div>
-        <div>{{data.value}}</div>
-      </div>
+  <n-popover trigger="manual" :show="data.showDetail.value" raw :show-arrow="false" class="p-0 m-0 rd-2">
+    <template #trigger>
+      <div class="flex-auto flex items-center justify-start
+        rd-1 box-border m-1 p-0 h-24px max-w-210px
+        hover:bg-slate-2"
+        @click="data.showDetail.value=true">
+        <div class="flex-auto ml-1" >
+          <input type="text" class="b-0 p-0 m-0 outline-0 bg-inherit w-185px text-gray-6" v-model="data.valueFormat.value">
+        </div>
+        <div class="i-carbon-event-schedule bg-gray-8 mr-1 text-xl p-0 flex-none " ></div>    
+      </div>  
     </template>
-    <n-date-picker panel type="datetime" v-model:value="data.value.value"  @update:value="check(data.value.value)"/>
+    <n-date-picker panel type="datetime"
+      value-format="yyyy.MM.dd HH:mm:ss"
+      :actions="['confirm','now']"
+      v-model:value="data.value.value"
+      @confirm="data.showDetail.value=!data.showDetail.value" />
   </n-popover>
 </define-time>
 <define-c v-slot="{data}"></define-c>
-<define-a v-slot="{data}">
+<define-filter v-slot="{data}">
 <div class="flex flex-nowrap items-center justify-between gap-2 pr-2 bg-slate-1 pt-1 pb-1 rd-2 w-full pl-8 ml--6">
   <div class="flex-none w-70px">
     <n-dropdown
@@ -188,7 +245,7 @@ onMounted(()=>{
       @select="(key,option)=>{data.logic=key; data.logic_icon=option.icon}">
       <div class="flex flex-nowarp justify-start items-center gap-1
         transition-210 cursor-pointer
-        rd-1 h-28px b-blue-2 box-border bg-light-1 b-2 p-0 m-0 text-lg
+        rd-1 h-32px b-blue-2 box-border bg-light-1 b-2 p-0 m-0 text-lg
         hover:(b-blue-4 bg-slate-2)
         focus-within:(outline outline-2px outline-blue-2 b-blue-4 bg-slate-2)"
         tabindex="0">
@@ -204,17 +261,10 @@ onMounted(()=>{
       :render-label="(option:any)=>h('div',{class:'mr--2 ml-1'},option.label)"
       placement="bottom-start"
       trigger="click"
-      @select="(_key,option)=>{
-        data.label=option.label as string; 
-        data.label_icon=option.icon;
-        if (option.key=='during'){
-          data.type='during'
-          data.value=[ref(Date.now()),ref(Date.now())] 
-        }
-      }">
+      @select="(_key,option:any)=>onSelect(option,data)">
       <div class="flex flex-nowarp justify-start pl-2 items-center gap-3
         transition-210 cursor-pointer
-        rd-1 h-28px b-blue-2 box-border bg-light-1 b-2 p-0 m-0 text-lg
+        rd-1 h-32px b-blue-2 box-border bg-light-1 b-2 p-0 m-0 text-lg
         hover:(b-blue-4 bg-slate-2)
         focus-within:(outline outline-2px outline-blue-2 b-blue-4 bg-slate-2)"
         tabindex="0">
@@ -225,13 +275,22 @@ onMounted(()=>{
     </n-dropdown>
   </div>
   <div class="flex-auto flex items-center justify-between 
-      h-28px w-full rd-1 b-blue-2 box-border b-2 transition-210 bg-light-1
+      h-32px w-full rd-1 b-blue-2 box-border b-2 transition-210 bg-light-1
       active:(outline outline-2px outline-blue-2)
       focus-within:(outline outline-2px outline-blue-2 b-blue-4)
       hover:b-blue-4">
     <div v-if="data.type=='during'" class="data_time flex-auto flex items-center justify-start">
-      <reuse-time :data="({value:data.value[0] as Ref<number>})"></reuse-time>
-      <reuse-time :data="({value:data.value[1] as Ref<number>})"></reuse-time>
+      <reuse-time :data="{
+        value:data.value[0] as Ref<number>,
+        valueFormat:data.valueFormat[0] as Ref<string>,
+        showDetail:data.showDetail[0]as Ref<boolean>,
+      }"></reuse-time>
+      <span>-</span>
+      <reuse-time :data="{
+        value:data.value[1] as Ref<number>,
+        valueFormat:data.valueFormat[1] as Ref<string>,
+        showDetail:data.showDetail[1]as Ref<boolean>,
+      }"></reuse-time>
     </div>
     <div v-else-if="true"></div>
     <div v-else-if="true"></div>
@@ -243,7 +302,7 @@ onMounted(()=>{
     hover:text-blue-5"
     @click="del_condition(data.id)"></div>
 </div>
-</define-a>
+</define-filter>
 <div class="flex flex-nowrap flex-col items-center text-lg c-black gap-2 ">
   <div class="flex-none flex flex-nowrap justify-between items-center w-60vw relative 
     h-36px m-0.5 pr-0 rd-1 b-blue-2 box-border b-2 transition-210
@@ -251,7 +310,7 @@ onMounted(()=>{
     focus-within:(outline outline-2px outline-blue-2 b-blue-4)
     hover:b-blue-4" >
     <div class="pre_line"></div>
-    <input ref="input" class='flex-auto outline-0 b-0 rd-1 pl-1 m-0 p-0 box-border z-1 h-100%'
+    <input ref="input" class='flex-auto outline-0 b-0 rd-1 pl-1 m-0 p-0 box-border z-1 h-100% '
       v-model="inputText" placeholder="smiles, smarts or Nothing"/>
     <div v-show="!!inputText" class="aspect-ratio-1 rd-50% h-5 mr-1 bg-slate-100
      flex justify-center items-center hover:(cursor-pointer bg-gray-200)"
@@ -286,7 +345,7 @@ onMounted(()=>{
     <div class="flex justify-center items-center b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4
       hover:(cursor-pointer bg-blue-5)
       active:(outline outline-2px outline-blue-2 bg-blue-6)"
-     @click="search" >
+      @click="search" >
       <div class="i-twemoji-magnifying-glass-tilted-left text-2xl"/>
     </div>
   </div>
@@ -295,13 +354,13 @@ onMounted(()=>{
       <TransitionGroup name="list" >
         <div v-for="item in conditions" :key="item.id" 
           class="flex justify-between items-center pr-2 w-full box-border ">
-          <div  class='flex-none flex justify-center items-center 
-            h-28px w-20px box-border ml-1
-            bg-blue-2 rd-1.5 b-2 b-blue-2 z-1 
-            hover:(b-blue-3 bg-blue-3) handle'>
-            <div class="flex-none i-charm-grab-vertical cursor-grab bg-blue"></div>
+          <div class='flex-none flex justify-center items-center 
+            h-32px w-20px box-border ml-1 p-0 m-0
+            bg-blue-2 rd-1.5 b-0 z-1
+            handle cursor-grab'>
+            <div class="flex-none i-charm-grab-vertical bg-blue-5 hover:bg-blue-3"></div>
           </div>
-          <reuse-a class="flex-auto " :data="item" ></reuse-a>
+          <reuse-filter class="flex-auto " :data="item" ></reuse-filter>
         </div>
       </TransitionGroup>
     </div>
@@ -320,8 +379,8 @@ onMounted(()=>{
 </template>
 <style >
 .pre_line {
-  display: block;
   position: absolute;
+  pointer-events: none;
   top:34px;
   left: 11px;
   width: 2px;
