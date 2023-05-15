@@ -60,7 +60,7 @@ onMounted(()=>{
     </n-button>
   </define-tag>
   <div class="filter">
-    <search></search>
+    <search />
     <div class="flex flex-nowrap justify-between items-start">
       <div class="flex-none flex items-center mr-2 rd-2 pr-1 pl-1 mb-0.5 mt-0.5 bg-blue-100 cursor-pointer box-border b-2 transition-210"
       :class="[dataLabels.enabled 

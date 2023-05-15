@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted,h,createVNode } from "vue";
+import { ref, reactive, computed, onMounted,h } from "vue";
 import type { VNode,VNodeChild,Component,Ref } from 'vue'
 import { useIDBKeyval } from '@vueuse/integrations/useIDBKeyval';
 import { createReusableTemplate,useElementSize,refDebounced,useDebounceFn,useFocus } from '@vueuse/core';
 import { useSortable } from '@vueuse/integrations/useSortable'
 import dayjs from 'dayjs'
-import { NButton,NModal,NCard,NDropdown,NDatePicker,NPopover } from "naive-ui";
-import { DatePicker as TDatePicker } from 'tdesign-vue-next';
+import { NButton,NModal,NCard,NDropdown,NDatePicker,NPopover } from "naive-ui"
+import { DatePicker as TDatePicker } from 'tdesign-vue-next'
+import tags from "@/components/ketcher/tags.vue"
+import { useMolStore } from '@/stores/molStore'
 import type { DropdownOption } from 'naive-ui'
-import initKetcher from './initKetcher.vue';
-import type { molData } from "@/components/types";
+import initKetcher from './initKetcher.vue'
+import type { molData } from "@/components/types"
 enum logicType {
   And = 'and',
   Not = 'not',
@@ -36,11 +38,12 @@ interface condition extends Omit<option,'value'>{
   logic:logicType;
   label?:string;
   type?:string;
-  logic_icon?:VNode|Component;
-  label_icon?:VNode|Component;
-  value?: string[]|number[]|Ref<number>[]|Ref<string>[];
+  value?: string[]|number[]|Ref<number>[]|Ref<string>[]|Ref;
   valueFormat?:string[]|Ref<string>[];
-  showDetail?:Ref<boolean>[];
+  showDetail?:Ref<boolean>[]|Ref;
+  logic_icon?:Component;
+  label_icon?:VNode|Component;
+  component?:Component;
 }
 
 const [DefineFilter, ReuseFilter] = createReusableTemplate<{ data:condition }>()
@@ -96,7 +99,7 @@ const options = ref<option[]>([
       {label:'极化率',key:'polar',icon:(()=>h('div',{class:'i-solar-magnet-bold-duotone bg-blue mr--2 text-2xl'}))},
       {label:'电子传输',key:'transport',icon:(()=>h('div',{class:'i-solar-square-transfer-horizontal-bold-duotone bg-blue mr--2 text-2xl'}))}
   ]},
-  {label:'时间范围',key:'during',editable:false,
+  {label:'时间范围',key:'date',editable:false,
   icon:(()=>h('div',{class:'i-solar-calendar-date-bold-duotone bg-blue mr--2 text-2xl'})),
     items:[
       {label:'开始',key:'start'},
@@ -139,9 +142,9 @@ async function add_condition() {
   conditions.value.push({
     id:id_condition.value,
     logic:logicType.And,
-    logic_icon:(()=>h('div',{class:'i-carbon-shape-intersect bg-blue ml-1 text-2xl'})),
+    logic_icon:h('div',{class:'i-carbon-shape-intersect bg-blue ml-1 text-2xl'}),
     label:'-select-',
-    label_icon:(()=>h('div',{class:'i-solar-alt-arrow-down-linear bg-blue text-2xl'})),
+    label_icon:h('div',{class:'i-solar-alt-arrow-down-linear bg-blue text-2xl'}),
   })
   id_condition.value+=1
   //console.log('add',conditions.value)
@@ -165,8 +168,8 @@ const debouncedFn = useDebounceFn((newVal,data) => {
 function onSelect(option:option,data:condition) {
   data.label=option.label as string; 
   data.label_icon=option.icon;
-  if (option.key=='during'){
-    data.type='during'
+  if (option.key=='date'){
+    data.type='date'
     data.value=[ref(Date.now()),ref(Date.now())]
     data.valueFormat=[
       computed<string>({
@@ -189,6 +192,34 @@ function onSelect(option:option,data:condition) {
       }),
     ]
     data.showDetail=[ref(false),ref(false)]
+    data.component= ()=>h(
+      'div',
+      {class:"flex-auto flex items-center justify-start"},
+      [h(ReuseTime,{data:{
+        value:data.value[0] as Ref<number>,
+        valueFormat:data.valueFormat[0] as Ref<string>,
+        showDetail:data.showDetail[0]as Ref<boolean>,
+      }}),
+      h('tr','-'),
+      h(ReuseTime,{data:{
+        value:data.value[1] as Ref<number>,
+        valueFormat:data.valueFormat[1] as Ref<string>,
+        showDetail:data.showDetail[1]as Ref<boolean>,
+      }})]
+    )
+  }else if (['labels','types'].includes(option.key)) {
+    data.type='tag'
+    const store = useMolStore()
+    const labels=computed(()=>store.getAllLabels)
+    data.value=[]
+    data.component= ()=>h(tags,{
+      tags:labels.value,
+      selected:data.value,
+      'onUpdate:selected': (val:string[])=>{data.value=val;console.log(data.value)},
+      class:'flex-auto w-full flex items-center justify-start relative',
+    })
+  }else{
+
   }
 }
 
@@ -229,7 +260,7 @@ onMounted(()=>{
       value-format="yyyy.MM.dd HH:mm:ss"
       :actions="['confirm','now']"
       v-model:value="data.value.value"
-      @confirm="data.showDetail.value=!data.showDetail.value" />
+      @confirm="data.showDetail.value=false" />
   </n-popover>
 </define-time>
 <define-c v-slot="{data}"></define-c>
@@ -275,11 +306,12 @@ onMounted(()=>{
     </n-dropdown>
   </div>
   <div class="flex-auto flex items-center justify-between 
-      h-32px w-full rd-1 b-blue-2 box-border b-2 transition-210 bg-light-1
+      h-32px rd-1 b-blue-2 box-border b-2 transition-210 bg-light-1
       active:(outline outline-2px outline-blue-2)
       focus-within:(outline outline-2px outline-blue-2 b-blue-4)
       hover:b-blue-4">
-    <div v-if="data.type=='during'" class="data_time flex-auto flex items-center justify-start">
+      <component :is="data.component" />
+    <!-- <div v-if="data.type=='during'" class="data_time flex-auto flex items-center justify-start">
       <reuse-time :data="{
         value:data.value[0] as Ref<number>,
         valueFormat:data.valueFormat[0] as Ref<string>,
@@ -292,11 +324,11 @@ onMounted(()=>{
         showDetail:data.showDetail[1]as Ref<boolean>,
       }"></reuse-time>
     </div>
+    <div v-else-if="data.type=='labels'"></div>
     <div v-else-if="true"></div>
     <div v-else-if="true"></div>
     <div v-else-if="true"></div>
-    <div v-else-if="true"></div>
-    <div v-else-if="true"></div>
+    <div v-else-if="true"></div> -->
   </div>
   <div class="flex-none i-solar-close-square-bold-duotone text-3xl text-blue cursor-pointer
     hover:text-blue-5"
