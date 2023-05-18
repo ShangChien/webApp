@@ -16,6 +16,7 @@ const renderTag:SelectRenderTag=({ option, handleClose })=>{
         	{
 						type:'success',
         	  closable:true,
+						round:true,
 						size:"small",
         	  onMousedown: (e:FocusEvent)=>{ 
 							e.preventDefault() 

@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted,h } from "vue";
-import type { VNode,VNodeChild,Component,Ref } from 'vue'
+import { ref, reactive, computed,toValue,onMounted,h } from "vue";
+import type { VNode,Component,Ref } from 'vue'
 import { useIDBKeyval } from '@vueuse/integrations/useIDBKeyval';
 import { createReusableTemplate,useElementSize,refDebounced,useDebounceFn,useFocus } from '@vueuse/core';
 import { useSortable } from '@vueuse/integrations/useSortable'
 import dayjs from 'dayjs'
-import { NButton,NModal,NCard,NDropdown,NDatePicker,NPopover } from "naive-ui"
+import { NButton,NModal,NCard,NDropdown,NDatePicker,NPopover,NInputNumber } from "naive-ui"
 import { DatePicker as TDatePicker } from 'tdesign-vue-next'
 import tags from "@/components/ketcher/tags.vue"
 import { useMolStore } from '@/stores/molStore'
 import type { DropdownOption } from 'naive-ui'
 import initKetcher from './initKetcher.vue'
 import type { molData } from "@/components/types"
+import { eachMinuteOfInterval } from "date-fns";
 enum logicType {
   And = 'and',
   Not = 'not',
@@ -38,8 +39,8 @@ interface condition extends Omit<option,'value'>{
   logic:logicType;
   label?:string;
   type?:string;
-  value?: string[]|number[]|Ref<number>[]|Ref<string>[]|Ref;
-  valueFormat?:string[]|Ref<string>[];
+  value?: string|number|string[]|number[]|Ref<number>[]|Ref<string>[]|Ref|any;
+  valueFormat?:string|number|string[]|number[]|Ref<number>[]|Ref<string>[]|Ref|any;
   showDetail?:Ref<boolean>[]|Ref;
   logic_icon?:Component;
   label_icon?:VNode|Component;
@@ -52,7 +53,11 @@ const [DefineTime, ReuseTime] = createReusableTemplate<{data:{
   valueFormat:Ref<string>;
   showDetail:Ref<boolean>
 }}>()
-const [DefineC, ReuseC] = createReusableTemplate<{ data:{label:string} }>()
+const [DefineInputNum, ReuseInputNum] = createReusableTemplate<{data:{
+  value:Ref<number>;
+  placeholder:string;
+  unit:string;
+}}>()
 const el_condition =  ref(null)
 const input        =  ref(null)
 const filter_c     =  ref(null)
@@ -78,14 +83,15 @@ const options = ref<option[]>([
   {label:'搜索方式',key:'methods',editable:false,
     icon:(()=>h('div',{class:'i-solar-card-search-bold-duotone bg-blue mr--2 text-2xl'})),
     children:[
-      {label:'子结构',key:'substructure',icon:(()=>h('div',{class:'i-carbon-assembly bg-blue mr--2 text-2xl'}))},
+      {label:'子结构',key:'substructure',icon:
+      (()=>h('div',{class:'i-carbon-assembly bg-blue mr--2 text-2xl'}))},
       {label:'相似度',key:'similarity',icon:(()=>h('div',{class:'i-carbon-assembly-reference bg-blue mr--2 text-2xl'}))}
     ],
   },
   {label:'材料名称',key:'name',
     icon:(()=>h('div',{class:'i-solar-hashtag-square-bold-duotone bg-blue mr--2 text-2xl'})),
     children:[
-      {label:'计算编号',key:'name_cal',icon:(()=>h('div',{class:'i-tabler-number bg-blue mr--2 text-2xl'})),},
+      {label:'计算编号',key:'name_cal',icon:(()=>h('div',{class:'i-tabler-number bg-blue mr--2 text-2xl'}))},
       {label:'材料编号',key:'name_mat',icon:(()=>h('div',{class:'i-fluent-text-number-format-20-filled bg-blue mr--2 text-2xl'}))},
     ]
   },
@@ -147,7 +153,6 @@ async function add_condition() {
     label_icon:h('div',{class:'i-solar-alt-arrow-down-linear bg-blue text-2xl'}),
   })
   id_condition.value+=1
-  //console.log('add',conditions.value)
 }
 async function del_condition(id:number){
   let index =await Promise.resolve(conditions.value.findIndex((el)=>el.id==id))
@@ -159,22 +164,27 @@ async function del_condition(id:number){
   //console.log('delete',conditions.value)
 }
 //
-const debouncedFn = useDebounceFn((newVal,data) => {
+const debouncedFnDay = useDebounceFn((newVal,data) => {
   const stmp = dayjs(newVal, 'YYYY.MM.DD HH:mm:ss').valueOf()
   if (!isNaN(stmp)) {
     data.value = stmp;
   }
-}, 1000)
+}, 500)
+const debouncedFnText = useDebounceFn((newVal:string,data) => {
+  let strList=newVal.split(/[,;\s\n]+/) .map(e=>e.startsWith('/') ? e : e.toUpperCase())
+  data.value = strList.join(' ')
+}, 500)
 function onSelect(option:option,data:condition) {
   data.label=option.label as string; 
   data.label_icon=option.icon;
   if (option.key=='date'){
     data.type='date'
     data.value=[ref(Date.now()),ref(Date.now())]
+    data.showDetail=[ref(false),ref(false)]
     data.valueFormat=[
       computed<string>({
         get(){
-          return dayjs((data.value[0] as Ref<number>).value).format('YYYY.MM.DD HH:mm:ss')
+          return dayjs(data.value[0].value).format('YYYY.MM.DD HH:mm:ss')
         },
         set(newVal){
           //@ts-ignore
@@ -183,43 +193,115 @@ function onSelect(option:option,data:condition) {
       }),
       computed<string>({
         get(){
-          return dayjs((data.value[1] as Ref<number>).value).format('YYYY.MM.DD HH:mm:ss')
+          return dayjs(data.value[1].value).format('YYYY.MM.DD HH:mm:ss')
         },
         set(newVal){
-          //@ts-ignore
-          debouncedFn(newVal,data.value[1])
+          debouncedFnDay(newVal,data.value[1])
         }
       }),
     ]
-    data.showDetail=[ref(false),ref(false)]
-    data.component= ()=>h(
+    data.component = ()=>h(
       'div',
-      {class:"flex-auto flex items-center justify-start"},
+      {class:"flex items-center justify-start"},
       [h(ReuseTime,{data:{
-        value:data.value[0] as Ref<number>,
-        valueFormat:data.valueFormat[0] as Ref<string>,
-        showDetail:data.showDetail[0]as Ref<boolean>,
+        value:data.value[0],
+        valueFormat:data.valueFormat[0],
+        showDetail:data.showDetail[0],
       }}),
-      h('tr','-'),
+      h('div',{class:'i-carbon-pan-horizontal text-gray-5'}),
       h(ReuseTime,{data:{
-        value:data.value[1] as Ref<number>,
-        valueFormat:data.valueFormat[1] as Ref<string>,
-        showDetail:data.showDetail[1]as Ref<boolean>,
+        value:data.value[1],
+        valueFormat:data.valueFormat[1],
+        showDetail:data.showDetail[1],
       }})]
     )
-  }else if (['labels','types'].includes(option.key)) {
+  }else if ('labels'==option.key) {
     data.type='tag'
     const store = useMolStore()
     const labels=computed(()=>store.getAllLabels)
     data.value=[]
-    data.component= ()=>h(tags,{
-      tags:labels.value,
-      selected:data.value,
-      'onUpdate:selected': (val:string[])=>{data.value=val;console.log(data.value)},
-      class:'flex-auto w-full flex items-center justify-start relative',
+    data.component = ()=>h(
+      tags,
+      {
+        tags:labels.value,
+        selected:data.value,
+        'onUpdate:selected': (val:string[])=>{data.value=val},
+      }
+    )
+  }else if ('types'==option.key) {
+    data.type='tag'
+    let labels=option.items.map(e=>e.key)
+    data.value=[]
+    data.component = ()=>h(
+      tags,
+      {
+        tags:labels,
+        selected:data.value,
+        'onUpdate:selected': (val:string[])=>{data.value=val},
+      }
+    )
+  }else if (['mw','homo','lumo','eg','polar','transport','similarity'].includes(option.key)){
+    let unit={'mw':'M(相对分子质量)','homo':'eV','lumo':'eV','eg':'eV','polar':'C·m(Debye)','transport':'cm²/s','similarity':'%'}
+    data.type='interval'
+    data.value=[ref<number>(),ref<number>()]
+    data.component= ()=>h(
+      'div',
+      {class:"flex-auto flex justify-start items-center"},
+      [h(ReuseInputNum,{data:{
+        value: data.value[0],
+        placeholder:'- ∞',
+        unit:'',
+      }}),
+      h('div',{class:'i-carbon-pan-horizontal text-gray-5'}),
+      h(ReuseInputNum,{data:{
+        value: data.value[1],
+        placeholder:'+ ∞',
+        unit:unit[option.key],
+      }})]
+    )
+  }else if (option.key=='substructure') {
+    data.value='gt'
+    data.component= ()=>h(
+      'div',
+      {class: 'flex items-center justify-start gap-2 bg-slate-2 rd-1.2 h-24px ml-1 pr-0.5 pl-0.5'},
+      [h(
+        'div',
+        {
+          class: [toValue(data.value)=='gt' ? 'bg-blue-3 text-blue-6':'hover:bg-blue-1 text-gray-5',
+            'h-22px flex items-center justify-center rd-1 pr-1 pl-1 cursor-pointer'],
+          onClick: ()=>{data.value='gt'}
+        },
+        [h('div',{class:'i-carbon-radio-button-checked text-center'}),
+        h('span',{class:'text-0.9em'},'大于检索结构')]
+      ),
+      h(
+        'div',
+        {
+          class: [toValue(data.value)=='lt' ? 'bg-blue-3 text-blue-6':'hover:bg-blue-1 text-gray-5',
+            'h-22px flex items-center justify-center rd-1 pr-1 pl-1 cursor-pointer'],
+          onClick: ()=>{data.value='lt'}
+        },
+        [h('div',{class: 'i-carbon-recording-filled-alt text-center'}),
+        h('span',{class: 'text-0.9em'},'小于检索结构')]
+      )]
+    )
+  }else if (['name_mat','name_cal'].includes(option.key)){
+    data.value=ref('')
+    data.valueFormat = computed<string>({
+      get(){
+        return data.value
+      },
+      set(newVal){
+        debouncedFnText(newVal,data)
+      }
     })
-  }else{
-
+    data.component= ()=>h('input',{
+      class: ['pl-1 rd-1 b-0 m-1 p-0 h-24px w-full outline-0 box-border bg-slate-2 hover:bg-blue-1 text-gray-8 whitespace-nowrap'],
+      value: data.valueFormat,
+      'onInput': (e:any)=>{data.valueFormat=e.target.value;console.log(data.value)}
+    })
+  }else {
+    //todo
   }
 }
 
@@ -227,45 +309,60 @@ function search(){
   initMol.smiles = inputText.value
   initMol.atoms = {}
   initMol.bonds = {}
+  console.log('search',conditions.value)
   //console.log(initMol)
 }
-const check=(value:any)=>{
-  const text=dayjs(Date.now()).format('YYYY.MM.DD HH:mm:ss')
-  const stmp = dayjs(text, 'YYYY.MM.DD HH:mm:ss').valueOf()
-  console.log(text,stmp)
-}
-
-
+const clickOut=(x:Ref<boolean>)=>setTimeout(()=>x.value=false,0)
 onMounted(()=>{
-  check('s')
+  //check('s')
   //console.log(h_filter_c.value)
 })
 </script>
 <template>
 <div>
 <define-time v-slot="{data}">
-  <n-popover trigger="manual" :show="data.showDetail.value" raw :show-arrow="false" class="p-0 m-0 rd-2">
+  <n-popover class="p-0 m-0 rd-2" trigger="manual" 
+    :show="data.showDetail.value" raw 
+    :show-arrow="false"
+    @clickoutside="clickOut(data.showDetail)"	 >
     <template #trigger>
       <div class="flex-auto flex items-center justify-start
-        rd-1 box-border m-1 p-0 h-24px max-w-210px
-        hover:bg-slate-2"
+        rd-1 box-border m-1 p-0 h-24px max-w-210px bg-slate-2
+        hover:bg-lightblue-1" 
         @click="data.showDetail.value=true">
         <div class="flex-auto ml-1" >
-          <input type="text" class="b-0 p-0 m-0 outline-0 bg-inherit w-185px text-gray-6" v-model="data.valueFormat.value">
+          <input type="text" class="b-0 p-0 m-0 outline-0 bg-inherit w-185px text-gray-8 text-0.9em" v-model="data.valueFormat.value">
         </div>
-        <div class="i-carbon-event-schedule bg-gray-8 mr-1 text-xl p-0 flex-none " ></div>    
+        <div class="i-carbon-event-schedule bg-gray-5 mr-1 text-xl p-0 flex-none" ></div>    
       </div>  
     </template>
     <n-date-picker panel type="datetime"
       value-format="yyyy.MM.dd HH:mm:ss"
       :actions="['confirm','now']"
-      v-model:value="data.value.value"
+      v-model:value="data.value.value" 
       @confirm="data.showDetail.value=false" />
   </n-popover>
 </define-time>
-<define-c v-slot="{data}"></define-c>
+<define-input-num v-slot="{data}">
+  <input class="rd-1 b-0 m-1 p-0 h-24px outline-0 box-border
+    w-30% max-w-210px min-w-50px text-center text-0.9em
+    bg-slate-2 text-gray-8
+    hover:bg-lightblue-1"
+    :placeholder='data.placeholder'
+    v-model="data.value.value"
+    type="number"
+    step=0.001 />
+    <span class="text-1em text-gray-5">{{ data.unit }}</span>
+</define-input-num>
 <define-filter v-slot="{data}">
-<div class="flex flex-nowrap items-center justify-between gap-2 pr-2 bg-slate-1 pt-1 pb-1 rd-2 w-full pl-8 ml--6">
+<div class="flex flex-nowrap box-border items-center justify-between bg-slate-1 
+  gap-2 p-1 rd-2 w-full ">
+  <div class='flex-none flex justify-center items-center 
+    h-32px w-20px box-border p-0 m-0
+    bg-blue-2 rd-1.5 z-1
+    handle cursor-grab'>
+    <div class="flex-none i-charm-grab-vertical bg-blue-5 hover:bg-blue-3"></div>
+  </div>
   <div class="flex-none w-70px">
     <n-dropdown
       width="trigger"
@@ -294,7 +391,7 @@ onMounted(()=>{
       trigger="click"
       @select="(_key,option:any)=>onSelect(option,data)">
       <div class="flex flex-nowarp justify-start pl-2 items-center gap-3
-        transition-210 cursor-pointer
+        transition-210 cursor-pointer 
         rd-1 h-32px b-blue-2 box-border bg-light-1 b-2 p-0 m-0 text-lg
         hover:(b-blue-4 bg-slate-2)
         focus-within:(outline outline-2px outline-blue-2 b-blue-4 bg-slate-2)"
@@ -305,44 +402,26 @@ onMounted(()=>{
       </div>
     </n-dropdown>
   </div>
-  <div class="flex-auto flex items-center justify-between 
+  <div class="flex-auto flex items-center justify-between overflow-hidden
       h-32px rd-1 b-blue-2 box-border b-2 transition-210 bg-light-1
       active:(outline outline-2px outline-blue-2)
       focus-within:(outline outline-2px outline-blue-2 b-blue-4)
       hover:b-blue-4">
       <component :is="data.component" />
-    <!-- <div v-if="data.type=='during'" class="data_time flex-auto flex items-center justify-start">
-      <reuse-time :data="{
-        value:data.value[0] as Ref<number>,
-        valueFormat:data.valueFormat[0] as Ref<string>,
-        showDetail:data.showDetail[0]as Ref<boolean>,
-      }"></reuse-time>
-      <span>-</span>
-      <reuse-time :data="{
-        value:data.value[1] as Ref<number>,
-        valueFormat:data.valueFormat[1] as Ref<string>,
-        showDetail:data.showDetail[1]as Ref<boolean>,
-      }"></reuse-time>
-    </div>
-    <div v-else-if="data.type=='labels'"></div>
-    <div v-else-if="true"></div>
-    <div v-else-if="true"></div>
-    <div v-else-if="true"></div>
-    <div v-else-if="true"></div> -->
   </div>
-  <div class="flex-none i-solar-close-square-bold-duotone text-3xl text-blue cursor-pointer
+  <div class="w-30px flex-none i-solar-close-square-bold-duotone text-3xl text-blue cursor-pointer
     hover:text-blue-5"
     @click="del_condition(data.id)"></div>
 </div>
 </define-filter>
-<div class="flex flex-nowrap flex-col items-center text-lg c-black gap-2 ">
+<div class="flex flex-nowrap flex-col items-center text-lg c-black gap-2">
   <div class="flex-none flex flex-nowrap justify-between items-center w-60vw relative 
-    h-36px m-0.5 pr-0 rd-1 b-blue-2 box-border b-2 transition-210
+    h-36px m-0 p-0 rd-1 b-blue-2 box-border b-2 transition-210
     active:(outline outline-2px outline-blue-2)
     focus-within:(outline outline-2px outline-blue-2 b-blue-4)
     hover:b-blue-4" >
     <div class="pre_line"></div>
-    <input ref="input" class='flex-auto outline-0 b-0 rd-1 pl-1 m-0 p-0 box-border z-1 h-100% '
+    <input ref="input" class='flex-auto outline-0 b-0 rd-1 pl-1 m-0 p-0 box-border h-100% '
       v-model="inputText" placeholder="smiles, smarts or Nothing"/>
     <div v-show="!!inputText" class="aspect-ratio-1 rd-50% h-5 mr-1 bg-slate-100
      flex justify-center items-center hover:(cursor-pointer bg-gray-200)"
@@ -381,25 +460,21 @@ onMounted(()=>{
       <div class="i-twemoji-magnifying-glass-tilted-left text-2xl"/>
     </div>
   </div>
-  <div class="flex-none flex flex-col item-start w-60vw gap-2 transition-height-210" :style="{height:h_filter_c+40+'px'}">
-    <div ref="filter_c" class="flex-none flex flex-col item-start w-60vw gap-2 relative">
+  <div class="flex-auto flex flex-col item-start 
+    w-60vw gap-2 box-border p-0  
+    transition-height-210" :style="{height:h_filter_c+40+'px'}">
+    <div ref="filter_c" class="flex-none flex flex-col item-start box-border gap-2 relative">
       <TransitionGroup name="list" >
-        <div v-for="item in conditions" :key="item.id" 
-          class="flex justify-between items-center pr-2 w-full box-border ">
-          <div class='flex-none flex justify-center items-center 
-            h-32px w-20px box-border ml-1 p-0 m-0
-            bg-blue-2 rd-1.5 b-0 z-1
-            handle cursor-grab'>
-            <div class="flex-none i-charm-grab-vertical bg-blue-5 hover:bg-blue-3"></div>
-          </div>
-          <reuse-filter class="flex-auto " :data="item" ></reuse-filter>
+        <div v-for="item in conditions" :key="item.id" class="box-border mr-2 p-0 " >
+          <reuse-filter :data="item" ></reuse-filter>
         </div>
       </TransitionGroup>
     </div>
-    <div class="flex justify-start items-center">
-      <div class="flex-none aspect-ratio-1 bg-slate-1 rd-50% h-6 flex justify-center items-center b-2 b-blue-2 cursor-pointer
-                  hover:(bg-slate-2 b-blue-3)
-                  active:(outline outline-2px outline-blue-2)">
+    <div class="flex-none flex justify-start items-center">
+      <div class="flex-none aspect-ratio-1 bg-slate-1 rd-50% h-6 z-1
+        flex justify-center items-center b-2 b-blue-2 cursor-pointer
+        hover:(bg-slate-2 b-blue-3)
+        active:(outline outline-2px outline-blue-2)">
         <div ref="add_c" @click="add_condition()" 
           class="i-iconamoon-sign-plus-bold text-2xl text-blue">
         </div>

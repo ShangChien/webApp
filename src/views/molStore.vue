@@ -61,7 +61,7 @@ onMounted(()=>{
   </define-tag>
   <div class="filter">
     <search />
-    <div class="flex flex-nowrap justify-between items-start">
+    <!-- <div class="flex flex-nowrap justify-between items-start">
       <div class="flex-none flex items-center mr-2 rd-2 pr-1 pl-1 mb-0.5 mt-0.5 bg-blue-100 cursor-pointer box-border b-2 transition-210"
       :class="[dataLabels.enabled 
       ? 'bg-indigo-400 b-indigo-300 hover:(bg-indigo-300 b-indigo-400)'
@@ -118,11 +118,11 @@ onMounted(()=>{
           </div>
         </div>
       </Transition>
-    </div>
-    <div class='font-1300'>回家</div>
-    <div class="sortedby"></div>
+    </div> -->
   </div>
-  <grid-page v-if="mols4view" :molList="mols4view" :cols='8' :rows="6" class='h-200vh'/>
+  <div class="flex flex-col justify-center items-center mt-2">
+    <grid-page v-if="mols4view" :molList="mols4view" :cols='8' :rows="6" class='w-60vw'/>
+  </div>
 </div>
 </template>
 <style scoped>
