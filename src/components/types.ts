@@ -1,3 +1,4 @@
+import type { VNode,Component,Ref } from 'vue'
 export interface molData {
   id?: number;
   name?: string;
@@ -30,4 +31,95 @@ export interface enumData {
 		keepSame2Index : number[],
 		connect2index  : number[],
 	}
+}
+interface electronCross{
+  energy:number[];
+  oscillator:number[];
+}
+export interface pgData{
+  id?:number;
+  timestamp?:number;
+  name_calc?:string;
+  name_mat?:string;
+  smiles?:string;
+  functional?:string;
+  basisset?:string;
+  charge?:number;
+  spinmultiplicity?:number;
+  numberbasisfunc?:number;
+  elections?:number[];
+  ispcm?:boolean;
+  isspin?:boolean;
+  stationarytype?:string;
+  extrainfo?:string;
+  homo?:number;
+  lumo?:number;
+  eg?:number;
+  polar?:number;
+  energy?:number;
+  sfp?:any;
+  bfp?:any;
+  dirpath?:{
+    ground?:string;
+    udft?:string;
+    tdft?:string;
+    polar?:string;
+    uv?:string;    
+  };
+  corrections?:{
+    zeroPoint?:number;
+    energy?:number;
+    enthalpy?:number;
+    gibbsFreeEnergy?:number;
+  };
+  structure?:{
+    ground?:string;
+    udft?:string;
+    tdft?:string;   
+  };
+  tdft?:{
+    s0_s1?:electronCross;
+    s0_t1?:electronCross;
+  };
+  udft?:{
+    energy?:number;
+    correction?:{
+      zeroPoint?:number;
+      energy?:number;
+      enthalpy?:number;
+      gibbsFreeEnergy?:number;
+    };
+  }
+  spectrum?:{
+    uv?:electronCross;
+    uv_low?:electronCross;
+  }
+}
+
+enum logicType {
+  And = 'and',
+  Not = 'not',
+  Or = 'or',
+}
+export interface option{
+  label?:string;
+  editable?:boolean;
+  value?:string;
+  key?:string;
+  icon?:VNode|Component;
+  disabled?:boolean;
+  items?:option[];
+  children?:option[];
+}
+export interface condition extends Omit<option,'value'>{
+  id:number;
+  logic:logicType;
+  label?:string;
+  type?:string;
+  value?: string|number|string[]|number[]|Ref<number>[]|Ref<string>[]|Ref|any;
+  valueFormat?:string|number|string[]|number[]|Ref<number>[]|Ref<string>[]|Ref|any;
+  showDetail?:Ref<boolean>[]|Ref;
+  logic_icon?:Component;
+  label_icon?:VNode|Component;
+  component?:Component;
 }

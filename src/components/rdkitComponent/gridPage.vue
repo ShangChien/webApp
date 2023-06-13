@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { refDebounced } from '@vueuse/core'
 import { computed, ref } from "vue";
-import type { molData } from "@/components/types";
+import type { molData,pgData } from "@/components/types";
 import exportMol from '@/components/rdkitComponent/exportMol.vue'
 import cardRdkit from "@/components/rdkitComponent/cardRdkit.vue";
 import { NInputNumber,NPagination,NPopover,NTag,NScrollbar } from "naive-ui";
@@ -32,7 +32,7 @@ const arrayShow=computed(()=>{
 </script>
 
 <template>
-<div ref="outBox" class="b-2 rd-2 b-indigo-100 relative min-w-230px min-h-160px">
+<div ref="outBox" class="b-2 rd-2 b-indigo-100 relative min-w-230px min-h-160px h-full box-border">
   <div class="flex-none absolute rd-2 z-2 top-0 menubg" :style="{'width':outBoxW+'px'}">
     <div class="ma-1 title-grid">
       <div><n-pagination v-model:page="currentPageInput"

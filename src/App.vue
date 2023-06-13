@@ -74,10 +74,10 @@ const menuOptions: MenuOption[] = [
 <template>
   <n-layout class="font-lx-b" bordered position="absolute" style="height: 100vh" :native-scrollbar="false"  @contextmenu.prevent >
     <n-layout-header style="height: 6vh; padding: 2px" bordered>
-      <img class="logo" src="/favicon.ico" width="50"  />
+      <img class="logo w-5vh" src="/favicon.ico"   />
       <reload-prompt/>
     </n-layout-header>
-    <n-layout has-sider position="absolute" style="top: 6vh; bottom: 20px" bordered>
+    <n-layout has-sider position="absolute" style="top: 6vh; bottom: 2vh" bordered>
       <n-layout-sider 
         bordered
         collapse-mode="width"
@@ -101,7 +101,7 @@ const menuOptions: MenuOption[] = [
         </div>
       </n-layout-sider>
       <n-layout
-        class="p-2 pr-0"
+        class="p-1vh pr-0 box-border"
         :native-scrollbar="false"
         bordered
       >
@@ -119,7 +119,7 @@ const menuOptions: MenuOption[] = [
     <n-layout-footer
       bordered
       position="absolute"
-      style="height: 20px; padding: 2px" />
+      style="height: 2vh; padding: 2px" />
   </n-layout>
 </template>
 

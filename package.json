@@ -68,7 +68,7 @@
     "typescript": "^5.0.4",
     "unocss": "^0.45.30",
     "unplugin-auto-import": "^0.12.2",
-    "unplugin-vue-components": "^0.18.5",
+    "unplugin-vue-components": "^0.25.1",
     "vfonts": "^0.0.3",
     "vite-plugin-mkcert": "^1.15.0",
     "vite-plugin-pwa": "^0.12.8",
