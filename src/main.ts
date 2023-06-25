@@ -3,7 +3,7 @@ import { createPinia } from "pinia";
 //import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2'
 import localforage from "localforage"
-import 'uno.css'
+import 'virtual:uno.css'
 import '@/assets/font/font.css'
 import App from "./App.vue";
 import router from "./router";

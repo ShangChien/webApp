@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import { ref, reactive, computed,toValue,onMounted,h } from "vue";
-import type { Ref } from 'vue'
-import { createReusableTemplate,useElementSize,useDebounceFn,useFocus } from '@vueuse/core';
+import type { Ref,VNodeChild } from 'vue'
+import { createReusableTemplate,useElementSize,useDebounceFn } from '@vueuse/core';
 import { useSortable } from '@vueuse/integrations/useSortable'
 import dayjs from 'dayjs'
-import { NButton,NModal,NCard,NDropdown,NDatePicker,NPopover} from "naive-ui"
+import { NButton,NModal,NCard,NDropdown,NDatePicker,NPopover,useMessage} from "naive-ui"
 import tags from "@/components/ketcher/tags.vue"
+import vmodelSmiles from "@/components/ketcher/vmodelSmiles.vue"
 import { useSearchStore } from '@/stores/searchStore'
 import { useMolStore } from '@/stores/molStore'
-import initKetcher from './initKetcher.vue'
 import axios from "axios";
-import type { molData,pgData,condition,option } from "@/components/types"
+import type { molData,pgDataItem,pgData,recordFull,records,condition,option } from "@/components/types"
+
 enum logicType {
   And = 'and',
   Not = 'not',
   Or = 'or',
 }
 
-const queryResult = defineModel<pgData[]>()
+const queryResult = defineModel<pgDataItem[]|pgData[]>()
 const [DefineFilter, ReuseFilter] = createReusableTemplate<{ data:condition }>()
 const [DefineTime, ReuseTime] = createReusableTemplate<{data:{
   value:Ref<number>;
@@ -29,12 +30,27 @@ const [DefineInputNum, ReuseInputNum] = createReusableTemplate<{data:{
   placeholder:string;
   unit:string;
 }}>()
+const [DefineHistroy, ReuseHistroy] = createReusableTemplate<{data:records[]}>()
+const message = useMessage()
+const info=(type:any,content:string|(()=>VNodeChild))=>{
+  message.create(
+    content,
+    {
+      type:type,
+      closable:true,
+      duration: 3000,
+      keepAliveOnHover: true
+    }
+  )
+}
+
+const searchStore = useSearchStore()
+
 const input        =  ref(null)
 const filter_c     =  ref(null)
 const showFilter   =  ref<boolean>(true)
 const canSerach    =  ref<boolean>(true)
 const { height:h_filter_c }=useElementSize(filter_c)
-const initMol: molData = reactive({qsmiles:'*~*'})
 const inputText = ref("")
 const showModal = ref(false)
 function clearText(){
@@ -55,9 +71,9 @@ const options = ref<option[]>([
   {label:'搜索方式',key:'methods',editable:false,
     icon:(()=>h('div',{class:'i-solar-card-search-bold-duotone bg-blue mr--2 text-2xl'})),
     children:[
-      {label:'子结构',key:'substructure',icon:
-      (()=>h('div',{class:'i-carbon-assembly bg-blue mr--2 text-2xl'}))},
-      {label:'相似度',key:'similarity',icon:(()=>h('div',{class:'i-carbon-assembly-reference bg-blue mr--2 text-2xl'}))}
+      {label:'子结构',key:'substructure',icon:(()=>h('div',{class:'i-carbon-3rd-party-connected bg-blue mr--2 text-2xl'}))},
+      {label:'相似度',key:'similarity',icon:(()=>h('div',{class:'i-carbon-assembly-reference bg-blue mr--2 text-2xl'}))},
+      {label:'精确匹配',key:'exactstructure',icon:(()=>h('div',{class:'i-carbon-assembly bg-blue mr--2 text-2xl'}))}
     ],
   },
   {label:'材料名称',key:'name',
@@ -117,7 +133,6 @@ const options = ref<option[]>([
 ])
 const id_condition=ref<number>(0)
 async function add_condition() {
-  showFilter.value=true
   conditions.value.push({
     id:id_condition.value,
     logic:logicType.And,
@@ -126,6 +141,7 @@ async function add_condition() {
     label_icon:h('div',{class:'i-solar-alt-arrow-down-linear bg-blue text-2xl'}),
   })
   id_condition.value+=1
+  showFilter.value=true
 }
 async function del_condition(id:number){
   let index =await Promise.resolve(conditions.value.findIndex((el)=>el.id==id))
@@ -214,26 +230,36 @@ function onSelect(option:option,data:condition) {
         'onUpdate:selected': (val:string[])=>{data.value=val},
       }
     )
-  }else if (['mw','homo','lumo','eg','polar','transport','similarity'].includes(option.key)){
-    let unit={'mw':'M(相对分子质量)','homo':'eV','lumo':'eV','eg':'eV','polar':'C·m(Debye)','transport':'cm²/s','similarity':'%'}
-    data.type='interval'
-    data.value=[ref<number>(),ref<number>()]
+  }else if ('substructure'==option.key){
+    data.value='sssssss'
+    data.type='gt'
     data.component= ()=>h(
       'div',
-      {class:"flex-auto flex justify-start items-center"},
-      [h(ReuseInputNum,{data:{
-        value: data.value[0],
-        placeholder:'- ∞',
-        unit:'',
-      }}),
-      h('div',{class:'i-carbon-pan-horizontal text-gray-5'}),
-      h(ReuseInputNum,{data:{
-        value: data.value[1],
-        placeholder:'+ ∞',
-        unit:unit[option.key],
-      }})]
+      {class: 'flex items-center justify-start gap-2 bg-slate-2 rd-1.2 h-24px ml-1 pr-0.5 pl-0.5'},
+      [
+        h(
+          'div',
+          {
+            class: ['bg-blue-3 text-blue-6 h-22px flex items-center justify-center rd-1 pr-1 pl-1 cursor-pointer'],
+            onClick: ()=>{ data.type = (data.type=='gt') ? 'lt' : 'gt' }
+          },
+          data.type
+        ),
+        h(
+          vmodelSmiles,
+          {
+            smiles:data.value,
+            'onUpdate:smiles':(val:string)=>{data.value=val;console.log(data.value,data.type)},
+          }
+        )
+      ]
     )
-  }else if (option.key=='substructure') {
+  }else if ('similarity'==option.key){
+    data.value='gt'
+    data.component= ()=>h(
+      'div'
+    )
+  }else if ('exactstructure'==option.key){
     data.value='gt'
     data.component= ()=>h(
       'div',
@@ -258,6 +284,25 @@ function onSelect(option:option,data:condition) {
         [h('div',{class: 'i-carbon-recording-filled-alt text-center'}),
         h('span',{class: 'text-0.9em min-w-100px'},'小于检索结构')]
       )]
+    )
+  }else if (['mw','homo','lumo','eg','polar','transport'].includes(option.key)){
+    let unit={'mw':'M(相对分子质量)','homo':'eV','lumo':'eV','eg':'eV','polar':'C·m(Debye)','transport':'cm²/s','similarity':'%'}
+    data.type='interval'
+    data.value=[ref<number>(),ref<number>()]
+    data.component= ()=>h(
+      'div',
+      {class:"flex-auto flex justify-start items-center"},
+      [h(ReuseInputNum,{data:{
+        value: data.value[0],
+        placeholder:'- ∞',
+        unit:'',
+      }}),
+      h('div',{class:'i-carbon-pan-horizontal text-gray-5'}),
+      h(ReuseInputNum,{data:{
+        value: data.value[1],
+        placeholder:'+ ∞',
+        unit:unit[option.key],
+      }})]
     )
   }else if (['name_mat','name_calc'].includes(option.key)){
     data.value=ref('')
@@ -315,15 +360,32 @@ function search(){
   if (searchField.value.some(item=>['substructure','similarity'].includes(item.key)) && 
   !searchField.value.some(item=>item.key==='smiles')) {
     console.log('smiles is empty!')
+    info('warning','条件错误: 指定了结构搜索但是没有给出smiles式')
+    return void 0
+  }
+  if (searchField.value.length==0) {
+    info('warning','条件错误: 请添加搜索条件')
     return void 0
   }
   canSerach.value=false
   axios.post(
 		'api/search', 
 		searchField.value,
-	).then((res:any)=>{
+	).then(async (res:any)=>{
     console.log('receve res:',res.data.data)
 		queryResult.value=res.data.data
+    const data4strore:recordFull|any={
+      timestamp:dayjs().unix(),
+      length:queryResult.value.length,
+      conditions:conditions.value,
+      res:res.data.data as {
+        id:number,
+        smiles:string,
+        name_calc:string,
+        name_mat:string,
+      }[]
+    }
+    await searchStore.addRecord(data4strore)
     canSerach.value=true
   }).catch((error)=>{
     console.log(error);
@@ -331,7 +393,12 @@ function search(){
   });
   
 }
-
+const font=ref<string>('font-Xl-R')
+const randomPick=()=>{
+  const options = ['font-TJ-R', 'font-LXMG-R', 'font-YZ-R','font-Xl-R'];
+  const randomIndex = Math.floor(Math.random() * options.length);
+  font.value= options[randomIndex];
+}
 const clickOut=(x:Ref<boolean>)=>setTimeout(()=>x.value=false,0)
 onMounted(()=>{
   //check('s')
@@ -372,7 +439,7 @@ onMounted(()=>{
     v-model="data.value.value"
     type="number"
     step=0.001 />
-    <span class="text-1em text-gray-5">{{ data.unit }}</span>
+  <span class="text-1em text-gray-5">{{ data.unit }}</span>
 </define-input-num>
 <define-filter v-slot="{data}">
 <div class="flex flex-nowrap box-border items-center justify-between bg-slate-1 
@@ -434,50 +501,72 @@ onMounted(()=>{
     @click="del_condition(data.id)"></div>
 </div>
 </define-filter>
-<div class="flex flex-nowrap flex-col items-center text-lg c-black gap-2 box-border w-full m-1">
+<define-histroy v-slot="{data}">
+  <div class="flex flex-col flex-nowrap items-center justify-start font-LX-B
+  box-border p-1 rd-2 bg-white relative min-h-400px">
+    <div class="flex-none flex flex-nowrap items-center justify-between 
+    rd-1 w-full min-w-400px box-border bg-slate-50">
+      <div class="m-1">
+        {{data.length === 0? 'No History':`Total: ${data.length}`}}
+      </div>
+      <div class="bg-slate-2 rd-1 m-1 p-1 text-l leading-1em cursor-pointer
+      hover:(bg-slate-3) active:(outline outline-2px outline-blue-2)"
+      @click="searchStore.clearAll()">
+        clear all
+      </div>
+    </div>
+    <div v-if="data.length === 0"
+			class="flex-auto flex flex-col justify-center items-center text-2xl gap-5"
+      :class="[font]">
+			<div class="i-fxemoji-expressionless text-5xl m-5 "></div>
+      空空如也
+		</div>
+    <div v-else class="flex-none flex flex-col flex-nowrap items-center justify-start 
+    w-full  text-center">
+      <div class="flex-none flex flex-nowrap items-center justify-between 
+      box-border w-full p-1 ">
+        <div class="flex-basis-15 ">id</div>
+        <div class="flex-basis-60 ">date</div>
+        <div class="flex-basis-30 ">length</div>
+        <div class="flex-basis-40 ">actions</div>
+      </div>
+      <div v-for="i in data" class="flex-none flex flex-nowrap items-center justify-between 
+      box-border w-full p-1">
+        <div class="flex-basis-15">{{i.id+1}}</div>
+        <div class="flex-basis-60">{{dayjs.unix(i.timestamp).format('YYYY-MM-DD HH:mm:ss')}}</div>
+        <div class="flex-basis-30">{{i.length}}</div>
+        <div class="flex-basis-40 flex flex-nowrap items-center justify-center gap-2 
+        box-border rd-1 bg-lightblue-50 p-1">
+          <div class="bg-slate-2 rd-1 text-0.8em leading-4 cursor-pointer hover:b-slate-3 
+          pr-1 pl-1 active:(outline outline-2px outline-blue-2)">view</div>
+          <div class="bg-red-3 rd-1 text-0.8em leading-4 cursor-pointer hover:b-red-4 
+          pr-1 pl-1 active:(outline outline-2px outline-red-2)"
+          @click="searchStore.rmRecordById(i.id)">delete</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</define-histroy>
+
+<div class="flex flex-nowrap flex-col items-center c-black gap-2 box-border w-full p-0">
   <div class="flex-none flex flex-nowrap justify-between items-center relative w-full
     h-36px m-0 p-0 rd-1 b-blue-2 box-border b-2 transition-210
     active:(outline outline-2px outline-blue-2)
     focus-within:(outline outline-2px outline-blue-2 b-blue-4)
     hover:b-blue-4" >
     <div class="pre_line"></div>
-    <input ref="input" class='flex-auto outline-0 b-0 rd-1 pl-1 m-0 p-0 box-border h-100% '
-      v-model.trim="inputText" placeholder="smiles, smarts or Nothing"/>
-    <div v-show="!!inputText" class="aspect-ratio-1 rd-50% h-5 mr-1 bg-slate-100
-     flex justify-center items-center hover:(cursor-pointer bg-gray-200)"
-     @click="clearText()">
-      <div class="i-ion-close" ></div>
+    
+    <div v-if="canSerach"  class="flex justify-center items-center 
+    box-border b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4 cursor-pointer
+    hover:(bg-blue-5)
+    active:(outline outline-2px outline-blue-2 bg-blue-6)" @click="search">
+      <div class="i-twemoji-magnifying-glass-tilted-left text-2xl"  />
     </div>
-    <div @click="showModal=true"
-      class="aspect-ratio-1 rd-50% h-7 box-border m-1 mr-2 bg-slate-100 
-        flex justify-center items-center hover:(cursor-pointer bg-gray-200)">
-      <div class="i-carbon-cloud-satellite text-xl bg-rose-500"></div>
-    </div>
-    <!--modal画板区域-->
-    <n-modal v-model:show="showModal" display-directive="show">
-      <n-card class="w-90vw h-96vh" 
-        :bordered = "false"
-        size="huge"
-        role="dialog"
-        aria-modal="true">
-        <template #default>
-          <init-ketcher
-            @update-smiles="(smiles) => (inputText = smiles)"
-          ></init-ketcher>
-        </template>
-        <template #footer>
-          <div class="flex justify-center gap-2">
-            <n-button @Click="showModal = false">取消</n-button>
-            <n-button @Click="showModal = false">确定</n-button>
-          </div>
-        </template>
-      </n-card>
-    </n-modal>
-    <div class="flex justify-center items-center b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4
-    hover:(cursor-pointer bg-blue-5)
+    <div v-else class="flex justify-center items-center 
+    box-border b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4 cursor-pointer
+    hover:(bg-blue-5)
     active:(outline outline-2px outline-blue-2 bg-blue-6)">
-      <div v-if="canSerach" class="i-twemoji-magnifying-glass-tilted-left text-2xl"  @click="search"/>
-      <div v-else class="i-eos-icons-loading text-2xl"></div>
+      <div  class="i-eos-icons-loading text-2xl"></div>
     </div>
   </div>
   <div class="flex-auto flex flex-col item-start 
@@ -491,28 +580,29 @@ onMounted(()=>{
         </div>
       </TransitionGroup>
     </div>
-    <div class="flex-none flex justify-between items-center bg-slate-1 rd-5 mt-2">
-      <div class="flex-none aspect-ratio-1 bg-slate-1 rd-50% h-6 z-1
-        flex justify-center items-center b-2 b-blue-2 cursor-pointer
+    <div class="flex-none flex justify-between box-border items-center bg-slate-1 rd-5 mt-2 p-1">
+      <div class="flex-none aspect-ratio-1 bg-slate-1 rd-50% h-6 z-1 box-border
+        flex justify-center items-center cursor-pointer b-(solid 2 blue-2 rd-50%)
         hover:(bg-slate-2 b-blue-3)
         active:(outline outline-2px outline-blue-2)">
-        <div ref="add_c" @click="add_condition()" 
-          class="i-iconamoon-sign-plus-bold text-2xl text-blue">
-        </div>
+        <div @click="add_condition()" class="i-iconamoon-sign-plus-bold text-xl text-blue"></div>
       </div>
       <div class="flex-none flex justify-end items-center box-border mr-1 gap-1
         relative">
-        <div class="bg-slate-2 rd-3 box-border p-1 text-0.8em leading-3.5 "
-          :class="[conditions.length < 1 ? 'text-gray-4':
-          'text-gray-6 cursor-pointer hover:(text-gray-9) active:(outline outline-2px outline-blue-2 bg-slate-6)']"
-          @click="()=>conditions.length<1 ?null:showFilter=!showFilter"
-          >
-          折叠条件
-        </div>
-        <div class="bg-slate-2 rd-3 box-border p-1 text-0.8em leading-3.5 cursor-pointer
-          hover:(text-gray-9)">
-          历史记录
-        </div>
+        <div v-show="conditions.length > 0" 
+        class="bg-slate-2 rd-3 box-border p-1 text-0.8em leading-3.5 cursor-pointer 
+        hover:(bg-slate-3) active:(outline outline-2px outline-blue-2)"
+        @click="()=>!(conditions.length > 0) ? null : showFilter=!showFilter">
+        {{showFilter ? '折叠条件':'展开条件'}}</div>
+        <n-popover raw display-directive="if" trigger="click" :show-arrow="true" placement="right-start"
+        class="p-0 rd-2 box-border">
+          <ReuseHistroy :data="searchStore.$state.records"></ReuseHistroy>
+          <template #trigger>
+            <div class="bg-slate-2 rd-3 box-border p-1 text-0.8em leading-3.5 cursor-pointer
+            hover:(bg-slate-3) active:(outline outline-2px outline-blue-2)"
+            @click="randomPick">历史记录</div>
+          </template>
+        </n-popover>
       </div>
     </div>
   </div>

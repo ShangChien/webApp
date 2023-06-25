@@ -72,7 +72,7 @@ function getCdxFile(){
 						<template #default>
 							<div class="font-LX-B m--2 mb--1 mt--1">
 								<div class="text-1.2em bg-slate-1 text-center rd-1 mb-1"
-									>cdxml文件布局设置：</div>
+									>cdxml文件布局设置:</div>
 								<div class="grid justify-center grid-cols-2 gap-1 w-170px">
               		<span class="self-center justify-self-end">cols:</span>
               		<n-input-number v-model:value="cols" 

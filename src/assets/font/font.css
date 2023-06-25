@@ -36,7 +36,7 @@
   src: url('./Yozai-Bold.ttf');
 }
 @font-face {
-  font-family: 'YZ-R';
+  font-family: 'YZ-L';
   src: url('./Yozai-Light.ttf');
 }
 @font-face {
@@ -48,10 +48,10 @@
   src: url('./Yozai-Regular.ttf');
 }
 @font-face {
-  font-family: 'LXMG-R';
-  src: url('./LXGWMarkerGothic-Regular.ttf');
-}
-@font-face {
   font-family: 'TJ-R';
   src: url('./TiejiliSC-Regular.ttf');
+}
+@font-face {
+  font-family: 'LXMG-R';
+  src: url('./LXGWMarkerGothic-Regular.ttf');
 }

@@ -4,7 +4,8 @@ import { NButton,NCheckbox } from 'naive-ui'
 import { useElementBounding,createReusableTemplate } from '@vueuse/core'
 import search from '@/components/ketcher/search.vue'
 import { useMolStore } from '@/stores/molStore'
-import type { molData,pgData } from "@/components/types"
+import { useSearchStore } from '@/stores/searchStore'
+import type { molData,pgDataItem } from "@/components/types"
 import gridPage from "@/components/rdkitComponent/gridPage.vue";
 interface dataPick {
   items: string[],
@@ -22,6 +23,7 @@ const showExpand = computed(()=>{
     ? true : false})
 const [DefineTag, ReuseTag] = createReusableTemplate<{label:string }>()
 const store = useMolStore()
+const searchStore = useSearchStore()
 const labels = computed(()=>store.getAllLabels)
 const types = ['all','molecule','ligand','core']
 const dataLabels:dataPick=reactive({items:labels,selected:[],expend:false,enabled:false})
@@ -45,7 +47,7 @@ async function reverse(data:dataPick) {
   data.selected = arr.filter(item => !data.selected.includes(item))
 }
 
-const result = ref<pgData[]>([])
+const result = ref<pgDataItem[]>([])
 
 onMounted(()=>{
   mounted.value=true
@@ -59,11 +61,11 @@ onMounted(()=>{
       <search v-model="result" />
     </div>
     <div class="w-full flex-auto box-border">
-      <grid-page :molList="result" :cols='8' :rows="4" class="w-full h-90vh" />
+      <grid-page :molList="result" :cols='6' :rows="9" class="w-full h-90vh" />
     </div>
   </div>
   <div class="w-40% flex-auto">
-    <div class="w-40px"></div>
+    <div v-for="i in searchStore.$state.records"></div>
   </div>
 </div>
 </template>

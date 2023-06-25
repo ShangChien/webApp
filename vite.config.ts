@@ -1,53 +1,22 @@
+import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
-import VueTypeImports from "vite-plugin-vue-type-imports";
 import mkcert from "vite-plugin-mkcert";
 import Unocss from 'unocss/vite'
-import { presetAttributify, presetUno } from 'unocss'
-import presetIcons from '@unocss/preset-icons'
-import transformerVariantGroup from '@unocss/transformer-variant-group'
 import { resolve } from "path";
 
 // https://vitejs.dev/config/
-export default {
+export default defineConfig({
   plugins: [
     vue({
       script: {
-        //@ts-ignore
         defineModel:true
       }
     }),
     mkcert(),
     vueJsx(),
-    VueTypeImports(),
-    Unocss({
-      presets: [
-        presetAttributify({ /* preset options */}),
-        presetUno(),
-        presetIcons({
-          extraProperties: {
-            'display': 'inline-block',
-            'vertical-align': 'middle',
-            // ...
-          },
-        })
-      ],
-      transformers: [
-        transformerVariantGroup(),
-      ],
-      rules: [
-        // your custom rules
-        [
-          /^hsla-(\d+)-(\d+)-(\d+)-(\d+)$/, 
-          ([_,a,b,c,d]:any) => ({'background-color': `hsla(${a}, ${b}%, ${c}%, ${d}%)`})
-        ],
-        [
-          /^font-([a-zA-Z]+)-([a-zA-Z]+)$/,
-          ([_,a,b]:any)=>({'font-family': `${a}-${b}` })
-        ]
-      ],
-    }),
+    Unocss(),
     VitePWA({
       includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
@@ -109,4 +78,4 @@ export default {
       "@": resolve(__dirname,"./src"),
     },
   },
-};
+});

@@ -36,7 +36,27 @@ interface electronCross{
   energy:number[];
   oscillator:number[];
 }
+
+export interface records{
+  id:number;
+  timestamp:number;
+  length:number;
+  conditions:condition[];
+}
+export interface recordFull extends records {
+  res:{
+    id:number,
+    smiles:string,
+    name_calc:string,
+    name_mat:string,
+  }[];
+}
+
 export interface pgData{
+  id:number;
+  smiles:string;
+}
+export interface pgDataItem{
   id?:number;
   timestamp?:number;
   name_calc?:string;
@@ -101,6 +121,7 @@ enum logicType {
   Not = 'not',
   Or = 'or',
 }
+
 export interface option{
   label?:string;
   editable?:boolean;
@@ -111,6 +132,7 @@ export interface option{
   items?:option[];
   children?:option[];
 }
+
 export interface condition extends Omit<option,'value'>{
   id:number;
   logic:logicType;
@@ -123,3 +145,4 @@ export interface condition extends Omit<option,'value'>{
   label_icon?:VNode|Component;
   component?:Component;
 }
+

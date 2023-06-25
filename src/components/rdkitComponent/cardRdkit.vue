@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, h, reactive, onMounted, inject,computed } from "vue";
 import type { Component, Ref } from "vue";
-import type { molData,pgData } from "@/components/types";
+import type { molData,pgDataItem } from "@/components/types";
 import svgRdkit from "@/components/rdkitComponent/svgRdkit.vue";
 import { useCopy } from '@/components/rdkitComponent/composable/useCopy'
 import {
@@ -19,7 +19,7 @@ import { Edit, Delete, CopyFile } from "@vicons/carbon";
 import { useEnumStore } from '@/stores/enumStore'
 
 const emit = defineEmits(["itemChecked"]);
-const props = defineProps<pgData>();
+const props = defineProps<pgDataItem>();
 const currentEdit:Ref<{id:number;state:number}>=inject('currentEdit')
 const enumStore = useEnumStore()
 const editState=computed(()=>{

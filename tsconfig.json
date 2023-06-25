@@ -1,25 +1,35 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.web.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "src/worker"],
-  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "strict":false,
-    "outDir": "./",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib":["ESNext","DOM"],
+    "skipLibCheck": true,
     "allowJs": true,
-    "suppressImplicitAnyIndexErrors": true,
+
+    /* Bundler mode */
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+
+    /*custom */
+    "outDir": "./",
     "baseUrl": ".",
-    "lib":[
-      "esnext",
-      "dom"
-    ],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
+  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "src/worker"],
+  "exclude": ["node_modules", "dist"],
 
   "references": [
     {
-      "path": "./tsconfig.vite-config.json"
+      "path": "./tsconfig.node.json"
     }
   ],
 }

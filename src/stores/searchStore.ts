@@ -1,20 +1,11 @@
 import { defineStore } from "pinia";
-import type { condition } from "@/components/types"
+import type { recordFull,records } from "@/components/types"
 import { set,get,del,clear } from 'idb-keyval';
-interface records{
-  id:number;
-  timestamp:number;
-  length:number;
-  conditions:condition[];
-}
-interface recordFull extends records {
-  res:{id:number,smiles:string}[];
-}
 
 export const useSearchStore = defineStore('search',{
   state: () => ({
     records: [] as records[],
-    nextId: 1,
+    nextId: 0,
   }),
   getters: {
     getById(state) {
@@ -30,14 +21,14 @@ export const useSearchStore = defineStore('search',{
   },
   actions: {
     async addRecord(x:recordFull) {
-      await set(x.id,x.res).then(() => console.log(`save res ${x.id} success`))
-      .catch((err) => console.log(`save res ${x.id} failed! ${err}`));
       this.records.push({
         id          : this.nextId++,
         timestamp   : x.timestamp,
         conditions  : x.conditions,
         length      : x.res.length
       })
+      await set(this.nextId,x.res).then(() => console.log(`save res ${this.nextId} success`))
+      .catch((err) => console.log(`save res ${this.nextId} failed! ${err}`));
     },
     async rmRecordById(id:number) {
       await del(id).then(() => console.log(`del res ${id} success`))

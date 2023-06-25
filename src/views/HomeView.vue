@@ -52,3 +52,5 @@ import { NCol, NRow, NStatistic } from "naive-ui";
   <img src="/picture/openbranch.png" />
 </div>
 </template>
+<style>
+</style>

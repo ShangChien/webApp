@@ -103,7 +103,7 @@ onMounted(()=>{
           {{label}}
         </n-button>
       </define-tag>
-      <div class="flex-none flex flex-nowrap justify-around items-center 
+      <div class="flex-none flex flex-nowrap justify-around items-center  
         rd-1.5 bg-blue-100 h-24px hover:bg-blue-200 ">
         <n-checkbox class=" ml-1.5 mr-1 " size="small"
           :checked="selected.length!==0 && selected.length===tags.length"
@@ -114,7 +114,7 @@ onMounted(()=>{
         :style="{ 'transform': `rotateY(${angle}deg)` }"
         @click="reverse"></div>
       </div>
-      <div class="flex-auto overflow-hidden flex flex-col justify-center items-start
+      <div class="flex-auto overflow-hidden flex flex-col justify-start items-start
         box-border relative transition-height-210">
         <div class="overflow-hidden box-border transition-height-210 max-w-full"
         :style="{height:labels_h+'px'}">
@@ -123,7 +123,7 @@ onMounted(()=>{
             <reuse-tag v-for="tag in tags" :label="tag"></reuse-tag>
           </div>
         </div>
-        <div class="max-w-full w-full box-border p-1">
+        <div class="max-w-full w-full box-border">
           <n-input v-show="expend" clearable class="w-full"
             v-model:value="inputValue"
             @keyup.enter="pushTag"
