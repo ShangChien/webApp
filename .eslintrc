@@ -1,0 +1,31 @@
+{
+  "extends": "@antfu",
+  "ignorePatterns": ["src/**/*_minimal.js"],
+  "rules": {
+    "max-statements-per-line":"off",
+    "no-console": "off",
+    "no-restricted-syntax": [
+        "error",
+        {
+            "selector": "CallExpression[callee.object.name='console'][callee.property.name!=/^(log|warn|error|info|trace)$/]",
+            "message": "Unexpected property on console object was called"
+        }
+    ]
+}
+}
+// module.exports = {
+//   root: true,
+//   extends: [
+//     "plugin:vue/vue3-essential",
+//     "eslint:recommended",
+//     "@vue/eslint-config-typescript/recommended",
+//     "@vue/eslint-config-prettier",
+//   ],
+//   env: {
+//     "vue/setup-compiler-macros": true,
+//   },
+//   rules: {
+//     "@typescript-eslint/no-explicit-any": ["off"],
+//     endOfLine: "auto",
+//   },
+// };

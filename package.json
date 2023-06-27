@@ -6,7 +6,8 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview --port 5050",
     "typecheck": "vue-tsc --noEmit",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@johnsoncodehk/html2pug": "^1.0.0",
@@ -40,6 +41,7 @@
     "vue-virtual-scroll-grid": "^1.10.2"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^0.39.5",
     "@arco-design/web-vue": "^2.47.1",
     "@iconify/json": "^2.2.81",
     "@rollup/plugin-inject": "^5.0.3",

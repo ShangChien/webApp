@@ -1,86 +1,86 @@
 <script setup lang="ts">
 import {
+  NButton,
+  NButtonGroup,
+  NIcon,
+  NProgress,
   NSpace,
   NTable,
-  NThead,
-  NTr,
-  NTh,
   NTbody,
   NTd,
-  NProgress,
-  NButtonGroup,
-  NButton,
-  NIcon,
-} from "naive-ui";
-import { Delete, View, Edit } from "@vicons/carbon";
+  NTh,
+  NThead,
+  NTr,
+} from 'naive-ui'
+import { Delete, Edit, View } from '@vicons/carbon'
 </script>
 
 <template>
-<div>
-  <n-space vertical>
-    <n-table :single-line="false" size="small">
-      <n-thead>
-        <n-tr>
-          <n-th>序号</n-th>
-          <n-th>名称</n-th>
-          <n-th>类型</n-th>
-          <n-th>状态</n-th>
-          <n-th>操作</n-th>
-        </n-tr>
-      </n-thead>
-      <n-tbody>
-        <n-tr>
-          <n-td>1</n-td>
-          <n-td>220510-ETA-0028</n-td>
-          <n-td>结构优化</n-td>
-          <n-td>
-            <n-progress
-              type="line"
-              :percentage="60"
-              :indicator-placement="'inside'"
-              color="#52c234"
-              processing
-            />
-          </n-td>
-          <n-td>
-            <n-button-group>
-              <n-button size="small" round tertiary type="primary">
-                <template #icon>
-                  <n-icon><View /></n-icon>
-                </template>
-                查看
-              </n-button>
-              <n-button size="small" round tertiary type="info">
-                <template #icon>
-                  <n-icon><Edit /></n-icon>
-                </template>
-                编辑
-              </n-button>
-              <n-button size="small" round tertiary type="error">
-                <template #icon>
-                  <n-icon><Delete /></n-icon>
-                </template>
-                删除
-              </n-button>
-            </n-button-group>
-          </n-td>
-        </n-tr>
-        <n-tr>
-          <n-td>...</n-td>
-          <n-td>...</n-td>
-          <n-td>...</n-td>
-          <n-td>...</n-td>
-          <n-td>...</n-td>
-        </n-tr>
-        <n-tr>
-          <n-td>...</n-td>
-          <n-td>...</n-td>
-          <n-td>...</n-td>
-          <n-td>...</n-td>
-          <n-td>...</n-td>
-        </n-tr>
-      </n-tbody>
-    </n-table>
-  </n-space>
-</div>
+  <div>
+    <NSpace vertical>
+      <NTable :single-line="false" size="small">
+        <NThead>
+          <NTr>
+            <NTh>序号</NTh>
+            <NTh>名称</NTh>
+            <NTh>类型</NTh>
+            <NTh>状态</NTh>
+            <NTh>操作</NTh>
+          </NTr>
+        </NThead>
+        <NTbody>
+          <NTr>
+            <NTd>1</NTd>
+            <NTd>220510-ETA-0028</NTd>
+            <NTd>结构优化</NTd>
+            <NTd>
+              <NProgress
+                type="line"
+                :percentage="60"
+                indicator-placement="inside"
+                color="#52c234"
+                processing
+              />
+            </NTd>
+            <NTd>
+              <NButtonGroup>
+                <NButton size="small" round tertiary type="primary">
+                  <template #icon>
+                    <NIcon><View /></NIcon>
+                  </template>
+                  查看
+                </NButton>
+                <NButton size="small" round tertiary type="info">
+                  <template #icon>
+                    <NIcon><Edit /></NIcon>
+                  </template>
+                  编辑
+                </NButton>
+                <NButton size="small" round tertiary type="error">
+                  <template #icon>
+                    <NIcon><Delete /></NIcon>
+                  </template>
+                  删除
+                </NButton>
+              </NButtonGroup>
+            </NTd>
+          </NTr>
+          <NTr>
+            <NTd>...</NTd>
+            <NTd>...</NTd>
+            <NTd>...</NTd>
+            <NTd>...</NTd>
+            <NTd>...</NTd>
+          </NTr>
+          <NTr>
+            <NTd>...</NTd>
+            <NTd>...</NTd>
+            <NTd>...</NTd>
+            <NTd>...</NTd>
+            <NTd>...</NTd>
+          </NTr>
+        </NTbody>
+      </NTable>
+    </NSpace>
+  </div>
 </template>

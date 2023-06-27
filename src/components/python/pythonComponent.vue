@@ -1,18 +1,19 @@
 <script setup lang='ts'>
-import { ref, onMounted } from "vue"
-import { useElementSize,watchDebounced } from '@vueuse/core'
-import { Splitpanes, Pane } from 'splitpanes'
-import MonacoEditor from 'monaco-editor-vue3';
-import { NButton,NScrollbar } from 'naive-ui'
-const python =await import('@/worker/pyodide' /* @vite-ignore */)
-//python setting
-const py=ref<any>()
-const codeStr=ref<string>(`
+import { onMounted, ref } from 'vue'
+import { useElementSize, watchDebounced } from '@vueuse/core'
+import { Pane, Splitpanes } from 'splitpanes'
+import MonacoEditor from 'monaco-editor-vue3'
+import { NButton, NScrollbar } from 'naive-ui'
+
+const python = await import('@/worker/pyodide' /* @vite-ignore */)
+// python setting
+const py = ref<any>()
+const codeStr = ref<string>(`
 arr1=[1,2,3,4,5,6,7]
 arr2=[x*x for x in arr1]
 arr2
 `)
-const res=ref<string>(`截至 2022.10.9，Github发布上一些开源中文字体，均为由开源日文字体转化。现将这些字体列出如下。（先按授权方式，再按发行时间排序）\n
+const res = ref<string>(`截至 2022.10.9，Github发布上一些开源中文字体，均为由开源日文字体转化。现将这些字体列出如下。（先按授权方式，再按发行时间排序）\n
 对于 SIL Open Font License 1.1 授权字体的使用许可与限制说明如下。 （适用于「小赖字体」「悠哉字体」「漫黑」「文楷」「975 系列字体」）
 
 允许做的事：
@@ -25,95 +26,105 @@ const res=ref<string>(`截至 2022.10.9，Github发布上一些开源中文字�
 简言之：
 可以用、可以嵌、可以改、不能单独卖。
 `)
-async function init(){
-	if (!py.value){
-		console.log('init python env...')
-		py.value=await python.loadPyodide()
-		await py.value.loadPackage('micropip',{checkIntegrity:false})
-		const micropip = py.value.pyimport("micropip");
-		await micropip.install('numpy');
-		py.value.runPython(`
-		import sys
-		import numpy as np
-		print('python.version:', sys.version)
-		print('numpy.version:', np.__version__)
-		`);
-	} else{
-		py.value=null
-		console.log('python env destroyed');
-	}
-
+async function init() {
+  if (!py.value) {
+    console.log('init python env...')
+    py.value = await python.loadPyodide()
+    await py.value.loadPackage('micropip', { checkIntegrity: false })
+    const micropip = py.value.pyimport('micropip')
+    await micropip.install('numpy')
+    py.value.runPython(`import sys
+import numpy as np
+print('python.version:', sys.version)
+print('numpy.version:', np.__version__)`)
+  }
+  else {
+    py.value = null
+    console.log('python env destroyed')
+  }
 }
-function run(code:string):void {
-	res.value=py.value.runPython(code)
+function run(code: string): void {
+  res.value = py.value.runPython(code)
 }
-//monaco editor setting
+// monaco editor setting
 const editorDom = ref(null)
 const renderKey = ref<number>(0)
-const { width:editorW, height:editorH } = useElementSize(editorDom)
-const options =  {
-	colorDecorators: true,
-	lineHeight: 2,
-	tabSize: 2,
-	theme:"vs",
-	language:'python',
+const { width: editorW, height: editorH } = useElementSize(editorDom)
+const options = {
+  colorDecorators: true,
+  lineHeight: 2,
+  tabSize: 2,
+  theme: 'vs',
+  language: 'python',
 }
-const operation =['open','edit','view','about']
-onMounted(()=>{
-	init()
+const operation = ['open', 'edit', 'view', 'about']
+onMounted(() => {
+  init()
 })
 watchDebounced(
-	[editorH,editorW],
-	()=>{
-		renderKey.value+=1
-		console.log('key',editorW.value,editorH.value,renderKey.value)
-	},
-	{ debounce: 1000, maxWait: 5000 }
+  [editorH, editorW],
+  () => {
+    renderKey.value += 1
+    console.log('key', editorW.value, editorH.value, renderKey.value)
+  },
+  { debounce: 1000, maxWait: 5000 },
 )
 </script>
+
 <template>
-<splitpanes horizontal class="splitpanes flex-auto relative" style="background-color: #ffffff">
-	<pane size="70" min-size="20" >
-		<div ref="editorDom" class="h-full flex flex-nowrap flex-col bg-slate-1 rd-1 min-w-280px" >
-			<div class="flex-none flex flex-nowrap justify-between ">
-				<div class="flex flex-nowrap flex-none justify-start items-center m-0 p-0">
-					<div v-for="i in operation" class="rd-1 m-1 p-1 bg-slate-2">{{i}}</div>
-				</div>
-				<div class="flex flex-nowrap flex-none justify-end items-center ">
-					<div class="i-simple-icons-python text-1.5xl m-1 p-1"
-						:class="[py ? 'bgColor' : '']"
-						@click="init"
-						></div>
-					<n-button class="m-1" size="small" :disabled="!py" type="info" @click="run(codeStr)">run</n-button>
-				</div>
-			</div>
-			<div :key="renderKey" class="pt-0 m-1 mt-0 flex-auto">
-				<monaco-editor 
-					:options="options" 
-					:height='editorH-43' 
-					:weight='editorW' 
-					v-model:value="codeStr" />
-			</div> 
-		</div>
-	</pane>
-	<pane size="30" min-size="10">
-		<div class="h-full mt-0 bg-slate-1 rd-1 flex flex-nowrap flex-col">
-			<div class="bg-slate-2 rd-1 p-1 text-xl flex-none">Output:</div>
-			<n-scrollbar class="flex-auto text-2xl"><div >
-				{{res}}
-			</div></n-scrollbar>
-		</div>
-	</pane>
-</splitpanes>
+  <Splitpanes horizontal class="splitpanes flex-auto relative" style="background-color: #ffffff">
+    <Pane size="70" min-size="20">
+      <div ref="editorDom" class="h-full flex flex-nowrap flex-col bg-slate-1 rd-1 min-w-280px">
+        <div class="flex-none flex flex-nowrap justify-between ">
+          <div class="flex flex-nowrap flex-none justify-start items-center m-0 p-0">
+            <div v-for="(item, index) in operation" :key="index" class="rd-1 m-1 p-1 bg-slate-2">
+              {{ item }}
+            </div>
+          </div>
+          <div class="flex flex-nowrap flex-none justify-end items-center ">
+            <div
+              class="i-simple-icons-python text-1.5xl m-1 p-1"
+              :class="[py ? 'bgColor' : '']"
+              @click="init"
+            />
+            <NButton class="m-1" size="small" :disabled="!py" type="info" @click="run(codeStr)">
+              run
+            </NButton>
+          </div>
+        </div>
+        <div :key="renderKey" v-eslint-disable class="pt-0 m-1 mt-0 flex-auto">
+          <!-- @ts-ignore -->
+          <MonacoEditor
+            v-model:value="codeStr"
+            :options="options"
+            :height="editorH - 43"
+            :weight="editorW"
+          />
+        </div>
+      </div>
+    </Pane>
+    <Pane size="30" min-size="10">
+      <div class="h-full mt-0 bg-slate-1 rd-1 flex flex-nowrap flex-col">
+        <div class="bg-slate-2 rd-1 p-1 text-xl flex-none">
+          Output:
+        </div>
+        <NScrollbar class="flex-auto text-2xl">
+          <div>
+            {{ res }}
+          </div>
+        </NScrollbar>
+      </div>
+    </Pane>
+  </Splitpanes>
 </template>
-<style >
+
+<style>
 @import "splitpanes/dist/splitpanes.css";
 .bgColor {
-	background-image: linear-gradient(314deg, #00c3ff, #ffff1c)
+background-image:linear-gradient(314deg, #00c3ff, #ffff1c)
 }
 
 .splitpanes {background-color: #f8f8f8;}
-
 
 .splitpanes__splitter {
   background-color:#6bd8fca3;

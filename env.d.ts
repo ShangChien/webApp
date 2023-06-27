@@ -5,6 +5,7 @@ declare module 'pyodide/pyodide.mjs'
 declare module "ngl/dist/ngl.js";
 declare module 'svgo/lib/svgo.js';
 declare module 'splitpanes';
+declare module 'naive-ui';
 declare interface Window {
   RDKit: any;
   py:any;
