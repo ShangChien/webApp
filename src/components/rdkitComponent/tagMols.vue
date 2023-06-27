@@ -11,7 +11,7 @@ const enumStore = useEnumStore()
 const tagsOption=computed<{label:string,value:string}[]>(()=>{
 	return enumStore.getAllLabels.map((v:string)=>({label:v,value:v}))
 })
-const renderTag:SelectRenderTag=({ option, handleClose })=>{
+const renderTag=({ option, handleClose })=>{
 	return h(NTag,
         	{
 						type:'success',

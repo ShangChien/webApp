@@ -1,7 +1,7 @@
-import initRDKitModule from "@rdkit/rdkit/dist/RDKit_minimal.js";
+import initRDKitModule from '@rdkit/rdkit/dist/RDKit_minimal.js'
+
 const initRDKit = (() => {
   let rdkitLoadingPromise: Promise<void>
-
   return () => {
     /**
      * Utility function ensuring there's only one call made to load RDKit
@@ -15,16 +15,15 @@ const initRDKit = (() => {
         initRDKitModule()
           .then((RDKit: any) => {
             // window.RDKit = RDKit;
-            resolve(RDKit);
+            resolve(RDKit)
           })
           .catch((e: any) => {
-            reject(e);
-          });
-      });
+            reject(e)
+          })
+      })
     }
+    return rdkitLoadingPromise
+  }
+})()
 
-    return rdkitLoadingPromise;
-  };
-})();
-
-export default initRDKit();
+export default initRDKit()
