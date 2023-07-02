@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, h, onMounted, ref, toValue } from 'vue'
+import { computed, h, onMounted, provide, ref, toValue } from 'vue'
 import type { Ref, VNodeChild } from 'vue'
 import { createReusableTemplate, useDebounceFn, useElementSize } from '@vueuse/core'
 import { useSortable } from '@vueuse/integrations/useSortable'
@@ -8,15 +8,20 @@ import { NDatePicker, NDropdown, NPopover, useMessage } from 'naive-ui'
 import axios from 'axios'
 import tags from '@/components/ketcher/tags.vue'
 import vmodelSmiles from '@/components/ketcher/vmodelSmiles.vue'
+import modalKetcher from '@/components/ketcher/modalKetcher.vue'
 import { useSearchStore } from '@/stores/searchStore'
 import { useMolStore } from '@/stores/molStore'
 import type { condition, option, pgData, pgDataItem, recordFull, records } from '@/components/types'
+import { keyStateKetcher } from '@/components/types'
 
 enum logicType {
   And = 'and',
   Not = 'not',
   Or = 'or',
 }
+
+const ketcher = { id: ref(0), showModal: ref(false), smiles: ref('') }
+provide(keyStateKetcher, ketcher)
 
 const queryResult = defineModel<pgDataItem[] | pgData[]>()
 const [DefineFilter, ReuseFilter] = createReusableTemplate<{ data: condition }>()
@@ -74,9 +79,8 @@ const options = ref<option[]>([
     editable: false,
     icon: () => h('div', { class: 'i-solar-card-search-bold-duotone bg-blue mr--2 text-2xl' }),
     children: [
-      { label: '子结构', key: 'substructure', icon: () => h('div', { class: 'i-carbon-3rd-party-connected bg-blue mr--2 text-2xl' }) },
+      { label: '子结构', key: 'substructure', icon: () => h('div', { class: 'i-carbon-assembly bg-blue mr--2 text-2xl' }) },
       { label: '相似度', key: 'similarity', icon: () => h('div', { class: 'i-carbon-assembly-reference bg-blue mr--2 text-2xl' }) },
-      { label: '精确匹配', key: 'exactstructure', icon: () => h('div', { class: 'i-carbon-assembly bg-blue mr--2 text-2xl' }) },
     ],
   },
   {
@@ -156,6 +160,7 @@ const options = ref<option[]>([
   },
 ])
 const id_condition = ref<number>(0)
+
 async function add_condition() {
   conditions.value.push({
     id: id_condition.value,
@@ -191,6 +196,7 @@ function onSelect(option: option, data: condition) {
   data.label = option.label as string
   data.label_icon = option.icon
   data.key = option.key
+  const unit = { mw: 'M(相对分子质量)', homo: 'eV', lumo: 'eV', eg: 'eV', polar: 'C·m(Debye)', transport: 'cm²/s', similarity: '%' }
   if (option.key === 'date') {
     data.type = 'date'
     data.value = [ref(Date.now()), ref(Date.now())]
@@ -261,27 +267,34 @@ function onSelect(option: option, data: condition) {
     )
   }
   else if (option.key === 'substructure') {
-    data.value = 'sssssss'
-    data.type = 'gt'
+    data.value = ''
+    data.type = '>'
     data.component = () => h(
       'div',
-      { class: 'flex items-center justify-start gap-2 bg-slate-2 rd-1.2 h-24px ml-1 pr-0.5 pl-0.5' },
+      { class: 'flex items-center justify-start gap-2 rd-1 h-24px mx-1 w-full' },
       [
         h(
           'div',
-          {
-            class: ['bg-blue-3 text-blue-6 h-22px flex items-center justify-center rd-1 pr-1 pl-1 cursor-pointer'],
-            onClick: () => { data.type = (data.type === 'gt') ? 'lt' : 'gt' },
-          },
-          data.type,
-        ),
+          { class: 'flex-(~ basis-30% shrink-1 grow-1) items-center justify-center gap-2' },
+          ['<', '=', '>'].map((item, index) => h('div',
+            {
+              class: [data.type === item ? 'bg-blue-3' : '',
+                'bg-blue-1 text-blue-9 text-xl flex items-center justify-center h-22px w-22px box-border rd-1 cursor-pointer hover:(bg-blue-2)'],
+              key: index,
+              onClick: () => { data.type = item },
+            },
+            item,
+          ),
+          )),
         h(
           vmodelSmiles,
           {
+            'class': 'flex-(~ basis-60% shrink-1 grow-1)',
+            'conditionId': data.id,
             'smiles': data.value,
             'onUpdate:smiles': (val: string) => {
               data.value = val
-              console.log(data.value, data.type)
+              console.log(data.value, data)
             },
           },
         ),
@@ -289,45 +302,52 @@ function onSelect(option: option, data: condition) {
     )
   }
   else if (option.key === 'similarity') {
-    data.value = 'gt'
+    data.value = [ref<number>(), ref<number>(), ref<string>('')]
+    data.type = 'interval'
     data.component = () => h(
       'div',
-    )
-  }
-  else if (option.key === 'exactstructure') {
-    data.value = 'gt'
-    data.component = () => h(
-      'div',
-      { class: 'flex items-center justify-start gap-2 bg-slate-2 rd-1.2 h-24px ml-1 pr-0.5 pl-0.5' },
-      [h(
-        'div',
-        {
-          class: [toValue(data.value) === 'gt' ? 'bg-blue-3 text-blue-6' : 'hover:bg-blue-1 text-gray-5',
-            'h-22px flex items-center justify-center rd-1 pr-1 pl-1 cursor-pointer'],
-          onClick: () => { data.value = 'gt' },
-        },
-        [h('div', { class: 'i-carbon-radio-button-checked text-center' }),
-          h('span', { class: 'text-0.9em min-w-100px' }, '大于检索结构')],
-      ),
-      h(
-        'div',
-        {
-          class: [toValue(data.value) === 'lt' ? 'bg-blue-3 text-blue-6' : 'hover:bg-blue-1 text-gray-5',
-            'h-22px flex items-center justify-center rd-1 pr-1 pl-1 cursor-pointer'],
-          onClick: () => { data.value = 'lt' },
-        },
-        [h('div', { class: 'i-carbon-recording-filled-alt text-center' }),
-          h('span', { class: 'text-0.9em min-w-100px' }, '小于检索结构')],
-      )],
+      { class: 'flex items-center justify-start gap-2 rd-1 h-24px mx-1 w-full' },
+      [
+        h(
+          'div',
+          { class: 'flex-(~ basis-30% shrink-1 grow-1) justify-center items-center' },
+          [h(ReuseInputNum, {
+            data: {
+              value: data.value[0],
+              placeholder: '- ∞',
+              unit: '',
+            },
+          }),
+          h('div', { class: 'i-carbon-pan-horizontal text-gray-5' }),
+          h(ReuseInputNum, {
+            data: {
+              value: data.value[1],
+              placeholder: '+ ∞',
+              unit: unit[option.key],
+            },
+          })],
+        ),
+        h(
+          vmodelSmiles,
+          {
+            'class': 'flex-(~ basis-60% shrink-1 grow-1)',
+            'conditionId': data.id,
+            'smiles': data.value[2].value,
+            'onUpdate:smiles': (val: string) => {
+              data.value[2].value = val
+              console.log(data.value[2], data)
+            },
+          },
+        ),
+      ],
     )
   }
   else if (['mw', 'homo', 'lumo', 'eg', 'polar', 'transport'].includes(option.key)) {
-    const unit = { mw: 'M(相对分子质量)', homo: 'eV', lumo: 'eV', eg: 'eV', polar: 'C·m(Debye)', transport: 'cm²/s', similarity: '%' }
     data.type = 'interval'
     data.value = [ref<number>(), ref<number>()]
     data.component = () => h(
       'div',
-      { class: 'flex-auto flex justify-start items-center' },
+      { class: 'flex-auto flex justify-start items-center mx-1' },
       [h(ReuseInputNum, {
         data: {
           value: data.value[0],
@@ -459,12 +479,15 @@ onMounted(() => {
         <template #trigger>
           <div
             class="flex-auto flex items-center justify-start
-        rd-1 box-border m-1 p-0 h-24px max-w-210px bg-slate-2
-        hover:bg-blue-1"
+              rd-1 box-border m-1 p-0 h-24px max-w-210px bg-slate-2
+              hover:bg-blue-1"
             @click="data.showDetail.value = true"
           >
             <div class="flex-auto ml-1">
-              <input v-model="data.valueFormat.value" type="text" class="b-0 p-0 m-0 outline-0 bg-inherit w-185px text-gray-8 text-0.9em">
+              <input
+                v-model="data.valueFormat.value" type="text"
+                class="b-0 p-0 m-0 outline-0 bg-inherit w-185px text-gray-8 text-0.9em"
+              >
             </div>
             <div class="i-carbon-event-schedule bg-gray-5 mr-1 text-xl p-0 flex-none" />
           </div>
@@ -481,10 +504,10 @@ onMounted(() => {
     <DefineInputNum v-slot="{ data }">
       <input
         v-model="data.value.value"
-        class="rd-1 b-0 m-1 p-0 h-24px outline-0 box-border
-    w-30% max-w-210px min-w-50px text-center text-0.9em
-    bg-slate-2 text-gray-8
-    hover:bg-blue-1"
+        class="rd-1 b-0 p-0 h-24px outline-0 box-border
+          w-30% max-w-210px min-w-50px text-center text-0.9em
+          bg-slate-2 text-gray-8
+          hover:bg-blue-1"
         :placeholder="data.placeholder"
         type="number"
         step="0.001"
@@ -493,16 +516,15 @@ onMounted(() => {
     </DefineInputNum>
     <DefineFilter v-slot="{ data }">
       <div
-        class="flex flex-nowrap box-border items-center justify-between bg-slate-1
-  gap-2 p-1 rd-2 w-full "
+        class="flex flex-nowrap box-border items-center justify-between bg-slate-1 gap-2 p-1 rd-2 w-full"
       >
         <div
           class="flex-none flex justify-center items-center
-    h-32px w-20px box-border p-0 m-0
-    bg-blue-2 rd-1.5 z-1
-    handle cursor-grab"
+            h-32px w-20px box-border p-0 ml-0.5 m-0
+            bg-blue-2 rd-1.5 z-1
+            handle cursor-grab"
         >
-          <div class="flex-none i-charm-grab-vertical bg-blue-5 hover:bg-blue-3" />
+          <div class="i-charm-grab-vertical flex-none bg-blue-5 hover:bg-blue-3" />
         </div>
         <div class="flex-none w-70px">
           <NDropdown
@@ -514,14 +536,14 @@ onMounted(() => {
             @select="(key, option) => { data.logic = key; data.logic_icon = option.icon }"
           >
             <div
-              class="flex flex-nowarp justify-start items-center gap-1
-        transition-210 cursor-pointer
-        rd-1 h-32px b-blue-2 box-border bg-light-1 b-2 p-0 m-0 text-lg
-        hover:(b-blue-4 bg-slate-2)
-        focus-within:(outline outline-2px outline-blue-2 b-blue-4 bg-slate-2)"
+              class="flex flex-nowrap justify-start items-center gap-1 transition-210 cursor-pointer
+                rd-1 h-32px box-border bg-light-1 p-0 m-0 text-lg
+                b-(solid 2 blue-2 rd-1) outline-(~ transparent 2px)
+                hover:(b-blue-4 bg-slate-2)
+                focus-within:(outline-blue-2 b-blue-4 bg-slate-2)"
               tabindex="0"
             >
-              <component :is="data.logic_icon" />
+              <component :is="data.logic_icon" :key="data.id" />
               <div class="p-0 m-0 text-l">
                 {{ data.logic }}
               </div>
@@ -531,18 +553,18 @@ onMounted(() => {
         <div class="flex-none w-120px">
           <NDropdown
             width="trigger"
-            :options="options as any"
+            :options="options"
             :render-label="(option:any) => h('div', { class: 'mr--2 ml-1' }, option.label)"
             placement="bottom-start"
             trigger="click"
             @select="(_key, option:any) => onSelect(option, data)"
           >
             <div
-              class="flex flex-nowarp justify-start pl-2 items-center gap-3
-        transition-210 cursor-pointer
-        rd-1 h-32px b-blue-2 box-border bg-light-1 b-2 p-0 m-0 text-lg
-        hover:(b-blue-4 bg-slate-2)
-        focus-within:(outline outline-2px outline-blue-2 b-blue-4 bg-slate-2)"
+              class="flex flex-nowrap justify-start items-center gap-3 pl-2 transition-210 cursor-pointer
+                rd-1 h-32px box-border bg-light-1 p-0 m-0 text-lg
+                b-(solid 2 blue-2 rd-1) outline-(~ transparent 2px)
+                hover:(b-blue-4 bg-slate-2)
+                focus-within:(outline-blue-2 b-blue-4 bg-slate-2)"
               tabindex="0"
             >
               <component :is="data.label_icon" />
@@ -557,16 +579,18 @@ onMounted(() => {
         </div>
         <div
           class="flex-auto flex items-center justify-between overflow-hidden
-      h-32px rd-1 b-blue-2 box-border b-2 transition-210 bg-light-1
-      active:(outline outline-2px outline-blue-2)
-      focus-within:(outline outline-2px outline-blue-2 b-blue-4)
-      hover:b-blue-4"
+            h-32px box-border transition-210 bg-light-1
+            b-(solid 2 blue-2 rd-1) outline-(~ transparent 2px)
+            hover:b-blue-4
+            active:outline-blue-2
+            focus-within:(outline-blue-2 b-blue-4)"
+          tabindex="0"
         >
           <component :is="data.component" />
         </div>
         <div
-          class="w-30px flex-none i-solar-close-square-bold-duotone text-3xl text-blue cursor-pointer
-    hover:text-blue-5"
+          class="i-solar-close-square-bold-duotone w-30px flex-none text-3xl text-blue cursor-pointer
+          hover:text-blue-5"
           @click="del_condition(data.id)"
         />
       </div>
@@ -574,18 +598,18 @@ onMounted(() => {
     <DefineHistroy v-slot="{ data }">
       <div
         class="flex flex-col flex-nowrap items-center justify-start font-LX-B
-  box-border p-1 rd-2 bg-white relative min-h-400px"
+          box-border p-1 rd-2 bg-white relative min-h-400px"
       >
         <div
           class="flex-none flex flex-nowrap items-center justify-between
-    rd-1 w-full min-w-400px box-border bg-slate-50"
+            rd-1 w-full min-w-400px box-border bg-slate-50"
         >
           <div class="m-1">
             {{ data.length === 0 ? 'No History' : `Total: ${data.length}` }}
           </div>
           <div
             class="bg-slate-2 rd-1 m-1 p-1 text-l leading-1em cursor-pointer
-      hover:(bg-slate-3) active:(outline outline-2px outline-blue-2)"
+              hover:(bg-slate-3) active:(outline outline-2px outline-blue-2)"
             @click="searchStore.clearAll()"
           >
             clear all
@@ -600,12 +624,10 @@ onMounted(() => {
           空空如也
         </div>
         <div
-          v-else class="flex-none flex flex-col flex-nowrap items-center justify-start
-    w-full  text-center"
+          v-else class="flex-none flex flex-col flex-nowrap items-center justify-start w-full text-center"
         >
           <div
-            class="flex-none flex flex-nowrap items-center justify-between
-      box-border w-full p-1 "
+            class="flex-none flex flex-nowrap items-center justify-between box-border w-full p-1 "
           >
             <div class="flex-basis-15 ">
               id
@@ -635,17 +657,17 @@ onMounted(() => {
             </div>
             <div
               class="flex-basis-40 flex flex-nowrap items-center justify-center gap-2
-        box-border rd-1 bg-lightblue-50 p-1"
+                box-border rd-1 bg-lightblue-50 p-1"
             >
               <div
                 class="bg-slate-2 rd-1 text-0.8em leading-4 cursor-pointer hover:b-slate-3
-          pr-1 pl-1 active:(outline outline-2px outline-blue-2)"
+                  pr-1 pl-1 active:(outline outline-2px outline-blue-2)"
               >
                 view
               </div>
               <div
                 class="bg-red-3 rd-1 text-0.8em leading-4 cursor-pointer hover:b-red-4
-          pr-1 pl-1 active:(outline outline-2px outline-red-2)"
+                  pr-1 pl-1 active:(outline outline-2px outline-red-2)"
                 @click="searchStore.rmRecordById(i.id)"
               >
                 delete
@@ -655,43 +677,45 @@ onMounted(() => {
         </div>
       </div>
     </DefineHistroy>
-
-    <div class="flex flex-nowrap flex-col items-center c-black gap-2 box-border w-full p-0">
+    <div class="flex flex-nowrap flex-col items-center c-black gap-2 box-border w-full p-1">
       <div
         class="flex-none flex flex-nowrap justify-between items-center relative w-full
-    h-36px m-0 p-0 rd-1 b-blue-2 box-border b-2 transition-210
-    active:(outline outline-2px outline-blue-2)
-    focus-within:(outline outline-2px outline-blue-2 b-blue-4)
-    hover:b-blue-4"
+          h-36px p-0 box-border transition-210 b-(2 solid blue-4 rd-1)
+          outline-(~ transparent 2px)
+          focus-within:(outline-blue-2)"
+        tabindex="0"
       >
         <div class="pre_line" />
-
+        <input
+          class="flex-auto text-lg outline-0 b-0 rd-1 pl-1 p-0 box-border h-full bg-slate-1 hover:(bg-blue-50)"
+          placeholder="conditions"
+        >
         <div
           v-if="canSerach" class="flex justify-center items-center
-          box-border b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4 cursor-pointer
-          hover:(bg-blue-5)
-          active:(outline outline-2px outline-blue-2 bg-blue-6)" @click="search"
+            box-border b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4 cursor-pointer
+            hover:(bg-blue-5) active:(outline outline-2px outline-blue-2 bg-blue-6)"
+          @click="search"
         >
           <div class="i-twemoji-magnifying-glass-tilted-left text-2xl" />
         </div>
         <div
           v-else class="flex justify-center items-center
-          box-border b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4 cursor-pointer
-          hover:(bg-blue-5)
-          active:(outline outline-2px outline-blue-2 bg-blue-6)"
+            box-border b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4 cursor-pointer
+            hover:(bg-blue-5)
+            active:(outline outline-2px outline-blue-2 bg-blue-6)"
         >
           <div class="i-eos-icons-loading text-2xl" />
         </div>
       </div>
       <div
-        class="flex-auto flex flex-col item-start
-  w-full box-border p-0 transition-height-210"
+        class="flex-auto flex flex-col  w-full box-border p-0 transition-height-210"
         :style="{ height: `${h_filter_c + 40}px` }"
       >
         <div
           v-show="showFilter" ref="filter_c"
-          class="flex-none flex flex-col item-start box-border gap-2 relative"
+          class="flex-none flex flex-col box-border gap-2 relative"
         >
+          <modalKetcher />
           <TransitionGroup name="list">
             <div v-for="item in conditions" :key="item.id" class="box-border mr-2 p-0 ">
               <ReuseFilter :data="item" />
@@ -701,20 +725,19 @@ onMounted(() => {
         <div class="flex-none flex justify-between box-border items-center bg-slate-1 rd-5 mt-2 p-1">
           <div
             class="flex-none aspect-ratio-1 bg-slate-1 rd-50% h-6 z-1 box-border
-        flex justify-center items-center cursor-pointer b-(solid 2 blue-2 rd-50%)
-        hover:(bg-slate-2 b-blue-3)
-        active:(outline outline-2px outline-blue-2)"
+              flex justify-center items-center cursor-pointer b-(solid 2 blue-2 rd-50%)
+              hover:(bg-slate-2 b-blue-3)
+              active:(outline outline-2px outline-blue-2)"
           >
             <div class="i-iconamoon-sign-plus-bold text-xl text-blue" @click="add_condition()" />
           </div>
           <div
-            class="flex-none flex justify-end items-center box-border mr-1 gap-1
-        relative"
+            class="flex-none flex justify-end items-center box-border mr-1 gap-1 relative"
           >
             <div
               v-show="conditions.length > 0"
               class="bg-slate-2 rd-3 box-border p-1 text-0.8em leading-3.5 cursor-pointer
-        hover:(bg-slate-3) active:(outline outline-2px outline-blue-2)"
+                hover:(bg-slate-3) active:(outline outline-2px outline-blue-2)"
               @click="() => !(conditions.length > 0) ? null : showFilter = !showFilter"
             >
               {{ showFilter ? '折叠条件' : '展开条件' }}
@@ -727,7 +750,7 @@ onMounted(() => {
               <template #trigger>
                 <div
                   class="bg-slate-2 rd-3 box-border p-1 text-0.8em leading-3.5 cursor-pointer
-            hover:(bg-slate-3) active:(outline outline-2px outline-blue-2)"
+                    hover:(bg-slate-3) active:(outline outline-2px outline-blue-2)"
                   @click="randomPick"
                 >
                   历史记录
@@ -746,9 +769,9 @@ onMounted(() => {
   position: absolute;
   pointer-events: none;
   top:34px;
-  left: 11px;
+  left: 13px;
   width: 2px;
-  height: v-bind("`${h_filter_c + 20}px`");
+  height: v-bind("`${h_filter_c + 30}px`");
   background-color:#bfdbfe;
   z-index: 1;
 }

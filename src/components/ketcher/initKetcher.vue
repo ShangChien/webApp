@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Undefined } from '@vicons/carbon'
 import { NButton, NInput, NInputGroup } from 'naive-ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 const smiles = defineModel<string>('smiles')
+const mounted = ref<boolean>(false)
 const src = ref<string>()
 const refketcher = ref<HTMLIFrameElement | any>()
 const iframeWin = ref<any>(null)
@@ -34,7 +34,7 @@ function getMessage() {
   iframeWin.value.postMessage(
     {
       cmd: 'getSmiles',
-      params: Undefined,
+      params: undefined,
     },
     '*',
   )
@@ -43,10 +43,15 @@ onMounted(() => {
   src.value = 'static/ketcher/index.html'
   window.addEventListener('message', handleMessage)
   iframeWin.value = refketcher.value.contentWindow
+  mounted.value = true
   // console.log(iframeWin.value)
 })
 onBeforeUnmount(() => {
   window.removeEventListener('message', handleMessage)
+})
+defineExpose({
+  sendMessage,
+  mounted,
 })
 </script>
 

@@ -31,7 +31,7 @@ const arrayShow = computed(() => {
 </script>
 
 <template>
-  <div ref="outBox" class="b-2 rd-2 b-indigo-100 relative min-w-230px min-h-160px h-full box-border">
+  <div ref="outBox" class="b-(solid 2 indigo-100 rd-2) relative min-w-230px min-h-160px h-full box-border">
     <div class="flex-none absolute rd-2 z-2 top-0 menubg" :style="{ width: `${outBoxW}px` }">
       <div class="ma-1 title-grid">
         <div>

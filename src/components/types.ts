@@ -1,4 +1,4 @@
-import type { Component, Ref, VNode } from 'vue'
+import type { Component, InjectionKey, Ref, VNode } from 'vue'
 
 export interface molData {
   id?: number
@@ -146,3 +146,8 @@ export interface condition extends Omit<option, 'value'> {
   label_icon?: VNode | Component
   component?: Component
 }
+export const keyStateKetcher: InjectionKey<{
+  id: Ref<number>
+  showModal: Ref<boolean>
+  smiles: Ref<string>
+}> = Symbol('stateKetcher')
