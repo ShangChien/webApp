@@ -23,17 +23,7 @@ function setShowModal() {
 
 const sameId = computedEager(() => id.value === props.conditionId)
 const diffSmiles = computedEager(() => modalSmiles.value !== smiles.value)
-const needUpdate = computedEager(() => {
-  if (sameId.value && showModal.value) {
-    if (diffSmiles.value)
-      return true
-    else
-      return false
-  }
-  else {
-    return false
-  }
-})
+const needUpdate = computedEager(() => sameId.value && showModal.value && diffSmiles.value)
 watch(needUpdate, () => {
   smiles.value = modalSmiles.value
 })

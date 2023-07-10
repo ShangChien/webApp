@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import { computed, h, onMounted, provide, ref, toValue } from 'vue'
+import { computed, h, onMounted, provide, ref, toValue, watch } from 'vue'
 import type { Ref, VNodeChild } from 'vue'
 import { createReusableTemplate, useDebounceFn, useElementSize } from '@vueuse/core'
 import { useSortable } from '@vueuse/integrations/useSortable'
 import dayjs from 'dayjs'
 import { NDatePicker, NDropdown, NPopover, useMessage } from 'naive-ui'
-import axios from 'axios'
 import tags from '@/components/ketcher/tags.vue'
 import vmodelSmiles from '@/components/ketcher/vmodelSmiles.vue'
 import modalKetcher from '@/components/ketcher/modalKetcher.vue'
 import { useSearchStore } from '@/stores/searchStore'
 import { useMolStore } from '@/stores/molStore'
-import type { condition, option, pgData, pgDataItem, recordFull, records } from '@/components/types'
+import type { condition, option, pgData, pgDataItem, record } from '@/components/types'
 import { keyStateKetcher } from '@/components/types'
 
 enum logicType {
@@ -35,7 +34,7 @@ const [DefineInputNum, ReuseInputNum] = createReusableTemplate<{ data: {
   placeholder: string
   unit: string
 } }>()
-const [DefineHistroy, ReuseHistroy] = createReusableTemplate<{ data: records[] }>()
+const [DefineHistroy, ReuseHistroy] = createReusableTemplate<{ data: record[] }>()
 const message = useMessage()
 function info(type: any, content: string | (() => VNodeChild)) {
   message.create(
@@ -56,7 +55,6 @@ const filter_c = ref(null)
 const showFilter = ref<boolean>(true)
 const canSerach = ref<boolean>(true)
 const { height: h_filter_c } = useElementSize(filter_c)
-const inputText = ref('')
 // const showModal = ref(false)
 // function clearText() {
 //   inputText.value = ''
@@ -294,7 +292,7 @@ function onSelect(option: option, data: condition) {
             'smiles': data.value,
             'onUpdate:smiles': (val: string) => {
               data.value = val
-              console.log(data.value, data)
+              // console.log(data.value, data)
             },
           },
         ),
@@ -335,7 +333,7 @@ function onSelect(option: option, data: condition) {
             'smiles': data.value[2].value,
             'onUpdate:smiles': (val: string) => {
               data.value[2].value = val
-              console.log(data.value[2], data)
+              // console.log(data.value[2], data)
             },
           },
         ),
@@ -399,7 +397,6 @@ const searchField = computed<{
           value = value.map(i => toValue(i))
         else
           value = toValue(value)
-
         const currValue = { key, logic, value }
         return accumu.concat(currValue)
       }
@@ -407,52 +404,59 @@ const searchField = computed<{
     },
     [],
   )
-  if (inputText.value.length > 0) {
-    out.push({
-      key: 'smiles',
-      logic: 'and',
-      value: inputText.value,
-    })
-  }
   return out
+})
+const searchText = ref<string>('')
+watch(searchField, (newVal, _oldVal) => {
+  searchText.value = JSON.stringify(newVal)
+})
+
+const checkSearchText = computed<boolean>(() => {
+  try {
+    JSON.parse(searchText.value)
+    return true
+  }
+  catch (err) {
+    return false
+  }
 })
 
 function search() {
   console.log('query:', searchField.value)
-  if (searchField.value.some(item => ['substructure', 'similarity'].includes(item.key))
-  && !searchField.value.some(item => item.key === 'smiles')) {
-    console.log('smiles is empty!')
-    info('warning', '条件错误: 指定了结构搜索但是没有给出smiles式')
-    return undefined
-  }
-  if (searchField.value.length === 0) {
-    info('warning', '条件错误: 请添加搜索条件')
-    return undefined
-  }
-  canSerach.value = false
-  axios.post(
-    'api/search',
-    searchField.value,
-  ).then(async (res: any) => {
-    console.log('receve res:', res.data.data)
-    queryResult.value = res.data.data
-    const data4strore: recordFull | any = {
-      timestamp: dayjs().unix(),
-      length: queryResult.value.length,
-      conditions: conditions.value,
-      res: res.data.data as {
-        id: number
-        smiles: string
-        name_calc: string
-        name_mat: string
-      }[],
-    }
-    await searchStore.addRecord(data4strore)
-    canSerach.value = true
-  }).catch((error) => {
-    console.log(error)
-    canSerach.value = true
-  })
+  // if (searchField.value.some(item => ['substructure', 'similarity'].includes(item.key))
+  // && !searchField.value.some(item => item.key === 'smiles')) {
+  //   console.log('smiles is empty!')
+  //   info('warning', '条件错误: 指定了结构搜索但是没有给出smiles式')
+  //   return undefined
+  // }
+  // if (searchField.value.length === 0) {
+  //   info('warning', '条件错误: 请添加搜索条件')
+  //   return undefined
+  // }
+  // canSerach.value = false
+  // axios.post(
+  //   'api/search',
+  //   searchField.value,
+  // ).then(async (res: any) => {
+  //   console.log('receve res:', res.data.data)
+  //   queryResult.value = res.data.data
+  //   const data4strore: recordFull | any = {
+  //     timestamp: dayjs().unix(),
+  //     length: queryResult.value.length,
+  //     conditions: conditions.value,
+  //     res: res.data.data as {
+  //       id: number
+  //       smiles: string
+  //       name_calc: string
+  //       name_mat: string
+  //     }[],
+  //   }
+  //   await searchStore.addRecord(data4strore)
+  //   canSerach.value = true
+  // }).catch((error) => {
+  //   console.log(error)
+  //   canSerach.value = true
+  // })
 }
 const font = ref<string>('font-Xl-R')
 function randomPick() {
@@ -686,10 +690,18 @@ onMounted(() => {
         tabindex="0"
       >
         <div class="pre_line" />
-        <input
-          class="flex-auto text-lg outline-0 b-0 rd-1 pl-1 p-0 box-border h-full bg-slate-1 hover:(bg-blue-50)"
-          placeholder="conditions"
-        >
+        <div class="flex-auto flex flex-nowrap justify-between items-center box-border rd-1 h-full bg-slate-1 hover:(bg-blue-50)">
+          <div class="flex-none text-xl m-0.8 ">
+            <div v-if="searchText === ''" class="i-ph-android-logo-duotone bg-blue" />
+            <div v-else-if="checkSearchText" class="i-ic-twotone-check-circle bg-green" />
+            <div v-else class="i-ic-twotone-error  bg-red" />
+          </div>
+          <input
+            v-model="searchText"
+            class="flex-auto text-lg outline-0 b-0 p-0 bg-inherit"
+            placeholder="conditions"
+          >
+        </div>
         <div
           v-if="canSerach" class="flex justify-center items-center
             box-border b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4 cursor-pointer
@@ -711,11 +723,11 @@ onMounted(() => {
         class="flex-auto flex flex-col  w-full box-border p-0 transition-height-210"
         :style="{ height: `${h_filter_c + 40}px` }"
       >
+        <modalKetcher />
         <div
           v-show="showFilter" ref="filter_c"
           class="flex-none flex flex-col box-border gap-2 relative"
         >
-          <modalKetcher />
           <TransitionGroup name="list">
             <div v-for="item in conditions" :key="item.id" class="box-border mr-2 p-0 ">
               <ReuseFilter :data="item" />

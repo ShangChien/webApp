@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { clear, del, get, set } from 'idb-keyval'
-import type { recordFull, records } from '@/components/types'
+import type { record, recordFull } from '@/components/types'
 
 export const useSearchStore = defineStore('search', {
   state: () => ({
-    records: [] as records[],
+    records: [] as record[],
     nextId: 0,
   }),
   getters: {
@@ -14,7 +14,7 @@ export const useSearchStore = defineStore('search', {
         await get(id).then(res => response = res)
           .then(() => console.log(`get res ${id} success`))
           .catch(err => console.log(`get res ${id} failed! ${err}`))
-        const out = state.records.filter(mol => mol.id === id)
+        const out = state.records.find(mol => mol.id === id)
         return { ...out, res: response }
       }
     },
@@ -33,9 +33,7 @@ export const useSearchStore = defineStore('search', {
     async rmRecordById(id: number) {
       await del(id).then(() => console.log(`del res ${id} success`))
         .catch(err => console.log(`del res ${id} failed: ${err}`))
-      this.records = this.records.filter(
-        mol => mol.id !== id,
-      )
+      this.records = this.records.filter((record: record) => record.id !== id)
     },
     async clearAll() {
       await clear().then(() => console.log('clear all success'))

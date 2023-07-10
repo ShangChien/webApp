@@ -10,7 +10,8 @@ const iframeWin = ref<any>(null)
 function handleMessage(event: {
   data: { cmd: any; params: { data: null } }
 }) {
-  console.log(event)
+  // console.log(event)
+  setTimeout(() => mounted.value = true, 210)
   switch (event.data.cmd) {
     case 'postSmiles':
       smiles.value = event.data.params.data
@@ -43,7 +44,6 @@ onMounted(() => {
   src.value = 'static/ketcher/index.html'
   window.addEventListener('message', handleMessage)
   iframeWin.value = refketcher.value.contentWindow
-  mounted.value = true
   // console.log(iframeWin.value)
 })
 onBeforeUnmount(() => {
@@ -85,13 +85,16 @@ defineExpose({
         Draw
       </NButton>
     </NInputGroup>
-    <div class="flex-auto w-full ">
+    <div class="flex-auto w-full flex justify-center items-center">
       <iframe
+        v-show="mounted"
+        id="ketcher"
         ref="refketcher"
         class="w-full h-full"
         frameborder="0"
         :src="src"
       />
+      <div v-show="!mounted" class="i-svg-spinners-blocks-wave text-4xl" />
     </div>
   </div>
 </template>

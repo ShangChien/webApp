@@ -14,8 +14,8 @@ const { showModal, smiles } = inject<{
 })
 const ketcherRef = ref(null)
 watch(showModal,
-  () => {
-    if (showModal && toValue(ketcherRef.value?.mounted))
+  (newVal, _oldVal) => {
+    if (newVal && toValue(ketcherRef.value?.mounted))
       toValue(ketcherRef).sendMessage()
   }, {
     flush: 'post',

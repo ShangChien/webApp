@@ -38,13 +38,13 @@ interface electronCross {
   oscillator: number[]
 }
 
-export interface records {
+export interface record {
   id: number
   timestamp: number
   length: number
   conditions: condition[]
 }
-export interface recordFull extends records {
+export interface recordFull extends record {
   res: {
     id: number
     smiles: string
