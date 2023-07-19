@@ -15,7 +15,6 @@ function handleMessage(event: {
   switch (event.data.cmd) {
     case 'postSmiles':
       smiles.value = event.data.params.data
-      console.log(smiles.value)
       break
   }
 }
@@ -94,7 +93,7 @@ defineExpose({
         frameborder="0"
         :src="src"
       />
-      <div v-show="!mounted" class="i-svg-spinners-blocks-wave text-4xl" />
+      <div v-show="!mounted" class="i-svg-spinners-blocks-wave text-4xl bg-blue-3" />
     </div>
   </div>
 </template>

@@ -69,8 +69,7 @@ const pageProvider: any = (pageNumber: number, pageSize: number) => (
         ),
         100,
       )
-    }
-    else {
+    } else {
       setTimeout(
         () => resolve(
           resultData.value?.data.message.slice(

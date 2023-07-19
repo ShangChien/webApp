@@ -4,7 +4,10 @@
   "rules": {
     "max-statements-per-line":"off",
     "no-console": "off",
+    "curly": "off",
     "vue/no-unused-vars": ["error", {"ignorePattern": "^_"}],
+    "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
+    "@typescript-eslint/brace-style": ["error", "1tbs", { "allowSingleLine": true }],
     "no-restricted-syntax": [
         "error",
         {

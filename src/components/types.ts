@@ -33,10 +33,6 @@ export interface enumData {
     connect2index: number[]
   }
 }
-interface electronCross {
-  energy: number[]
-  oscillator: number[]
-}
 
 export interface record {
   id: number
@@ -57,9 +53,13 @@ export interface pgData {
   id: number
   smiles: string
 }
+interface electronCross {
+  energy: number[]
+  oscillator: number[]
+}
 export interface pgDataItem {
   id?: number
-  timestamp?: number
+  timestamp?: number | string
   name_calc?: string
   name_mat?: string
   smiles?: string
@@ -76,10 +76,14 @@ export interface pgDataItem {
   homo?: number
   lumo?: number
   eg?: number
-  polar?: number
   energy?: number
   sfp?: any
   bfp?: any
+  polar?: {
+    iso?: number
+    aniso?: number
+    polarizability?: number[]
+  }
   dirpath?: {
     ground?: string
     udft?: string
@@ -93,7 +97,7 @@ export interface pgDataItem {
     enthalpy?: number
     gibbsFreeEnergy?: number
   }
-  structure?: {
+  structures?: {
     ground?: string
     udft?: string
     tdft?: string
@@ -151,3 +155,4 @@ export const keyStateKetcher: InjectionKey<{
   showModal: Ref<boolean>
   smiles: Ref<string>
 }> = Symbol('stateKetcher')
+export const keyMolDetail: InjectionKey<{ result: Ref<pgDataItem>; searchState: Ref<number> }> = Symbol('molDetial')

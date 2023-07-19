@@ -20,13 +20,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="viewport" class="nglView" />
+  <div ref="viewport" class="aspect-ratio-square w-full b-(solid 2 indigo-100 rd-1)" />
 </template>
 
 <style>
-.nglView {
-  width: 400px;
-  height: 50vh;
-  position: relative;
-}
 </style>

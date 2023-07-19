@@ -11,15 +11,28 @@ import {
   NTag,
 } from 'naive-ui'
 import { useClipboard } from '@vueuse/core'
+import axios from 'axios'
 import { Dots } from '@vicons/tabler'
 import { CopyFile, Delete, Edit } from '@vicons/carbon'
+import { useRoute } from 'vue-router'
 import svgRdkit from '@/components/rdkitComponent/svgRdkit.vue'
 import { useCopy } from '@/components/rdkitComponent/composable/useCopy'
-import type { pgDataItem } from '@/components/types'
+import type { molData, pgDataItem } from '@/components/types'
 import { useEnumStore } from '@/stores/enumStore'
+import { keyMolDetail } from '@/components/types'
 
-const props = defineProps<pgDataItem>()
+interface extraMolData extends molData {
+  // eslint-disable-next-line vue/prop-name-casing
+  name_calc?: string
+  // eslint-disable-next-line vue/prop-name-casing
+  name_mat?: string
+}
+const props = defineProps<extraMolData>()
 const _emit = defineEmits(['itemChecked'])
+
+const route = useRoute()
+const molDetail = inject<{ result: Ref<pgDataItem>; searchState: Ref<number> }>(keyMolDetail)
+
 const currentEdit: Ref<{ id: number;state: number }> = inject('currentEdit')
 const enumStore = useEnumStore()
 const editState = computed(() => {
@@ -35,18 +48,16 @@ const editState = computed(() => {
 
 // 可视加载组件
 const checked = ref(false)
-const cardView = ref()
+const cardView = ref(null)
 const target = ref(null)
 
 const { copy } = useClipboard()
 const _copytext = ref<string>(props.smiles)
 
 function renderIcon(icon: Component) {
-  return () => {
-    return h(NIcon, null, {
-      default: () => h(icon),
-    })
-  }
+  return () => h(NIcon, null, {
+    default: () => h(icon),
+  })
 }
 const options = [
   { label: 'edit', key: 'edit', icon: renderIcon(Edit) },
@@ -74,18 +85,42 @@ function handleDropOption(key: string) {
       console.log('no option matched ')
   }
 }
+function search(id: number) {
+  molDetail.searchState.value = 1 // searching
+  axios.post(
+    'api/molDetail',
+    { data: id },
+  ).then(async (res: any) => {
+    molDetail.result.value = res.data.data
+    console.log(res.data.data)
+    if (res.data.data)
+      molDetail.searchState.value = 2 // search success
+    else
+      molDetail.searchState.value = 3 // search no found
+  }).catch((error) => {
+    console.log(error)
+    molDetail.searchState.value = 4 // search fail
+  })
+}
+
 function quickView() {
   if (currentEdit.value.id !== props.id) {
     currentEdit.value.id = props.id
     currentEdit.value.state = 1
     console.log('preview', editState.value)
-  }
-  else {
+    if (route.name === 'molStore')
+      search(props.id)
+  } else {
     currentEdit.value.id = 0
     currentEdit.value.state = 0
     console.log('exit preview')
+    if (route.name === 'molStore') {
+      molDetail.result.value = {}
+      molDetail.searchState.value = 0 // reset
+    }
   }
 }
+
 onMounted(() => {
   // console.log(props);
 })

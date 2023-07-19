@@ -36,7 +36,7 @@ onMounted(() => {
 })
 watch(
   [ligands, cores],
-  (n, o) => {
+  (_n, _o) => {
     // console.log('old: ',o)
     // console.log('new: ',n)
   },
@@ -69,7 +69,7 @@ watch(
       </template>
       <template #default>
         <site-selcet :id="currentEdit.id" />
-        <div class="b-2 rd-2 b-indigo-100 mt--3 step ">
+        <div class="b-2 b-(solid 2 indigo-100 rd-2) mt--3 step ">
           <div class="bg-gray-50 m-2 rd-1.5">
             <NSteps v-model:current="currentStep" class="ma-2 p-2  ">
               <NStep title="配体" description="标记配体位点和分类" />

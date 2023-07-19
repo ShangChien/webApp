@@ -9,7 +9,7 @@ const visiable = ref(false)
 </script>
 
 <template>
-  <div>
+  <div class="flex-(~ justify-center items-center)">
     <div class="i-fluent-emoji-flat-artist-palette text-3xl mb-1" />
     <div class="text-xl inline-block ml-1 ma-1">
       :
@@ -22,7 +22,7 @@ const visiable = ref(false)
           @click="visiable = !visiable"
         />
       </template>
-      <div class="p-0 m--2 mb--1" @click="visiable = !visiable">
+      <div class="p-0 m--2 mb--1 flex-(~ justify-center items-center)" @click="visiable = !visiable">
         <div
           v-for="option in options"
           :key="option.value"

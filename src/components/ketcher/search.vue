@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { computed, h, onMounted, provide, ref, toValue, watch } from 'vue'
 import type { Ref, VNodeChild } from 'vue'
-import { createReusableTemplate, useDebounceFn, useElementSize } from '@vueuse/core'
+import { computedEager, createReusableTemplate, useDebounceFn, useElementSize } from '@vueuse/core'
 import { useSortable } from '@vueuse/integrations/useSortable'
 import dayjs from 'dayjs'
+import axios from 'axios'
 import { NDatePicker, NDropdown, NPopover, useMessage } from 'naive-ui'
 import tags from '@/components/ketcher/tags.vue'
 import vmodelSmiles from '@/components/ketcher/vmodelSmiles.vue'
 import modalKetcher from '@/components/ketcher/modalKetcher.vue'
 import { useSearchStore } from '@/stores/searchStore'
 import { useMolStore } from '@/stores/molStore'
-import type { condition, option, pgData, pgDataItem, record } from '@/components/types'
+import type { condition, option, pgData, pgDataItem, record, recordFull } from '@/components/types'
 import { keyStateKetcher } from '@/components/types'
 
 enum logicType {
@@ -22,7 +23,7 @@ enum logicType {
 const ketcher = { id: ref(0), showModal: ref(false), smiles: ref('') }
 provide(keyStateKetcher, ketcher)
 
-const queryResult = defineModel<pgDataItem[] | pgData[]>()
+const queryResult = defineModel<pgDataItem[] | pgData[]>('queryResult')
 const [DefineFilter, ReuseFilter] = createReusableTemplate<{ data: condition }>()
 const [DefineTime, ReuseTime] = createReusableTemplate<{ data: {
   value: Ref<number>
@@ -53,7 +54,7 @@ const searchStore = useSearchStore()
 // const input = ref(null)
 const filter_c = ref(null)
 const showFilter = ref<boolean>(true)
-const canSerach = ref<boolean>(true)
+const serachProcessing = ref<boolean>(false)
 const { height: h_filter_c } = useElementSize(filter_c)
 // const showModal = ref(false)
 // function clearText() {
@@ -174,10 +175,8 @@ async function del_condition(id: number) {
   const index = await Promise.resolve(conditions.value.findIndex(el => el.id === id))
   if (index !== -1)
     conditions.value.splice(index, 1)
-
   else
     console.log(id, 'not found,internal error!')
-
   // console.log('delete',conditions.value)
 }
 //
@@ -236,8 +235,7 @@ function onSelect(option: option, data: condition) {
         },
       })],
     )
-  }
-  else if (option.key === 'labels') {
+  } else if (option.key === 'labels') {
     data.type = 'tag'
     const store = useMolStore()
     const labels = computed(() => store.getAllLabels)
@@ -250,8 +248,7 @@ function onSelect(option: option, data: condition) {
         'onUpdate:selected': (val: string[]) => { data.value = val },
       },
     )
-  }
-  else if (option.key === 'types') {
+  } else if (option.key === 'types') {
     data.type = 'tag'
     const labels = option.items.map(e => e.key)
     data.value = []
@@ -263,10 +260,9 @@ function onSelect(option: option, data: condition) {
         'onUpdate:selected': (val: string[]) => { data.value = val },
       },
     )
-  }
-  else if (option.key === 'substructure') {
-    data.value = ''
-    data.type = '>'
+  } else if (option.key === 'substructure') {
+    data.value = [ref('>'), ref('')]
+    data.type = 'subs'
     data.component = () => h(
       'div',
       { class: 'flex items-center justify-start gap-2 rd-1 h-24px mx-1 w-full' },
@@ -276,10 +272,10 @@ function onSelect(option: option, data: condition) {
           { class: 'flex-(~ basis-30% shrink-1 grow-1) items-center justify-center gap-2' },
           ['<', '=', '>'].map((item, index) => h('div',
             {
-              class: [data.type === item ? 'bg-blue-3' : '',
+              class: [data.value[0].value === item ? 'bg-blue-3' : '',
                 'bg-blue-1 text-blue-9 text-xl flex items-center justify-center h-22px w-22px box-border rd-1 cursor-pointer hover:(bg-blue-2)'],
               key: index,
-              onClick: () => { data.type = item },
+              onClick: () => { data.value[0].value = item },
             },
             item,
           ),
@@ -289,18 +285,17 @@ function onSelect(option: option, data: condition) {
           {
             'class': 'flex-(~ basis-60% shrink-1 grow-1)',
             'conditionId': data.id,
-            'smiles': data.value,
+            'smiles': data.value[1].value,
             'onUpdate:smiles': (val: string) => {
-              data.value = val
+              data.value[1].value = val
               // console.log(data.value, data)
             },
           },
         ),
       ],
     )
-  }
-  else if (option.key === 'similarity') {
-    data.value = [ref<number>(), ref<number>(), ref<string>('')]
+  } else if (option.key === 'similarity') {
+    data.value = [ref<number>(0), ref<number>(100), ref<string>('')]
     data.type = 'interval'
     data.component = () => h(
       'div',
@@ -339,10 +334,9 @@ function onSelect(option: option, data: condition) {
         ),
       ],
     )
-  }
-  else if (['mw', 'homo', 'lumo', 'eg', 'polar', 'transport'].includes(option.key)) {
+  } else if (['mw', 'homo', 'lumo', 'eg', 'polar', 'transport'].includes(option.key)) {
     data.type = 'interval'
-    data.value = [ref<number>(), ref<number>()]
+    data.value = [ref<number>(0), ref<number>(1)]
     data.component = () => h(
       'div',
       { class: 'flex-auto flex justify-start items-center mx-1' },
@@ -362,8 +356,7 @@ function onSelect(option: option, data: condition) {
         },
       })],
     )
-  }
-  else if (['name_mat', 'name_calc'].includes(option.key)) {
+  } else if (['name_mat', 'name_calc'].includes(option.key)) {
     data.value = ref('')
     data.valueFormat = computed<string>({
       get() {
@@ -378,12 +371,43 @@ function onSelect(option: option, data: condition) {
       value: data.valueFormat,
       onInput: (e: any) => { data.valueFormat = e.target.value },
     })
-  }
-  else {
+  } else {
     // todo
   }
 }
 
+const searchText = ref<string>('')
+const failureCheckReason = ref<string>('')
+const checkSearchText = computedEager<boolean>(() => {
+  try {
+    const check = ref<boolean>(true)
+    const feild = JSON.parse(searchText.value)
+    if (feild !== '' && feild.length > 0) {
+      feild.forEach(({ value }: condition) => {
+        console.log(value)
+        if (value === '') {
+          check.value = false
+          failureCheckReason.value = 'value值为空'
+        } else if (Array.isArray(value)) {
+          if (value.length === 0) {
+            check.value = false
+            failureCheckReason.value = 'value值为列表, 但是长度为0'
+          } else if (value.some(v => ['', null, undefined].includes(v))) {
+            check.value = false
+            failureCheckReason.value = 'value值为列表, 有非法元素（空值, null, undefined)'
+          }
+        }
+      })
+    } else {
+      check.value = false
+      failureCheckReason.value = '尚未添加条件'
+    }
+    return check.value
+  } catch (err) {
+    failureCheckReason.value = '小问题: Fail to parse search feild!'
+    return false
+  }
+})
 const searchField = computed<{
   key: string
   logic: string
@@ -406,57 +430,35 @@ const searchField = computed<{
   )
   return out
 })
-const searchText = ref<string>('')
 watch(searchField, (newVal, _oldVal) => {
-  searchText.value = JSON.stringify(newVal)
-})
-
-const checkSearchText = computed<boolean>(() => {
-  try {
-    JSON.parse(searchText.value)
-    return true
-  }
-  catch (err) {
-    return false
-  }
+  searchText.value = newVal.length > 0 ? JSON.stringify(newVal) : ''
 })
 
 function search() {
-  console.log('query:', searchField.value)
-  // if (searchField.value.some(item => ['substructure', 'similarity'].includes(item.key))
-  // && !searchField.value.some(item => item.key === 'smiles')) {
-  //   console.log('smiles is empty!')
-  //   info('warning', '条件错误: 指定了结构搜索但是没有给出smiles式')
-  //   return undefined
-  // }
-  // if (searchField.value.length === 0) {
-  //   info('warning', '条件错误: 请添加搜索条件')
-  //   return undefined
-  // }
-  // canSerach.value = false
-  // axios.post(
-  //   'api/search',
-  //   searchField.value,
-  // ).then(async (res: any) => {
-  //   console.log('receve res:', res.data.data)
-  //   queryResult.value = res.data.data
-  //   const data4strore: recordFull | any = {
-  //     timestamp: dayjs().unix(),
-  //     length: queryResult.value.length,
-  //     conditions: conditions.value,
-  //     res: res.data.data as {
-  //       id: number
-  //       smiles: string
-  //       name_calc: string
-  //       name_mat: string
-  //     }[],
-  //   }
-  //   await searchStore.addRecord(data4strore)
-  //   canSerach.value = true
-  // }).catch((error) => {
-  //   console.log(error)
-  //   canSerach.value = true
-  // })
+  serachProcessing.value = true
+  axios.post(
+    'api/search',
+    searchField.value,
+  ).then(async (res: any) => {
+    queryResult.value = res.data.data
+    console.log('receve res:', res.data.data.length)
+    const data4strore: recordFull | any = {
+      timestamp: dayjs().unix(),
+      length: queryResult.value.length,
+      conditions: conditions.value,
+      res: res.data.data as {
+        id: number
+        smiles: string
+        name_calc: string
+        name_mat: string
+      }[],
+    }
+    await searchStore.addRecord(data4strore)
+    serachProcessing.value = false
+  }).catch((error) => {
+    console.log(error)
+    serachProcessing.value = false
+  })
 }
 const font = ref<string>('font-Xl-R')
 function randomPick() {
@@ -703,20 +705,28 @@ onMounted(() => {
           >
         </div>
         <div
-          v-if="canSerach" class="flex justify-center items-center
-            box-border b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4 cursor-pointer
-            hover:(bg-blue-5) active:(outline outline-2px outline-blue-2 bg-blue-6)"
-          @click="search"
-        >
-          <div class="i-twemoji-magnifying-glass-tilted-left text-2xl" />
-        </div>
-        <div
-          v-else class="flex justify-center items-center
+          v-if="serachProcessing" class="flex justify-center items-center
             box-border b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4 cursor-pointer
             hover:(bg-blue-5)
             active:(outline outline-2px outline-blue-2 bg-blue-6)"
         >
           <div class="i-eos-icons-loading text-2xl" />
+        </div>
+        <div
+          v-else-if="!checkSearchText && searchText !== ''" class="flex justify-center items-center
+            box-border b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4 cursor-pointer
+            hover:(bg-blue-5) active:(outline outline-2px outline-blue-2 bg-blue-6)"
+          @click="info('warning', failureCheckReason)"
+        >
+          <div class="i-fluent-chat-bubbles-question-32-filled text-2xl bg-amber-300" />
+        </div>
+        <div
+          v-else class="flex justify-center items-center
+            box-border b-0 m--0.5 rd-r-1 p-1.5 pl-2 pr-2 bg-blue-4 cursor-pointer
+            hover:(bg-blue-5) active:(outline outline-2px outline-blue-2 bg-blue-6)"
+          @click="search"
+        >
+          <div class="i-twemoji-magnifying-glass-tilted-left text-2xl" />
         </div>
       </div>
       <div

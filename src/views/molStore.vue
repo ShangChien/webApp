@@ -1,71 +1,57 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
-import { createReusableTemplate, useElementBounding } from '@vueuse/core'
+import { onMounted, provide, ref } from 'vue'
+import { NScrollbar } from 'naive-ui'
 import search from '@/components/ketcher/search.vue'
-import { useMolStore } from '@/stores/molStore'
-import { useSearchStore } from '@/stores/searchStore'
 import type { pgDataItem } from '@/components/types'
+import { keyMolDetail } from '@/components/types'
 import gridPage from '@/components/rdkitComponent/gridPage.vue'
+import molDetail from '@/components/rdkitComponent/molDetail.vue'
 
-interface dataPick {
-  items: string[]
-  selected: string[]
-  expend: boolean
-  enabled: boolean
-}
 const mounted = ref<boolean>(false)
-const angle = ref(0)
-const el_label = ref(null)
-const { height: labels_h, right: labels_r } = useElementBounding(el_label)
-const showExpand = computed(() => {
-  return !!(el_label.value?.lastElementChild.getBoundingClientRect().right > labels_r.value
-    || labels_h.value > 32)
-})
-const [DefineTag, ReuseTag] = createReusableTemplate<{ label: string }>()
-const store = useMolStore()
-const searchStore = useSearchStore()
-const labels = computed(() => store.getAllLabels)
-const types = ['all', 'molecule', 'ligand', 'core']
-const dataLabels: dataPick = reactive({ items: labels, selected: [], expend: false, enabled: false })
-const dataTypes: dataPick = reactive({ items: types, selected: ['all'], expend: false, enabled: false })
-const mols4view = computed(() => {
-  return store.getByTypesAndLabels(dataTypes.selected, dataLabels.selected)
-})
-
-async function select_all_or_none(data: dataPick) {
-  const len = await Promise.resolve(data.items.length)
-  if (len !== 0)
-    data.selected = (data.selected.length !== 0) ? [] : [...data.items]
-
-  else
-    console.log('data items length', data.selected.length)
-}
-async function reverse(data: dataPick) {
-  // 翻转icon
-  angle.value = (angle.value === 0) ? 180 : 0
-  const arr = await Promise.resolve(data.items)
-  data.selected = arr.filter(item => !data.selected.includes(item))
-}
 
 const result = ref<pgDataItem[]>([])
 
+const molDetailData = { result: ref({}), searchState: ref(0) }
+provide(keyMolDetail, molDetailData)
 onMounted(() => {
   mounted.value = true
 })
 </script>
 
 <template>
-  <div class="flex flex-nowrap items-center justify-center relative box-border">
-    <div class="w-60% flex-auto flex flex-col flex-nowrap items-center justify-start box-border gap-5px">
-      <div class="w-full flex-none">
-        <search v-model="result" />
+  <div class="flex flex-nowrap items-start justify-center relative box-border gap-5px h-full">
+    <div class="w-60% flex-auto flex flex-col flex-nowrap items-center justify-start box-border gap-5px max-h-90vh relative">
+      <div class="w-full flex-none h-full">
+        <search v-model:queryResult="result" />
       </div>
       <div class="w-full flex-auto box-border">
-        <grid-page :mol-list="result" :cols="6" :rows="9" class="w-full h-90vh" />
+        <grid-page :mol-list="result" :cols="6" :rows="9" class="w-full h-79vh" />
       </div>
     </div>
-    <div class="w-40% flex-auto">
-      <div v-for="(item, index) in searchStore.$state.records" :key="index" />
+    <div class="w-40% flex-auto box-border b-(solid 2 indigo-100 rd-2) ">
+      <NScrollbar :style="{ maxHeight: '89.5vh' }">
+        <div v-if="molDetailData.searchState.value === 0" class="flex-(~ col) justify-center items-center box-border h-89vh">
+          <div class="i-simple-icons-mcdonalds text-4xl bg-amber-300 text-4xl m-5" />
+          <div>double-click target to get detail info</div>
+        </div>
+        <div v-if="molDetailData.searchState.value === 1" class="flex-(~ col) justify-center items-center box-border h-89vh">
+          <div class="i-noto-hamburger animate-bounce-alt animate-count-infinite animate-duration-1.5s text-4xl" />
+          <div>processing...</div>
+        </div>
+        <div v-if="molDetailData.searchState.value === 2" class="h-full p-1 box-border ">
+          <molDetail v-bind="molDetailData.result.value" />
+        </div>
+        <div v-if="molDetailData.searchState.value === 3" class="flex-(~ col) justify-center items-center box-border h-89vh">
+          <div class="i-fxemoji-expressionless text-4xl m-5" />
+          <div>no found</div>
+        </div>
+        <div v-if="molDetailData.searchState.value === 4" class="flex-(~ col) justify-center items-center  box-border h-89vh">
+          <div class="i-twemoji-sad-but-relieved-face text-4xl m-5" />
+          <div>SORRY: Error occurred! </div>
+          <div>Please repeat the operation again,</div>
+          <div>Or report to developer</div>
+        </div>
+      </NScrollbar>
     </div>
   </div>
 </template>
@@ -79,5 +65,25 @@ onMounted(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+.MCD {
+  animation: rotate 3s linear infinite
+}
+@keyframes rotate {
+  0% {
+      transform: rotateY(0);
+  }
+  25% {
+      transform: rotateY(30deg);
+  }
+  50% {
+      transform: rotateY(90deg);
+  }
+  75% {
+      transform: rotateY(150deg);
+  }
+  100% {
+      transform: rotateY(180deg);
+  }
 }
 </style>

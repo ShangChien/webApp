@@ -2,7 +2,7 @@
 import { computed, h, inject, ref, watch } from 'vue'
 import type { CSSProperties, ComputedRef, Ref, VNode } from 'vue'
 import type { TreeOption } from 'naive-ui'
-import { NSpace, NSwitch, NTree } from 'naive-ui'
+import { NSwitch, NTree } from 'naive-ui'
 import { Pane, Splitpanes } from 'splitpanes'
 import { useMouseInElement } from '@vueuse/core'
 import gridPage from '@/components/rdkitComponent/gridPage.vue'
@@ -135,10 +135,10 @@ defineExpose({ gridData })
 </script>
 
 <template>
-  <Splitpanes class="pt-1 splitpanes " style="background-color: #ffffff">
+  <Splitpanes class="pt-1 h-80vh splitpanes " style="background-color: #ffffff">
     <Pane size="15" min-size="11">
-      <div ref="siderBox" class="b-2 rd-2 b-indigo-100 min-w-180px h-70vh">
-        <NSpace justify="space-between" class="p-1">
+      <div ref="siderBox" class="b-(solid 2 indigo-100 rd-2) flex-(~ col) justify-center items-stretch min-w-180px h-70vh box-border">
+        <div class="flex-none flex justify-between items-center p-1 ">
           <NSwitch
             v-model:value="checkStrategy"
             size="medium"
@@ -161,23 +161,23 @@ defineExpose({ gridData })
               <div class="i-fluent-emoji-flat-label text-2xl" />
             </template>
           </NSwitch>
-          <div v-show="!isOutside" class="grid grid-cols-4 ">
-            <div class="text-center rd-1 w-5 hover:(bg-gray-200 cursor-pointer)">
+          <div v-show="!isOutside" class="flex justify-end items-center gap-0.5">
+            <div class="text-center rd-1 p-0.4 hover:(bg-gray-200 cursor-pointer)">
               <div class="i-codicon-new-file text-4" />
             </div>
-            <div class="text-center rd-1 w-5 hover:(bg-gray-200 cursor-pointer)">
+            <div class="text-center rd-1 p-0.4 hover:(bg-gray-200 cursor-pointer)">
               <div class="i-codicon-new-folder text-4" />
             </div>
-            <div class="text-center rd-1 w-5 hover:(bg-gray-200 cursor-pointer)">
+            <div class="text-center rd-1 p-0.4 hover:(bg-gray-200 cursor-pointer)">
               <div class="i-codicon-refresh text-4" />
             </div>
-            <div class="text-center rd-1 w-5 hover:(bg-gray-200 cursor-pointer)" @click="expandedKeys = []">
+            <div class="text-center rd-1 p-0.4 hover:(bg-gray-200 cursor-pointer)" @click="expandedKeys = []">
               <div class="i-codicon-collapse-all text-4" />
             </div>
           </div>
-        </NSpace>
+        </div>
         <NTree
-          class="h-full"
+          class="flex-auto"
           :block-line="true" :block-node="true"
           :data="siderData"
           :expanded-keys="expandedKeys"
@@ -195,10 +195,8 @@ defineExpose({ gridData })
       <grid-page v-if="gridData" class="h-70vh" :mol-list="gridData" :cols="6" :rows="3" :max-h="70" />
     </Pane>
     <Pane size="25" min-size="10">
-      <div class="w-full h-full text-center">
-        <div class="v-mid leading-700px">
-          <div class="i-vscode-icons-file-type-flareact text-5xl" />
-        </div>
+      <div class="flex justify-center items-center h-70vh">
+        <div class="i-vscode-icons-file-type-flareact text-5xl" />
       </div>
     </Pane>
   </Splitpanes>
