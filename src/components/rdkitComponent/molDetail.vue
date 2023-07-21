@@ -20,8 +20,7 @@ const nglViewer = defineAsyncComponent({
   timeout: 3000,
   suspensible: false,
 })
-
-const data = { ...props }
+const sortOrder = ['structures', 'id', 'timestamp', 'name_calc', 'name_mat', 'smiles', 'functional', 'basisset', 'charge', 'spinmultiplicity', 'numberbasisfunc', 'elections', 'ispcm', 'isspin', 'stationarytype', 'extrainfo', 'homo', 'lumo', 'eg', 'energy', 'sfp', 'bfp', 'polar', 'dirpath', 'corrections', 'spectrum', 'uv', 'uv_low', 'iso', 'aniso', 'polarizability', 'ground', 'udft', 'tdft', 'polar', 'zeroPoint', 'energy', 'enthalpy', 'gibbsFreeEnergy', 's0_s1', 's0_t1', 'oscillator']
 
 function isLeaf(obj: any): boolean {
   return typeof obj !== 'object' || obj === null || Array.isArray(obj)
@@ -37,20 +36,34 @@ function leafDom(v: number[] | string | number | null) {
     return h('div', { class: '' }, v.join(', '))
   }
 }
-// C1C=C(C2C=C(C3C=CC=CC=3)C(C3C=CC(C4C=CC=CC=4)=CC=3)=C(C3C=CC=CC=3)C=2)C=CC=1
+// C1C=CC=C(C2C(C3C=CC=CC=3)=C(C3C=CC=CC=3)C(C3C=CC=CC=3)=CC=2)C=1
 function convert2Dom(k: string, v: any): VNode | (() => VNode) {
   return h(
     'div',
-    { class: 'flex items-center justify-start gap-0.5 bg-indigo-1 box-border w-full' },
+    { class: 'flex items-center justify-start gap-0.5 bg-indigo-1 box-border w-full rd-1' },
     [h('div', { class: 'flex-none rd-1 p-1' }, `${k}: `),
-      h('div', { class: 'flex-auto break-all rd-1 bg-fuchsia-1 m-0.3 p-1' }, leafDom(v) || h('div', { class: 'i-fluent-emoji-flat-japanese-free-of-charge-button text-xl' }))],
+      h('div', { class: 'flex-auto break-all rd-1 bg-fuchsia-1 m-0.3 p-1 box-border' }, leafDom(v) || h('div', { class: 'i-fluent-emoji-flat-japanese-free-of-charge-button text-xl' }))],
   )
 }
 function renderItems(obj: any): VNode | (() => VNode) {
+  const sortedKeys = Object.keys(obj).sort((a, b) => {
+    const indexA = sortOrder.indexOf(a)
+    const indexB = sortOrder.indexOf(b)
+    // 如果 a 在 sortOrder 中的索引小于 b，则 a 应该排在 b 前面
+    if (indexA < indexB) {
+      return -1
+    }
+    // 如果 a 在 sortOrder 中的索引大于 b，则 a 应该排在 b 后面
+    if (indexA > indexB) {
+      return 1
+    }
+    // 如果 a 和 b 在 sortOrder 中的索引相同，则它们的顺序不变
+    return 0
+  })
   return h(
     'div',
     { class: 'flex-(~ col nowrap) items-start justify-start gap-1 w-full' },
-    Object.keys(obj).map((k) => {
+    sortedKeys.map((k) => {
       if (isLeaf(obj[k])) {
         return h(convert2Dom(k, obj[k]))
       } else {
@@ -66,7 +79,7 @@ function renderItems(obj: any): VNode | (() => VNode) {
 </script>
 
 <template>
-  <component :is="renderItems(data)" />
+  <component :is="renderItems(props)" />
 </template>
 
 <style>

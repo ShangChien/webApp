@@ -11,9 +11,10 @@ export const useSearchStore = defineStore('search', {
     getById(state) {
       return async (id: number) => {
         let response: { id: number; smiles: string }[]
-        await get(id).then(res => response = res)
-          .then(() => console.log(`get res ${id} success`))
-          .catch(err => console.log(`get res ${id} failed! ${err}`))
+        await get(id).then((res) => {
+          response = res
+          console.log(`get res ${id} success`)
+        }).catch(err => console.log(`get res ${id} failed! ${err}`))
         const out = state.records.find(mol => mol.id === id)
         return { ...out, res: response }
       }
@@ -21,8 +22,9 @@ export const useSearchStore = defineStore('search', {
   },
   actions: {
     async addRecord(x: recordFull) {
+      this.nextId++
       this.records.push({
-        id: this.nextId++,
+        id: this.nextId,
         timestamp: x.timestamp,
         conditions: x.conditions,
         length: x.res.length,
@@ -39,6 +41,7 @@ export const useSearchStore = defineStore('search', {
       await clear().then(() => console.log('clear all success'))
         .catch(err => console.log(`clear all failed: ${err}`))
       this.records = []
+      this.nextId = 0
     },
   },
 })

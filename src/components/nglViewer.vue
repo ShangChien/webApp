@@ -1,33 +1,42 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import * as NGL from 'ngl/dist/ngl.js'
+import { useElementHover } from '@vueuse/core'
 
 const props = defineProps<{ data: string }>()
+const stringBlob = new Blob([props.data], { type: 'text/plain' })
 const viewport = ref(null)
+const unwatch = ref(null)
+const isHovered = useElementHover(viewport)
 function initViewer(viewport: any) {
   const stage = new NGL.Stage(viewport, { backgroundColor: 'white' })
-  const stringBlob = new Blob([props.data], { type: 'text/plain' })
-  stage.loadFile(stringBlob, { ext: 'sdf' }).then((o: any) => {
+  return stage
+}
+onMounted(() => {
+  const viewer = initViewer(viewport.value)
+  viewer.loadFile(stringBlob, { ext: 'sdf' }).then((o: any) => {
     o.addRepresentation('licorice')
     o.stage.setSpin(true)
     o.autoView()
     // 悬停事件
   })
-  stage.signals.hovered.add((pickingProxy) => {
-    if (pickingProxy) {
-      stage.setSpin(false)
-    } else {
-      stage.setSpin(true)
-    }
-  })
-}
-onMounted(() => {
-  initViewer(viewport.value)
+  unwatch.value = watch(isHovered,
+    () => {
+      if (isHovered.value) {
+        viewer.setSpin(false)
+      } else {
+        viewer.setSpin(true)
+      }
+    },
+  )
+})
+onUnmounted(() => {
+  unwatch.value()
 })
 </script>
 
 <template>
-  <div ref="viewport" class="aspect-ratio-square w-full b-(solid 2 indigo-100 rd-1)" />
+  <div ref="viewport" class="aspect-ratio-square w-full m-0 p-0 box-border rd-1" />
 </template>
 
 <style>

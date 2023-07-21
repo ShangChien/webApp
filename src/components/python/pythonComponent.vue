@@ -37,8 +37,7 @@ async function init() {
 import numpy as np
 print('python.version:', sys.version)
 print('numpy.version:', np.__version__)`)
-  }
-  else {
+  } else {
     py.value = null
     console.log('python env destroyed')
   }
@@ -93,7 +92,6 @@ watchDebounced(
           </div>
         </div>
         <div :key="renderKey" v-eslint-disable class="pt-0 m-1 mt-0 flex-auto">
-          <!-- @ts-ignore -->
           <MonacoEditor
             v-model:value="codeStr"
             :options="options"

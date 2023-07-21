@@ -29,9 +29,9 @@ onMounted(() => {
       </div>
     </div>
     <div class="w-40% flex-auto box-border b-(solid 2 indigo-100 rd-2) ">
-      <NScrollbar :style="{ maxHeight: '89.5vh' }">
+      <NScrollbar :style="{ maxHeight: '89vh' }">
         <div v-if="molDetailData.searchState.value === 0" class="flex-(~ col) justify-center items-center box-border h-89vh">
-          <div class="i-simple-icons-mcdonalds text-4xl bg-amber-300 text-4xl m-5" />
+          <div class="i-fluent-emoji-flat-ghost text-4xl text-4xl m-5" />
           <div>double-click target to get detail info</div>
         </div>
         <div v-if="molDetailData.searchState.value === 1" class="flex-(~ col) justify-center items-center box-border h-89vh">

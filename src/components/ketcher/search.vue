@@ -441,24 +441,31 @@ function search() {
     searchField.value,
   ).then(async (res: any) => {
     queryResult.value = res.data.data
-    console.log('receve res:', res.data.data.length)
-    const data4strore: recordFull | any = {
-      timestamp: dayjs().unix(),
-      length: queryResult.value.length,
-      conditions: conditions.value,
-      res: res.data.data as {
-        id: number
-        smiles: string
-        name_calc: string
-        name_mat: string
-      }[],
+    const len = res.data.data.length
+    console.log('receve res:', res.data.data)
+    if (len > 0) {
+      const data4strore: recordFull | any = {
+        timestamp: dayjs().unix(),
+        length: len,
+        conditions: conditions.value,
+        res: res.data.data as {
+          id: number
+          smiles: string
+          name_calc: string
+          name_mat: string
+        }[],
+      }
+      await searchStore.addRecord(data4strore)
     }
-    await searchStore.addRecord(data4strore)
     serachProcessing.value = false
   }).catch((error) => {
     console.log(error)
     serachProcessing.value = false
   })
+}
+async function viewSearch(id: number) {
+  const { res } = await searchStore.getById(id)
+  queryResult.value = res
 }
 const font = ref<string>('font-Xl-R')
 function randomPick() {
@@ -653,7 +660,7 @@ onMounted(() => {
             class="flex-none flex flex-nowrap items-center justify-between box-border w-full p-1"
           >
             <div class="flex-basis-15">
-              {{ i.id + 1 }}
+              {{ i.id }}
             </div>
             <div class="flex-basis-60">
               {{ dayjs.unix(i.timestamp).format('YYYY-MM-DD HH:mm:ss') }}
@@ -666,14 +673,15 @@ onMounted(() => {
                 box-border rd-1 bg-lightblue-50 p-1"
             >
               <div
-                class="bg-slate-2 rd-1 text-0.8em leading-4 cursor-pointer hover:b-slate-3
-                  pr-1 pl-1 active:(outline outline-2px outline-blue-2)"
+                class="bg-sky-2 rd-1 text-0.8em leading-4 cursor-pointer
+                  pr-1 pl-1 active:(outline outline-2px outline-sky-2 b-sky-4)"
+                @click="viewSearch(i.id)"
               >
                 view
               </div>
               <div
-                class="bg-red-3 rd-1 text-0.8em leading-4 cursor-pointer hover:b-red-4
-                  pr-1 pl-1 active:(outline outline-2px outline-red-2)"
+                class="bg-red-3 rd-1 text-0.8em leading-4 cursor-pointer
+                  pr-1 pl-1 active:(outline outline-2px outline-red-2 b-red-4)"
                 @click="searchStore.rmRecordById(i.id)"
               >
                 delete
@@ -765,7 +773,7 @@ onMounted(() => {
               {{ showFilter ? '折叠条件' : '展开条件' }}
             </div>
             <NPopover
-              raw display-directive="if" trigger="click" :show-arrow="true" placement="right-start"
+              raw display-directive="if" trigger="click" :show-arrow="true" placement="bottom-end"
               class="p-0 rd-2 box-border"
             >
               <ReuseHistroy :data="searchStore.$state.records" />
