@@ -50,7 +50,7 @@ function enumMol() {
           <div v-for="(item, i) in setting" :key="i">
             <div
               class="p-1 rd-t-2 b-2 b-b-0 text-1.2em"
-              :class="[settingName === item ? 'bg-slate-1 b-sky-2' : 'b-slate-2/0']"
+              :class="[settingName === item ? 'bg-slate-1 b-sky-2' : 'b-slate-2']"
               @click="settingName = item"
             >
               {{ item.substring(4) }}

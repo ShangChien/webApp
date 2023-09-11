@@ -54,8 +54,7 @@ const siderData = computed<TreeOption[] | undefined>(() => {
       })
       return { label, key, children }
     })
-  }
-  else {
+  } else {
     return types.map((type: 'core' | 'ligand' | 'mole', index) => {
       const key = `${index}`
       const children = enumStore.getByType(type).map((mol, indexInner) => {
@@ -101,8 +100,7 @@ function railStyle({ focused, checked }: { focused: boolean;checked: boolean }) 
     style.background = '#7dd3fc'
     if (focused)
       style.boxShadow = '0 0 0 2px #7dd3fc40'
-  }
-  else {
+  } else {
     style.background = '#6ee7b7'
     if (focused)
       style.boxShadow = '0 0 0 2px #6ee7b740'
@@ -125,8 +123,7 @@ function onSelect(key: string[]) {
   if ((key[0]?.includes('-'))) {
     currentEdit.value.id = +v.split('-').at(-1)
     currentEdit.value.state = 1
-  }
-  else {
+  } else {
     currentEdit.value.id = 0
   }
   console.log('currentEdit:', currentEdit.value)

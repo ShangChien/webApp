@@ -50,7 +50,7 @@ watch(coresData, () => {
       <div class="w-25% flex-grow-1 m-1 ml-0">
         <card-rdkit min-w-200px v-bind="core" />
       </div>
-      <div class="w-25% justify-around flex-grow-1 place-items-center b-2 rd-2 min-w-420px bg-slate-2 b-indigo-2 m-1 mr-0">
+      <div class="w-25% justify-around flex-grow-1 place-items-center min-w-420px b-(2 rd-2 solid indigo-2) bg-slate-2 m-1 mr-0">
         <combo-setting :core="core" :ligands="props.ligands" />
       </div>
       <div class="w-70%" />
