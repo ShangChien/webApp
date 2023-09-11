@@ -31,7 +31,7 @@ const props = defineProps<extraMolData>()
 const _emit = defineEmits(['itemChecked'])
 
 const route = useRoute()
-const molDetail = inject<{ result: Ref<pgDataItem>; searchState: Ref<number> }>(keyMolDetail)
+const molDetail = inject<{ result: Ref<pgDataItem>; searchState: Ref<number> }>(keyMolDetail, {} as any)
 
 const currentEdit: Ref<{ id: number;state: number }> = inject('currentEdit')
 const enumStore = useEnumStore()

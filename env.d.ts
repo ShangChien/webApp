@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-declare module "@rdkit/rdkit/dist/RDKit_minimal.js"
+declare module "@/assets/RDKit_minimal.js"
 declare module "pyodide/pyodide.js"
 declare module "monaco-editor-vue3";
 declare module 'pyodide/pyodide.mjs'

@@ -19,3 +19,4 @@ else if (typeof define === 'function' && define['amd'])
   define([], function() { return initRDKitModule; });
 else if (typeof exports === 'object')
   exports["initRDKitModule"] = initRDKitModule;
+export { initRDKitModule }

@@ -1,6 +1,6 @@
 /* eslint-disable */
 // import rdkit into the worker, and export the renderMol function
-import initRDKitModule from '@rdkit/rdkit/dist/RDKit_minimal.js'
+import { initRDKitModule } from '@/assets/RDKit_minimal.js'
 import { optimize } from 'svgo/lib/svgo.js'
 
 let i = 0 // counter for the number of times the worker is connected

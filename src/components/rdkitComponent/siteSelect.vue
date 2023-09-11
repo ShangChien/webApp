@@ -52,8 +52,7 @@ async function updateMol() {
   if (id.value === 0) { // 新增结构
     enumStore.addMol(mol4Store)
     currentEdit.value.state = 3
-  }
-  else { // 更新结构
+  } else { // 更新结构
     mol4Store.id = id.value
     await enumStore.updateMol(mol4Store)
     // change to complited state for updating checked-list
@@ -209,7 +208,7 @@ onMounted(() => {
                   <!-- modal画板区域 -->
                   <NModal v-model:show="showModal" display-directive="show">
                     <NCard
-                      class="w-1300px h-96vh"
+                      class="w-80vw h-80vh relative"
                       :bordered="false"
                       size="huge"
                       role="dialog"
@@ -217,7 +216,8 @@ onMounted(() => {
                     >
                       <template #default>
                         <init-ketcher
-                          @update-smiles="(smiles) => (inputText = smiles)"
+                          v-model:smiles="inputText"
+                          class="w-full h-full"
                         />
                       </template>
                       <template #footer>
