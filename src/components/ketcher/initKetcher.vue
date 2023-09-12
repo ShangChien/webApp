@@ -39,16 +39,20 @@ function getMessage() {
     '*',
   )
 }
+
 onMounted(() => {
   src.value = 'static/ketcher/index.html'
   window.addEventListener('message', handleMessage)
   iframeWin.value = refketcher.value.contentWindow
-  // console.log(iframeWin.value)
+  console.log(iframeWin.value)
 })
+
 onBeforeUnmount(() => {
   window.removeEventListener('message', handleMessage)
 })
+
 defineExpose({
+  getMessage,
   sendMessage,
   mounted,
 })

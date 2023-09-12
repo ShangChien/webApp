@@ -28,7 +28,7 @@ function isLeaf(obj: any): boolean {
 function leafDom(v: number[] | string | number | null) {
   if (['number', 'string'].includes(typeof v) || (v === null)) {
     if ((typeof v === 'string') && v.startsWith('\n     RDKit          3D\n\n')) {
-      return h(nglViewer, { data: v })
+      return h(nglViewer, { class: 'w-full max-w-full', data: v })
     }
     return v
   }
@@ -40,7 +40,7 @@ function leafDom(v: number[] | string | number | null) {
 function convert2Dom(k: string, v: any): VNode | (() => VNode) {
   return h(
     'div',
-    { class: 'flex items-center justify-start gap-0.5 bg-indigo-1 box-border w-full rd-1' },
+    { class: 'flex items-center justify-start gap-0.5 bg-indigo-1 box-border max-w-full w-full rd-1 ' },
     [h('div', { class: 'flex-none rd-1 p-1' }, `${k}: `),
       h('div', { class: 'flex-auto break-all rd-1 bg-fuchsia-1 m-0.3 p-1 box-border' }, leafDom(v) || h('div', { class: 'i-fluent-emoji-flat-japanese-free-of-charge-button text-xl' }))],
   )
@@ -62,14 +62,14 @@ function renderItems(obj: any): VNode | (() => VNode) {
   })
   return h(
     'div',
-    { class: 'flex-(~ col nowrap) items-start justify-start gap-1 w-full' },
+    { class: 'flex-(~ col nowrap) items-start justify-start gap-1 max-w-full w-full' },
     sortedKeys.map((k) => {
       if (isLeaf(obj[k])) {
         return h(convert2Dom(k, obj[k]))
       } else {
         return h(
           'div',
-          { class: 'flex items-center justify-start gap-1 b-(solid 0.4 blue-50 rd-1) bg-blue-50 box-border w-full' },
+          { class: 'flex items-center justify-start gap-1 b-(solid 0.4 blue-50 rd-1) bg-blue-50 box-border max-w-full w-full' },
           [h('div', {}, k), h(renderItems(obj[k]))],
         )
       }

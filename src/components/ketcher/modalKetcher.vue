@@ -15,12 +15,24 @@ const { showModal, smiles } = inject<{
 const ketcherRef = ref(null)
 watch(showModal,
   (newVal, _oldVal) => {
-    if (newVal && toValue(ketcherRef.value?.mounted))
+    if (newVal && toValue(ketcherRef.value?.mounted)) {
       toValue(ketcherRef).sendMessage()
+    }
   }, {
     flush: 'post',
   },
 )
+function confirm() {
+  smiles.value = ''
+  toValue(ketcherRef).getMessage()
+  const unwatch = watch(
+    () => smiles.value,
+    () => {
+      showModal.value = false
+      unwatch()
+    },
+  )
+}
 </script>
 
 <template>
@@ -44,7 +56,7 @@ watch(showModal,
           <NButton @click="showModal = false">
             取消
           </NButton>
-          <NButton @click="showModal = false">
+          <NButton @click="confirm">
             确定
           </NButton>
         </div>

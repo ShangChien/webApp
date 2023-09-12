@@ -90,8 +90,7 @@ function domClick($event: any) {
     highlightMap.value.atoms[siteType.value].push(itemList[1] / 1)
     // highlightMap.atoms[siteType.value] = Array.from(new Set(highlightMap.atoms[siteType.value])).sort();
     // emit("update-mol", highlightMap);
-  }
-  else if (itemList[0] === 'bond') {
+  } else if (itemList[0] === 'bond') {
     // 如果点击bond
     $event.target.style.stroke = Color(siteType.value)
     $event.target.style.fill = Color(siteType.value)
@@ -106,8 +105,7 @@ function domClick($event: any) {
     // highlightMap.bonds[siteType.value] = Array.from(new Set(highlightMap.bonds[siteType.value])).sort();
     // emit("update-mol", highlightMap);
     // console.log(highlightMap.bonds)
-  }
-  else {
+  } else {
     console.log(itemList[0], 'error')
   }
 }
@@ -124,8 +122,7 @@ function domRClick($event: any) {
     preHandleIndex(highlightMap.value.atoms, itemList[1] / 1)
     // emit("update-mol", highlightMap);
     // console.log(highlightMap.highlightAtoms)
-  }
-  else if (itemList[0] === 'bond') {
+  } else if (itemList[0] === 'bond') {
     // 如果点击bond
     $event.target.style.stroke = '#9FACE6'
     $event.target.style.fill = '#9FACE6'
@@ -134,8 +131,7 @@ function domRClick($event: any) {
     preHandleIndex(highlightMap.value.bonds, itemList[1] / 1)
     // emit("update-mol", highlightMap);
     // console.log(highlightMap.highlightAtoms)
-  }
-  else {
+  } else {
     console.log(itemList[0], 'error')
   }
 }
