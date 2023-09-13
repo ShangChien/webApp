@@ -1,12 +1,12 @@
 <script setup lang='ts'>
-import pythonComponent from '@/components/python/pythonComponent.vue'
+import monaco from '@/components/monaco/fileSelector.vue'
 </script>
 
 <template>
   <div class="h-90vh relative m-0 p-0 flex ">
     <Suspense>
       <template #default>
-        <python-component />
+        <monaco />
       </template>
       <template #fallback>
         <span>Loading...</span>

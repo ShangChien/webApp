@@ -93,7 +93,7 @@ watchDebounced(
         </div>
         <div :key="renderKey" v-eslint-disable class="pt-0 m-1 mt-0 flex-auto">
           <MonacoEditor
-            v-model:value="codeStr"
+            v-model:value="res"
             :options="options"
             :height="editorH - 43"
             :weight="editorW"

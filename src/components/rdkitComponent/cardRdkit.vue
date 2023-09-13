@@ -73,7 +73,7 @@ function handleDropOption(key: string) {
       // console.log('editing',editState.value)
       break
     case 'copy':
-      useCopy('')
+      useCopy(props.smiles)
       // copy(copytext.value);
       console.log('copied')
       break

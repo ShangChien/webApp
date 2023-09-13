@@ -47,6 +47,11 @@ const router = createRouter({
       name: 'python',
       component: () => import('../views/pythonView.vue'),
     },
+    {
+      path: '/ml',
+      name: 'ml',
+      component: () => import('../views/ml.vue'),
+    },
   ],
 })
 

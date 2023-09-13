@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { refDebounced, useElementSize } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { NInputNumber, NPagination, NPopover, NScrollbar, NTag } from 'naive-ui'
 import type { molData } from '@/components/types'
 import exportMol from '@/components/rdkitComponent/exportMol.vue'
@@ -14,6 +14,7 @@ const props = defineProps<{
 }>()
 const outBox = ref<HTMLElement | null>(null)
 const { width: outBoxW } = useElementSize(outBox)
+
 const initArray = computed(() => props.molList)
 const inputCols = ref(props.cols)
 const inputRows = ref(props.rows)
@@ -21,8 +22,11 @@ const cols = refDebounced(inputCols, 500)
 const rows = refDebounced(inputRows, 500)
 const pageSize = computed(() => cols.value * rows.value)
 const pageCount = computed(() => Math.ceil(initArray.value.length / pageSize.value))
+
 const currentPageInput = ref(1)
 const currentPage = refDebounced(currentPageInput, 500)
+watch(() => props.molList.length, () => currentPageInput.value = 1)
+
 const arrayShow = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
   const end = currentPage.value * pageSize.value

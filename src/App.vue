@@ -12,6 +12,8 @@ import {
 } from 'naive-ui'
 import { RouterLink, RouterView } from 'vue-router'
 import { LogoElectron } from '@vicons/ionicons5'
+
+// eslint-disable-next-line unused-imports/no-unused-imports
 import { BrandSlack, Home, Tabler3DCubeSphere } from '@vicons/tabler'
 import { Carbon, Data1, DataVis1 } from '@vicons/carbon'
 import ReloadPrompt from '@/components/ReloadPrompt.vue'
@@ -50,12 +52,12 @@ const menuOptions = [
     key: 'view-task',
     icon: renderIcon(Data1),
   },
-  {
-    label: () =>
-      h(RouterLink, { to: { name: 'enumMole' } }, { default: () => 'Enum Molecule' }),
-    key: 'view-workSpcae',
-    icon: renderIcon(BrandSlack),
-  },
+  // {
+  //   label: () =>
+  //     h(RouterLink, { to: { name: 'enumMole' } }, { default: () => 'Enum Molecule' }),
+  //   key: 'view-workSpcae',
+  //   icon: renderIcon(BrandSlack),
+  // },
   {
     label: () =>
       h(RouterLink, { to: { name: 'enum' } }, { default: () => 'Enum' }),
@@ -67,6 +69,12 @@ const menuOptions = [
       h(RouterLink, { to: { name: 'python' } }, { default: () => 'python' }),
     key: 'view-python',
     icon: () => h(NIcon, null, { default: () => h('div', { class: 'i-tabler-brand-python' }) }),
+  },
+  {
+    label: () =>
+      h(RouterLink, { to: { name: 'ml' } }, { default: () => 'ml' }),
+    key: 'view-ml',
+    icon: () => h('img', { class: 'h-full', alt: 'mechine learning', src: 'src/assets/core-ml-256.png' }),
   },
 ]
 </script>
@@ -141,7 +149,7 @@ const menuOptions = [
 .fade-leave-to {
   opacity: 0;
 }
-*{
+.logo {
 -webkit-touch-callout:none;  /*系统默认菜单被禁用*/
 -webkit-user-select:none; /*webkit浏览器*/
 -khtml-user-select:none; /*早期浏览器*/
