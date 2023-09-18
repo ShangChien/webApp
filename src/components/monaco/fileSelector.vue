@@ -1,16 +1,22 @@
 <script setup lang='ts'>
-import { onMounted, reactive, ref } from 'vue'
-import { useDropZone, useFileDialog } from '@vueuse/core'
-import monaco from '@/components/monaco/monaco.vue'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useDropZone, useElementSize, useFileDialog } from '@vueuse/core'
+import editor from '@/components/monaco/editor.vue'
 
-const textFiles = ref<any[]>([])
+const textFiles = ref<{ name: string; contents: string }[]>([])
 const textEditor = reactive<{ id: number | null; name: string; strText: string }>({
   id: null,
   name: '',
-  strText: '',
+  strText: 'sss',
 })
+function updateText(newStrText: string) {
+  textEditor.strText = newStrText
+  textFiles.value[textEditor.id].contents = newStrText
+}
 
 const dropZoneRef = ref(null)
+const { width: _width } = useElementSize(dropZoneRef)
+const sizewidth = computed(() => `${_width.value + 12}px`)
 const { isOverDropZone } = useDropZone(dropZoneRef, onDrop)
 function onDrop(files: File[]) {
   readfiles(files)
@@ -57,14 +63,14 @@ function readfiles(files: any) {
     })
   })
   Promise.all(fileContents)
-    .then((files) => {
+    .then((files: { name: string; contents: string }[]) => {
       textFiles.value = files
       console.log(`读取${files?.length}个文件`)
     })
     .catch(e => console.log(`error:${e}`))
 }
 
-function deleteitem(index: number) {
+function deleteItem(index: number) {
   textFiles.value.splice(index, 1)
   if (index === textEditor.id) {
     textEditor.strText = ''
@@ -85,7 +91,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-nowrap items-center bg-slate-1 rd-2 min-w-280px py-1 box-border">
+  <div class="h-full w-full flex flex-nowrap items-center bg-slate-1 rd-2 min-w-280px max-w-full py-1 box-border">
     <div
       ref="dropZoneRef" class="flex-none flex-(~ col nowrap) justify-center items-center rd-1 m-1 h-full bg-green-50"
       :class="[isOverDropZone ? 'outline outline-0.2rem outline-green-4 bg-green-1' : '']"
@@ -124,7 +130,7 @@ onMounted(() => {
             class="bg-sky-2 rd-1 m-1 p-1 text-(l blue-5) leading-1em cursor-pointer
             hover:(bg-sky-3)
             active:(outline outline-2px outline-blue-3)"
-            @click="() => { textEditor.strText = file.contents; textEditor.id = index; textEditor.name = file.name }"
+            @click="() => { textEditor.strText = file.contents; textEditor.name = file.name; textEditor.id = index /* last to set id */ }"
           >
             view
           </div>
@@ -132,7 +138,7 @@ onMounted(() => {
             class="bg-red-2 rd-1 m-1 p-1 text-(l blue-5) leading-1em cursor-pointer
             hover:(bg-red-3)
             active:(outline outline-2px outline-red-3)"
-            @click=" deleteitem(index)"
+            @click=" deleteItem(index)"
           >
             del
           </div>
@@ -143,14 +149,19 @@ onMounted(() => {
         Or drag files to here (not support directory)
       </div>
     </div>
-    <div class="h-full flex-auto pr-3.5">
-      <monaco v-model:strText="textEditor.strText" class="h-full" :name="textEditor.name" />
+    <div class="h-full size relative box-border">
+      <editor
+        :strText="textEditor.strText"
+        :name="textEditor.name"
+        class="h-full w-full box-border"
+        @update:strText="(e) => updateText(e)"
+      />
     </div>
   </div>
 </template>
 
 <style>
-.bgColor {
-background-image:linear-gradient(314deg, #00c3ff, #ffff1c)
+.size {
+  width:calc(100% - v-bind(sizewidth))
 }
 </style>

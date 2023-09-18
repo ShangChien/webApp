@@ -2,6 +2,8 @@
   "extends": "@antfu",
   "ignorePatterns": ["src/**/*_minimal.js"],
   "rules": {
+    "vue/attribute-hyphenation": "off",
+    "vue/v-on-event-hyphenation":"off",
     "max-statements-per-line":"off",
     "no-console": "off",
     "curly": "off",
