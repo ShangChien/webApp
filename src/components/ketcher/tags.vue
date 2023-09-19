@@ -44,8 +44,7 @@ function select(label: string) {
   if (selected.value.includes(label)) {
     selected.value.splice(selected.value.indexOf(label), 1)
     selected.value = [...selected.value]
-  }
-  else {
+  } else {
     selected.value.push(label)
     selected.value = [...selected.value]
   }
@@ -62,8 +61,7 @@ function pushTag() {
   if (!tags.value.includes(inputValue.value)) {
     tags.value.push(inputValue.value)
     inputValue.value = ''
-  }
-  else {
+  } else {
     console.log(inputValue.value, 'has already exist in tags')
   }
 }

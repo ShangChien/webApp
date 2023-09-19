@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { ref, watch } from 'vue'
 import { computedEager, useManualRefHistory } from '@vueuse/core'
+import { NButton } from 'naive-ui'
 import monaco from '@/components/monaco/monaco.vue'
 import editorHistory from '@/components/monaco/editorHistory.vue'
 
@@ -9,6 +10,7 @@ import editorHistory from '@/components/monaco/editorHistory.vue'
 // records.history.value[0].snapshot.text is latest textstr
 // records.history.value.slice(-1)[0].snapshot.text(= props.strText; strText.value) is init textstr
 const props = defineProps<{ strText: string; name: string }>()
+const emits = defineEmits<{ sync: [strText: string] }>()
 const monacoDom = ref()
 const RefreshKey = ref<number>(0)
 const strText = ref<string>(props.strText)
@@ -30,8 +32,9 @@ const canReset = computedEager(() => {
 
 function save() {
   text4View.value.detial = `save: ${detail.value}`
-  records.commit()
   detail.value = ''
+  records.commit()
+  emits('sync', text4View.value.text)
 }
 
 function commit() {
@@ -69,56 +72,26 @@ watch(() => props.strText, (val) => {
 
 <template>
   <div class="flex flex-col flex-nowrap justify-between items-center h-full w-full box-border p-1">
-    <div class="flex-none w-full flex flex-nowrap justify-between items-center pt-1 px-1 box-border gap-2">
-      <div class="flex-auto flex flex-nowrap justify-start items-center box-border gap-2">
-        <div
-          v-if="canSave"
-          class="bg-sky-2 rd-1 p-1 m-0 text-(x blue-5) leading-1em cursor-pointer box-border
-              hover:(bg-sky-3)
-              active:(outline outline-2px outline-blue-3)"
-          @click="save()"
-        >
-          save
-        </div>
-        <div
-          v-if="isDiff"
-          class="bg-sky-2 rd-1 p-1 m-0 text-(x blue-5) leading-1em cursor-pointer box-border
-              hover:(bg-sky-3)
-              active:(outline outline-2px outline-blue-3)"
-          @click="commit()"
-        >
-          commit
-        </div>
-        <div
-          v-if="records.canUndo.value"
-          class="bg-sky-2 rd-1 p-1 m-0 text-(x blue-5) leading-1em cursor-pointer box-border
-              hover:(bg-sky-3)
-              active:(outline outline-2px outline-blue-3)"
-          @click="undo()"
-        >
+    <div class="flex-none w-full flex flex-nowrap justify-between items-center box-border gap-0">
+      <div class="flex-auto flex flex-nowrap justify-start items-center box-border gap-2 p-0">
+        <NButton size="small" :type="!canSave ? 'success' : 'warning'" :disabled="!canSave" @click="save()">
+          {{ !canSave ? "data safe" : "need sync" }}
+        </NButton>
+        <NButton size="small" type="info" :disabled="!isDiff" @click="commit()">
+          local commit
+        </NButton>
+        <NButton size="small" secondary type="info" :disabled="!records.canUndo.value" @click="undo()">
           undo
-        </div>
-        <div
-          v-if="records.canRedo.value"
-          class="bg-sky-2 rd-1 p-1 m-0 text-(x blue-5) leading-1em cursor-pointer box-border
-              hover:(bg-sky-3)
-              active:(outline outline-2px outline-blue-3)"
-          @click="redo()"
-        >
+        </NButton>
+        <NButton size="small" secondary type="info" :disabled="!records.canRedo.value" @click="redo()">
           redo
-        </div>
-        <div
-          v-if="canReset"
-          class="bg-sky-2 rd-1 p-1 m-0 text-(x blue-5) leading-1em cursor-pointer box-border
-              hover:(bg-sky-3)
-              active:(outline outline-2px outline-blue-3)"
-          @click="reset()"
-        >
+        </NButton>
+        <NButton size="small" type="error" :disabled="!canReset" @click="reset()">
           reset
-        </div>
+        </NButton>
       </div>
-      <div class="flex-none leading-1em">
-        {{ props.name ? props.name : "empty (o_o)" }}
+      <div class="flex-none leading-1em mx-1">
+        {{ props.name ? props.name : "" }}
       </div>
       <editorHistory
         :records="records.history.value"
@@ -126,9 +99,14 @@ watch(() => props.strText, (val) => {
         @diffTo="(index) => console.log('diff to', index)"
       />
     </div>
-    <monaco ref="monacoDom" :key="RefreshKey" v-model:currentText="text4View.text" :strText="strText" />
+    <div class="w-full flex-auto editorH br-1 box-border">
+      <monaco ref="monacoDom" :key="RefreshKey" v-model:currentText="text4View.text" :strText="strText" />
+    </div>
   </div>
 </template>
 
 <style>
+.editorH {
+  height: calc(100% - 36px)
+}
 </style>
