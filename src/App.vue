@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, ref } from 'vue'
+import { computed, h, provide, ref } from 'vue'
 import type { Component } from 'vue'
 import {
   NIcon,
@@ -10,13 +10,19 @@ import {
   NMenu,
   NMessageProvider,
 } from 'naive-ui'
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { LogoElectron } from '@vicons/ionicons5'
 
 // eslint-disable-next-line unused-imports/no-unused-imports
 import { BrandSlack, Home, Tabler3DCubeSphere } from '@vicons/tabler'
 import { Carbon, Data1, DataVis1 } from '@vicons/carbon'
 import ReloadPrompt from '@/components/ReloadPrompt.vue'
+import mlHeader from '@/components/ml/mlHeader.vue'
+
+const route = useRoute()
+const headerTabName = ref('files')
+provide('headerTabName', headerTabName)
+const header = computed(() => route.name === 'python' ? h(mlHeader) : h(null))
 
 const collapsed = ref(true)
 function renderIcon(icon: Component) {
@@ -81,9 +87,16 @@ const menuOptions = [
 
 <template>
   <NLayout class="font-lx-b" bordered position="absolute" style="height: 100vh" :native-scrollbar="false" @contextmenu.prevent>
-    <NLayoutHeader style="height: 6vh; padding: 2px" bordered>
-      <img class="logo w-5vh" src="/favicon.ico">
-      <ReloadPrompt />
+    <ReloadPrompt />
+    <NLayoutHeader class="h-6vh p-2px" bordered>
+      <div class="flex flex-nowrap justify-start items-center h-full">
+        <div class="h-full flex-none">
+          <img class="w-5vh m-1" src="/favicon.ico">
+        </div>
+        <div class="flex-auto flex flex-nowrap justify-center items-center w-full h-full p-1">
+          <component :is="header" class="h-4vh w-30vw p-0 m-0" />
+        </div>
+      </div>
     </NLayoutHeader>
     <NLayout has-sider position="absolute" style="top: 6vh; bottom: 2vh" bordered>
       <NLayoutSider
@@ -135,11 +148,6 @@ const menuOptions = [
 </template>
 
 <style>
-.logo {
-  position: relative;
-  left: 10px;
-}
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;
@@ -149,7 +157,7 @@ const menuOptions = [
 .fade-leave-to {
   opacity: 0;
 }
-.logo {
+.noCopy {
 -webkit-touch-callout:none;  /*系统默认菜单被禁用*/
 -webkit-user-select:none; /*webkit浏览器*/
 -khtml-user-select:none; /*早期浏览器*/

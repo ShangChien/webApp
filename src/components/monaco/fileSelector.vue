@@ -1,12 +1,13 @@
 <!-- eslint-disable vue/attributes-order -->
 <script setup lang='ts'>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, inject, onMounted, reactive, ref } from 'vue'
 import type { VNodeChild } from 'vue'
 import { useDropZone, useElementSize, useFileDialog } from '@vueuse/core'
 import { NInput, NPopover, NScrollbar, useMessage } from 'naive-ui'
 import editor from '@/components/monaco/editor.vue'
 import filehandle from '@/components/monaco/filehandle.vue'
 
+const headerTabName = inject('headerTabName', 'files')
 const message = useMessage()
 function info(type: any | string, content: string | (() => VNodeChild)) {
   message.create(
@@ -128,7 +129,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-nowrap items-center bg-slate-1 rd-2  max-w-full py-1 box-border">
+  <div class="h-full w-full flex flex-nowrap items-center bg-slate-1 rd-2 max-w-full py-1 box-border">
     <div
       ref="dropZoneRef" class="flex-none flex-(~ col nowrap) justify-start items-center rd-1 m-1 h-full box-border w-280px bg-green-50"
       :class="[isOverDropZone ? 'outline outline-0.2rem outline-green-4 bg-green-1' : '']"
@@ -148,7 +149,7 @@ onMounted(() => {
           <div class="flex flex-nowrap justify-center items-center">
             <NInput v-model:value="fileName" size="small" placeholder="name" class="m-1" />
             <div
-              class="bg-green-2 rd-1 mr-1 p-1 text-(lg blue-5) leading-1em cursor-pointer text-nowrap box-border
+              class="bg-green-2 rd-1 mr-1 p-1 text-(lg green-5) leading-1em cursor-pointer text-nowrap box-border
               hover:(bg-green-3)
               active:(outline outline-2px outline-green-3)"
               @click="newFile(fileName)"
@@ -176,8 +177,8 @@ onMounted(() => {
           Clear
         </div>
       </div>
-      <div class="flex-auto w-full box-border p-1 relative bg-green-50">
-        <NScrollbar class="maxH h-full flex-auto rd-1 bg-lightblue-1 relative">
+      <div class="flex-auto maxH w-full box-border p-1 relative bg-green-50">
+        <NScrollbar class="max-h-full flex-auto rd-1 bg-lightblue-1 relative">
           <div v-if="hasFile" class="flex-(~ col nowrap) justify-start items-center box-border h-full w-full gap-1 p-1 rd-1 ">
             <div
               v-for="(file, index) in textFiles"
@@ -188,7 +189,7 @@ onMounted(() => {
               <filehandle
                 :fileName="file.name"
                 :index="index"
-                @view3d="(i) => {}"
+                @view="(i) => edit(i)"
                 @edit="(i) => edit(i)"
                 @delete="(i) => deleteItem(i)"
               />
@@ -204,11 +205,17 @@ onMounted(() => {
     </div>
     <div class="h-full size relative box-border bg-white rd-1">
       <editor
+        v-if="headerTabName === 'files'"
         :strText="textEditor.strText"
         :name="textEditor.name"
         class="h-full w-full box-border"
         @sync="(e) => updateText(e)"
       />
+      <div
+        v-else-if="headerTabName === 'ml'"
+      >
+        ssss
+      </div>
     </div>
   </div>
 </template>
@@ -218,6 +225,6 @@ onMounted(() => {
   width:calc(100% - v-bind(sizewidth))
 }
 .maxH {
-  max-height:calc(v-bind(sizeheight) - 42px)
+  max-height:calc(v-bind(sizeheight) - 38px)
 }
 </style>

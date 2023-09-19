@@ -4,7 +4,7 @@ import { useElementHover } from '@vueuse/core'
 
 const props = defineProps<{ fileName: string; index: number }>()
 const emits = defineEmits<{
-  view3d: [index: number]
+  view: [index: number]
   edit: [index: number]
   delete: [index: number]
 }>()
@@ -14,7 +14,10 @@ const isHovered = useElementHover(dom)
 </script>
 
 <template>
-  <div ref="dom" class="flex flex-nowrap justify-between items-center min-h-30px px-1">
+  <div
+    ref="dom" class="flex flex-nowrap justify-between items-center min-h-30px px-1 noCopy hover:(bg-green-50)"
+    @click="() => emits('view', props.index)"
+  >
     <div class="px-1">
       {{ props.fileName }}
     </div>
@@ -23,7 +26,7 @@ const isHovered = useElementHover(dom)
         class="bg-indigo-2 rd-1 my-1 p-1 text-(l indigo-5) leading-1em cursor-pointer
                 hover:(bg-indigo-3)
                 active:(outline outline-2px outline-indigo-3)"
-        @click="() => emits('view3d', props.index)"
+        @click="() => emits('view', props.index)"
       >
         3D
       </div>
@@ -48,4 +51,12 @@ const isHovered = useElementHover(dom)
 </template>
 
 <style>
+.noCopy {
+-webkit-touch-callout:none;  /*系统默认菜单被禁用*/
+-webkit-user-select:none; /*webkit浏览器*/
+-khtml-user-select:none; /*早期浏览器*/
+-moz-user-select:none;/*火狐*/
+-ms-user-select:none; /*IE10*/
+user-select:none;
+}
 </style>
