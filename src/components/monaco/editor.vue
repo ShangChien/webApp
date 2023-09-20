@@ -71,7 +71,7 @@ watch(() => props.strText, (val) => {
 </script>
 
 <template>
-  <div class="flex flex-col flex-nowrap justify-between items-center h-full w-full box-border p-1">
+  <div class="flex flex-col flex-nowrap justify-between items-center h-full w-full box-border p-1 gap-1">
     <div class="flex-none w-full flex flex-nowrap justify-between items-center box-border gap-0">
       <div class="flex-auto flex flex-nowrap justify-start items-center box-border gap-2 p-0">
         <NButton size="small" :type="!canSave ? 'success' : 'warning'" :disabled="!canSave" @click="save()">
@@ -99,7 +99,7 @@ watch(() => props.strText, (val) => {
         @diffTo="(index) => console.log('diff to', index)"
       />
     </div>
-    <div class="w-full flex-auto editorH br-1 box-border">
+    <div class=" flex-auto w-full editorH box-border rd-1">
       <monaco ref="monacoDom" :key="RefreshKey" v-model:currentText="text4View.text" :strText="strText" />
     </div>
   </div>

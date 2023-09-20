@@ -22,7 +22,7 @@ import mlHeader from '@/components/ml/mlHeader.vue'
 const route = useRoute()
 const headerTabName = ref('files')
 provide('headerTabName', headerTabName)
-const header = computed(() => route.name === 'python' ? h(mlHeader) : h(null))
+const header = computed(() => route.name === 'ml' ? h(mlHeader) : null)
 
 const collapsed = ref(true)
 function renderIcon(icon: Component) {

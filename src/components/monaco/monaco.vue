@@ -60,7 +60,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="editorDom" class="h-full w-full m-1 box-border" />
+  <div ref="editorDom" class="h-full w-full box-border" />
 </template>
 
 <style>
