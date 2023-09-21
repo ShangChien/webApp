@@ -15,7 +15,7 @@ const isHovered = useElementHover(dom)
 
 <template>
   <div
-    ref="dom" class="flex flex-nowrap justify-between items-center min-h-30px px-1 noCopy hover:(bg-green-50)"
+    ref="dom" class="flex flex-nowrap justify-between items-center min-h-30px px-1 rd-2 noCopy hover:(bg-green-50)"
     @click="() => emits('view', props.index)"
   >
     <div class="px-1">

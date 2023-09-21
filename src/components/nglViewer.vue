@@ -35,9 +35,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="viewerWindow" class="relative max-w-full w-full">
+  <div ref="viewerWindow" class="relative h-full">
     <div class="aspect-ratio-square w-full m-0 p-0 box-border rd-1" />
-    <div ref="viewport" class="absolute top-0 left-0 aspect-ratio-square w-full m-0 p-0 box-border rd-1" />
+    <div ref="viewport" class="absolute top-0 left-0 h-full w-full m-0 p-0 box-border rd-1" />
     <div v-show="isHovered" class="absolute bottom-0 left-0 flex flex-nowrap gap-1 items-end justify-end box-border w-full animate-fade-in animate-duration-0.3s">
       <div
         class="bg-slate-3 rd-1 m-1 p-1 text-lg leading-1em cursor-pointer i-material-symbols-3d-rotation-outline-rounded

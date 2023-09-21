@@ -150,6 +150,17 @@ export interface condition extends Omit<option, 'value'> {
   label_icon?: VNode | Component
   component?: Component
 }
+
+export interface dataUnimol {
+  models?: string[]
+  names: string[]
+  smiles?: string[]
+  molBlock?: string[]
+  atoms?: string[][]
+  coordinates?: number[][][]
+  results?: { [key: string]: (number | string)[] }
+}
+
 export const keyStateKetcher: InjectionKey<{
   id: Ref<number>
   showModal: Ref<boolean>

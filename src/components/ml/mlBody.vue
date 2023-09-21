@@ -25,7 +25,7 @@ const Tabs = {
     name: allFiles.value[fileIndex.value]?.name ?? '',
     onSync: e => updateText(e),
   }, null),
-  ml: () => h('div'),
+  ml: mlFlow,
 }
 
 const message = useMessage()
