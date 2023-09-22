@@ -134,7 +134,7 @@ defineExpose({ gridData })
 <template>
   <Splitpanes class="pt-1 h-80vh splitpanes " style="background-color: #ffffff">
     <Pane size="15" min-size="11">
-      <div ref="siderBox" class="b-(solid 2 indigo-100 rd-2) flex-(~ col) justify-center items-stretch min-w-180px h-70vh box-border">
+      <div ref="siderBox" class="b-(solid 2 indigo-100 rd-2) flex-(~ col) justify-center items-stretch min-w-180px h-70vh w-full box-border">
         <div class="flex-none flex justify-between items-center p-1 ">
           <NSwitch
             v-model:value="checkStrategy"
@@ -189,7 +189,7 @@ defineExpose({ gridData })
       </div>
     </Pane>
     <Pane size="60" min-size="16">
-      <grid-page v-if="gridData" class="h-70vh" :mol-list="gridData" :cols="6" :rows="3" :max-h="70" />
+      <grid-page v-if="gridData" class="h-70vh w-full" :mol-list="gridData" :cols="6" :rows="3" :max-h="70" />
     </Pane>
     <Pane size="25" min-size="10">
       <div class="flex justify-center items-center h-70vh">
@@ -201,7 +201,11 @@ defineExpose({ gridData })
 
 <style>
 @import "splitpanes/dist/splitpanes.css";
-.splitpanes {background-color: #f8f8f8;}
+.splitpanes__pane {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .splitpanes__splitter {
   background-color:#ecfeff;

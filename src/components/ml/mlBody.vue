@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/attributes-order -->
 <script setup lang='ts'>
-import { computed, h, inject, onMounted, ref, watch } from 'vue'
+import { computed, h, inject, onMounted, reactive, ref, watch } from 'vue'
 import type { VNodeChild } from 'vue'
 import { useElementSize } from '@vueuse/core'
 import { useMessage } from 'naive-ui'
@@ -19,14 +19,17 @@ const { width: _width } = useElementSize(dom)
 const sizewidth = computed(() => `${_width.value + 12}px`)
 
 const headerTabName = inject('headerTabName', 'files') // files or ml
-const Tabs = {
+const Tabs = reactive({
   files: () => h(editor, {
     strText: allFiles.value[fileIndex.value]?.contents ?? '',
     name: allFiles.value[fileIndex.value]?.name ?? '',
     onSync: e => updateText(e),
   }, null),
-  ml: mlFlow,
-}
+  ml: () => h(mlFlow, {
+    allFiles: allFiles.value,
+    index: fileIndex.value,
+  }),
+})
 
 const message = useMessage()
 function _info(type: any | string, content: string | (() => VNodeChild)) {
@@ -63,7 +66,7 @@ onMounted(() => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .sizeW {
   width:calc(100% - v-bind(sizewidth))
 }

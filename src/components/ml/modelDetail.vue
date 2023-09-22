@@ -2,13 +2,13 @@
 import { NCheckbox, NCheckboxGroup, NCollapse, NCollapseItem, NRadio, NRadioGroup, NSpace } from 'naive-ui'
 
 const task = defineModel<string>('task')
-const taskList = ['classification', 'multiclass', 'regression', 'multilabel_classification', 'multilabel_regression']
+const taskList = ['regression', 'classification', 'multiclass', 'multilabel_classification', 'multilabel_regression']
 
 const models = defineModel<string[]>('models')
-const modelsList = ['HOMO', 'LUMO', 'Eg']
+const modelsList = ['HOMO', 'LUMO', 'Eg', 'Representation']
 
 const fileType = defineModel<string>('fileType')
-const fileTypeList = ['*.smi', '*.mol']
+const fileTypeList = ['*.mol(3D)', '*.mol(2D)', '*.smi']
 </script>
 
 <template>
@@ -29,7 +29,12 @@ const fileTypeList = ['*.smi', '*.mol']
           </div>
           <NRadioGroup v-model:value="task" name="radiogroup" class="bg-sky-1 px-2 py-1 rd-2 box-border">
             <NSpace>
-              <NRadio v-for="(i_task, index) in taskList" :key="index" :value="i_task" class="p-1" :class="[i_task === task ? 'bg-blue-3 rd-1 ' : '']">
+              <NRadio
+                v-for="(i_task, index) in taskList"
+                :key="index" :value="i_task" class="p-1"
+                :disabled="i_task !== 'regression'"
+                :class="[i_task === task ? 'bg-blue-3 rd-1 ' : '']"
+              >
                 {{ i_task }}
               </NRadio>
             </NSpace>
@@ -39,16 +44,19 @@ const fileTypeList = ['*.smi', '*.mol']
           <div class="w-100px text-right flex-none">
             models:
           </div>
-          <NCheckboxGroup v-model:value="models" class="bg-sky-1 px-2 py-1 rd-2 box-border">
+          <NCheckboxGroup v-model:value="models" class="bg-sky-1 p-1 rd-2 box-border">
             <NCheckbox
               v-for="(i_model, index) in modelsList"
               :key="index" :value="i_model"
+              :disabled="i_model === 'Representation'"
               :label="i_model"
-              class="mx-1 px-2 p-1"
+              class="mx-1 pl-2 p-1"
               :class="[models.includes(i_model) ? 'bg-blue-3 rd-1 ' : '']"
             />
           </NCheckboxGroup>
-          <div>(multi select)</div>
+          <div class="text-nowrap">
+            (multi select)
+          </div>
         </div>
         <div class="flex-auto flex justify-start items-center gap-3 w-full box-border">
           <div class="w-100px text-right flex-none">

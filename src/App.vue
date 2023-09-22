@@ -20,7 +20,7 @@ import ReloadPrompt from '@/components/ReloadPrompt.vue'
 import mlHeader from '@/components/ml/mlHeader.vue'
 
 const route = useRoute()
-const headerTabName = ref('files')
+const headerTabName = ref('ml')
 provide('headerTabName', headerTabName)
 const header = computed(() => route.name === 'ml' ? h(mlHeader) : null)
 

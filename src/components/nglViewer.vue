@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import * as NGL from 'ngl/dist/ngl.js'
 import { useElementHover, useElementSize } from '@vueuse/core'
 
 const props = defineProps<{ data: string }>()
-const stringBlob = new Blob([props.data], { type: 'text/plain' })
+const stringBlob = computed(() => new Blob([props.data], { type: 'text/plain' }))
+
 const viewerWindow = ref(null)
 const isHovered = useElementHover(viewerWindow)
 const viewport = ref(null)
@@ -16,13 +17,19 @@ const fullScreen = ref(false)
 
 onMounted(() => {
   const stage = new NGL.Stage(viewport.value, { backgroundColor: 'white' })
-  stage.loadFile(stringBlob, { ext: 'sdf' })
-    .then((o: any) => {
-      o.addRepresentation('licorice')
-      // o.stage.setSpin(true)
-      o.autoView()
-      // 悬停事件
-    })
+  let molComponent = null
+  watch(stringBlob, (v) => {
+    if (molComponent !== null) {
+      stage.removeComponent(molComponent)
+    }
+    stage.loadFile(v, { ext: 'sdf' })
+      .then((o: any) => {
+        o.addRepresentation('licorice')
+        o.autoView()
+        molComponent = o
+      })
+  }, { immediate: true })
+
   watch([viewportSize.width, viewportSize.height],
     () => {
       stage.handleResize()
