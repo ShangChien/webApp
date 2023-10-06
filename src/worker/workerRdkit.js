@@ -1,4 +1,5 @@
-/* eslint-disable */
+/* eslint-disable no-restricted-globals */
+/* eslint-disable no-undef */
 // import rdkit into the worker, and export the renderMol function
 importScripts('/RDKit_minimal.js')
 

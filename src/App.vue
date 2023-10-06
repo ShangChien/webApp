@@ -1,3 +1,4 @@
+<!-- eslint-disable unused-imports/no-unused-imports -->
 <script setup lang="ts">
 import { computed, h, provide, ref } from 'vue'
 import type { Component } from 'vue'
@@ -12,8 +13,6 @@ import {
 } from 'naive-ui'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { LogoElectron } from '@vicons/ionicons5'
-
-// eslint-disable-next-line unused-imports/no-unused-imports
 import { BrandSlack, Home, Tabler3DCubeSphere } from '@vicons/tabler'
 import { Carbon, Data1, DataVis1 } from '@vicons/carbon'
 import ReloadPrompt from '@/components/ReloadPrompt.vue'
@@ -29,29 +28,29 @@ function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
 const menuOptions = [
-  {
-    label: () =>
-      h(RouterLink, { to: { name: 'home' } }, { default: () => 'Home' }),
-    key: 'go-back-home',
-    icon: renderIcon(Home),
-  },
-  {
-    label: () =>
-      h(RouterLink, { to: { name: 'ketcher' } }, { default: () => 'Ketcher' }),
-    key: 'view-ketcher',
-    icon: renderIcon(Carbon),
-  },
+  // {
+  //   label: () =>
+  //     h(RouterLink, { to: { name: 'home' } }, { default: () => 'Home' }),
+  //   key: 'go-back-home',
+  //   icon: renderIcon(Home),
+  // },
+  // {
+  //   label: () =>
+  //     h(RouterLink, { to: { name: 'ketcher' } }, { default: () => 'Ketcher' }),
+  //   key: 'view-ketcher',
+  //   icon: renderIcon(Carbon),
+  // },
   {
     label: () =>
       h(RouterLink, { to: { name: 'molStore' } }, { default: () => 'molStore' }),
     key: 'view-molStore',
     icon: renderIcon(LogoElectron),
   },
-  {
-    label: () => h(RouterLink, { to: { name: '3d' } }, { default: () => '3D' }),
-    key: 'view-3D',
-    icon: renderIcon(Tabler3DCubeSphere),
-  },
+  // {
+  //   label: () => h(RouterLink, { to: { name: '3d' } }, { default: () => '3D' }),
+  //   key: 'view-3D',
+  //   icon: renderIcon(Tabler3DCubeSphere),
+  // },
   {
     label: () =>
       h(RouterLink, { to: { name: 'task' } }, { default: () => 'Task' }),
@@ -70,12 +69,12 @@ const menuOptions = [
     key: 'view-enum',
     icon: renderIcon(DataVis1),
   },
-  {
-    label: () =>
-      h(RouterLink, { to: { name: 'python' } }, { default: () => 'python' }),
-    key: 'view-python',
-    icon: () => h(NIcon, null, { default: () => h('div', { class: 'i-tabler-brand-python' }) }),
-  },
+  // {
+  //   label: () =>
+  //     h(RouterLink, { to: { name: 'python' } }, { default: () => 'python' }),
+  //   key: 'view-python',
+  //   icon: () => h(NIcon, null, { default: () => h('div', { class: 'i-tabler-brand-python' }) }),
+  // },
   {
     label: () =>
       h(RouterLink, { to: { name: 'ml' } }, { default: () => 'ml' }),

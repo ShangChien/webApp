@@ -69,6 +69,9 @@ const fileTypeList = ['*.mol(3D)', '*.mol(2D)', '*.smi']
               </NRadio>
             </NSpace>
           </NRadioGroup>
+          <div class="text-nowrap">
+            (*.mol(2D) will be transformed to 3D by RDKIT)
+          </div>
         </div>
       </div>
     </NCollapseItem>
