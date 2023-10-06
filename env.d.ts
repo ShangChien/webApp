@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 declare module "@/assets/RDKit_minimal.js"
 declare module "pyodide/pyodide.js"
-declare module 'naive-ui'
+//declare module 'naive-ui'
 declare module "monaco-editor-vue3";
 declare module 'pyodide/pyodide.mjs'
 declare module "ngl/dist/ngl.js";

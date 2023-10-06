@@ -18,7 +18,7 @@ export default defineConfig({
     vueJsx(),
     Unocss(),
     VitePWA({
-      includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+      includeAssets: ['/64.png', 'favicon.ico', 'robots.txt', '/180.png', 'favicon.svg'],
       manifest: {
         name: 'SUNERA App',
         short_name: 'App Space',
@@ -26,25 +26,20 @@ export default defineConfig({
         theme_color: '#ffffff',
         icons: [
           {
-            src: 'android-chrome-192x192.png',
-            sizes: '192x192',
+            src: '/180.png',
+            sizes: '180x180',
             type: 'image/png',
           },
           {
-            src: 'android-chrome-384x384.png',
-            sizes: '384x384',
-            type: 'image/png',
-          },
-          {
-            src: 'android-chrome-384x384.png',
-            sizes: '384x384',
+            src: '/180.png',
+            sizes: '180x180',
             type: 'image/png',
             purpose: 'any maskable',
           },
         ],
       },
       workbox: {
-        maximumFileSizeToCacheInBytes: 10000000,
+        maximumFileSizeToCacheInBytes: 100000000,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,pdb,sdf,wasm}'],
         navigateFallbackDenylist: [/^\/api/],
       },
@@ -58,8 +53,9 @@ export default defineConfig({
     // 反向代理配置，注意rewrite写法，开始没看文档在这里踩了坑
     proxy: {
       '/api/': {
-        target: 'http://192.168.2.233:5050', // 代理接口
-        // target: 'http://127.0.0.1:8000',
+        target: 'http://api.vastlab.io:5050',
+        // target: 'http://192.168.2.233:5050', // 局域网代理接口
+        // target: 'http://127.0.0.1:8000', // dev 本地接口
         changeOrigin: true,
         rewrite: (path: string) => path.replace(/^\/api/, ''),
       },

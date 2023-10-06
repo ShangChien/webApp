@@ -90,7 +90,7 @@ const menuOptions = [
     <NLayoutHeader class="h-6vh p-2px" bordered>
       <div class="flex flex-nowrap justify-start items-center h-full">
         <div class="h-full flex-none">
-          <img class="w-5vh m-1" src="/favicon.ico">
+          <img class="w-5vh m-1" src="/180.png">
         </div>
         <div class="flex-auto flex flex-nowrap justify-center items-center w-full h-full p-1">
           <component :is="header" class="h-4vh w-30vw p-0 m-0" />

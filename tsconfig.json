@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "strict":false,
+    "strict": false,
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib":["ESNext","DOM"],
+    "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
     "allowJs": true,
 
@@ -17,7 +17,7 @@
     "noEmit": true,
     "jsx": "preserve",
 
-    /*custom */
+    /* custom */
     "outDir": "./",
     "baseUrl": ".",
     "paths": {
@@ -31,5 +31,5 @@
     {
       "path": "./tsconfig.node.json"
     }
-  ],
+  ]
 }

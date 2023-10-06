@@ -5,7 +5,7 @@ import { NButton, NDataTable } from 'naive-ui'
 const props = defineProps<{ data: { name: string; homo: number; lumo: number; eg: number }[] }>()
 
 const dom = ref()
-const columns = [
+const columns: any = [
   { title: 'Name', key: 'name', defaultSortOrder: 'ascend', sorter: 'default', width: 100 },
   { title: 'homo', key: 'homo', sorter: (row1, row2) => row1.age - row2.age, resizable: true, minWidth: 100 },
   { title: 'lumo', key: 'lumo', sorter: (row1, row2) => row1.age - row2.age, resizable: true, minWidth: 100 },

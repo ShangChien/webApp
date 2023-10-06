@@ -71,7 +71,7 @@ const logic_options = [
   { label: 'or', key: logicType.Or, icon: () => h('div', { class: 'i-carbon-shape-unite bg-blue ml-1 text-2xl' }) },
   { label: 'not', key: logicType.Not, icon: () => h('div', { class: 'i-carbon-send-to-back bg-blue ml-1 text-2xl' }) },
 ]
-const options = ref<option[]>([
+const options: any = ref<option[]>([
   {
     label: '搜索方式',
     key: 'methods',

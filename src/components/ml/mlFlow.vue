@@ -57,7 +57,7 @@ const currentFileTaskInfo = computed(() => ({
   atoms: null,
   coordinates: null,
   results: null,
-  models: toValue(models.value),
+  models: models.value,
   names: [currentFile.value.name],
   smiles: fileType.value === '*.smi' ? [currentFile.value.contents] : null,
   molBlocks: fileType.value !== '*.smi' ? [currentFile.value.contents] : null,
