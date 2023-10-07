@@ -18,21 +18,28 @@ export default defineConfig({
     vueJsx(),
     Unocss(),
     VitePWA({
+      strategies: 'generateSW',
+      injectRegister: 'auto',
       includeAssets: ['/64.png', 'favicon.ico', 'robots.txt', '/180.png', 'favicon.svg'],
       manifest: {
-        name: 'SUNERA App',
-        short_name: 'App Space',
-        description: 'sunera space components',
+        name: 'emm',
+        short_name: 'emm',
+        description: 'emm app',
         theme_color: '#ffffff',
         icons: [
           {
-            src: '/180.png',
-            sizes: '180x180',
+            src: '/192.png',
+            sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: '/180.png',
-            sizes: '180x180',
+            src: '/512.png',
+            sizes: '512x512',
+            type: 'image/png',
+          },
+          {
+            src: '/512.png',
+            sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable',
           },

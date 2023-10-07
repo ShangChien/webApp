@@ -79,14 +79,14 @@ const menuOptions = [
     label: () =>
       h(RouterLink, { to: { name: 'ml' } }, { default: () => 'ml' }),
     key: 'view-ml',
-    icon: () => h('img', { class: 'h-full', alt: 'mechine learning', src: 'src/assets/core-ml-256.png' }),
+    icon: () => h('img', { class: 'h-full', alt: 'mechine learning', src: '/core-ml-256.png' }),
   },
 ]
 </script>
 
 <template>
+  <ReloadPrompt />
   <NLayout class="font-lx-b" bordered position="absolute" style="height: 100vh" :native-scrollbar="false" @contextmenu.prevent>
-    <ReloadPrompt />
     <NLayoutHeader class="h-6vh p-2px" bordered>
       <div class="flex flex-nowrap justify-start items-center h-full">
         <div class="h-full flex-none">
