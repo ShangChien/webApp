@@ -161,6 +161,15 @@ export interface dataUnimol {
   results?: { [key: string]: (number | string)[] }
 }
 
+export interface dataResults {
+  name: string
+  homo?: number
+  lumo?: number
+  eg?: number
+  repr?: number[]
+  key: number
+}
+
 export const keyStateKetcher: InjectionKey<{
   id: Ref<number>
   showModal: Ref<boolean>

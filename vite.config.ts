@@ -44,6 +44,7 @@ export default defineConfig({
             purpose: 'any maskable',
           },
         ],
+        start_url: '/index.html',
       },
       workbox: {
         maximumFileSizeToCacheInBytes: 100000000,
@@ -60,8 +61,8 @@ export default defineConfig({
     // 反向代理配置，注意rewrite写法，开始没看文档在这里踩了坑
     proxy: {
       '/api/': {
-        target: 'http://api.vastlab.io:5050',
-        // target: 'http://192.168.2.233:5050', // 局域网代理接口
+        // target: 'http://api.vastlab.io:5050',
+        target: 'http://192.168.2.233:5050', // 局域网代理接口
         // target: 'http://127.0.0.1:8000', // dev 本地接口
         changeOrigin: true,
         rewrite: (path: string) => path.replace(/^\/api/, ''),

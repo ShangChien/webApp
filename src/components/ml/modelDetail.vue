@@ -5,10 +5,10 @@ const task = defineModel<string>('task')
 const taskList = ['regression', 'classification', 'multiclass', 'multilabel_classification', 'multilabel_regression']
 
 const models = defineModel<string[]>('models')
-const modelsList = ['HOMO', 'LUMO', 'Eg', 'Representation']
+const modelsList = ['HOMO', 'LUMO', 'Eg', 'Repr']
 
 const fileType = defineModel<string>('fileType')
-const fileTypeList = ['*.mol(3D)', '*.mol(2D)', '*.smi']
+const fileTypeList = ['*.mol', '*.smi']
 </script>
 
 <template>
@@ -48,7 +48,6 @@ const fileTypeList = ['*.mol(3D)', '*.mol(2D)', '*.smi']
             <NCheckbox
               v-for="(i_model, index) in modelsList"
               :key="index" :value="i_model"
-              :disabled="i_model === 'Representation'"
               :label="i_model"
               class="mx-1 pl-2 p-1"
               :class="[models.includes(i_model) ? 'bg-blue-3 rd-1 ' : '']"
@@ -69,9 +68,6 @@ const fileTypeList = ['*.mol(3D)', '*.mol(2D)', '*.smi']
               </NRadio>
             </NSpace>
           </NRadioGroup>
-          <div class="text-nowrap">
-            (*.mol(2D) will be transformed to 3D by RDKIT)
-          </div>
         </div>
       </div>
     </NCollapseItem>

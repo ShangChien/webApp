@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 
 // 全局状态，创建在模块作用域下
-const fileType = ref('*.mol(3D)')
+const fileType = ref('*.mol')
 const task = ref('regression')
 const models = ref<string[]>(['HOMO'])
 
