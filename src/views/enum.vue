@@ -50,7 +50,7 @@ watch(
         <a style="text-decoration: none; color: inherit">Molecule Generate</a>
       </template>
       <template #avatar>
-        <NAvatar color=" white" src="/favicon.svg" />
+        <NAvatar color=" white" src="/enum.svg" />
       </template>
       <template #extra>
         <NSpace class="mr-2">

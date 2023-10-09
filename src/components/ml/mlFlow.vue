@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { computed, ref, toValue } from 'vue'
+import { computed, toValue } from 'vue'
 import type { Ref } from 'vue'
 import { NButton } from 'naive-ui'
 import { Pane, Splitpanes } from 'splitpanes'
@@ -7,19 +7,18 @@ import axios from 'axios'
 import nglViewer from '@/components/nglViewer.vue'
 import mlTable from '@/components/ml/mlTable.vue'
 import modelDetail from '@/components/ml/modelDetail.vue'
-import { useMlSetting } from '@/stores/mlSetting'
-import type { dataResults, dataUnimol } from '@/components/types'
+import { useMlState } from '@/stores/mlState'
+import type { dataUnimol } from '@/components/types'
 
 const props = defineProps<{
   allFiles: { name: string; contents: string }[]
   index: number | null
 }>()
-const { fileType, task, models } = useMlSetting()
+const { fileType, task, models, result, isInferencing } = useMlState()
 
 const currentFile = computed<{ name: string; contents: string }>(() => props.allFiles[props.index])
 const allFiles = computed<{ name: string; contents: string }[]>(() => props.allFiles)
 
-const result = ref<dataResults[]>([])
 const currentFileTaskInfo = computed(() => ({
   atoms: null,
   coordinates: null,
@@ -43,19 +42,18 @@ const multiFileTaskInfo = computed(() => {
   }
 })
 
-const inferencing = ref(false)
 function Inference(taskInfo: dataUnimol | Ref<dataUnimol>) {
-  inferencing.value = true
+  isInferencing.value = true
   console.log(toValue(taskInfo))
   axios.post(
     'api/unimol',
     toValue(taskInfo),
   ).then(async (res: any) => {
     result.value = res2Obj(res.data)
-    inferencing.value = false
+    isInferencing.value = false
   }).catch((error) => {
     console.log(error)
-    inferencing.value = false
+    isInferencing.value = false
   })
 }
 
@@ -95,7 +93,7 @@ function res2Obj(res: dataUnimol) {
         <div class="h-full w-80% flex-auto box-border rd-1 bg-slate-1 pb-1">
           <div class="rd-1 bg-slate-2 h-full box-border flex flex-col ">
             <div class="flex-none h-38px">
-              <div v-if="!inferencing" class="flex justify-end items-center gap-2 p-1 pb-0 ">
+              <div v-if="!isInferencing" class="flex justify-end items-center gap-2 p-1 pb-0 ">
                 <NButton type="info" secondary class=" text-lg" @click="Inference(currentFileTaskInfo)">
                   predict current
                 </NButton>

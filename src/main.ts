@@ -6,7 +6,6 @@ import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2'
 import localforage from 'localforage'
 import 'virtual:uno.css'
 import '@/assets/font/font.css'
-import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import App from './App.vue'
 import router from './router'
 import initRDKit from '@/components/rdkitComponent/RDKit'
@@ -14,14 +13,6 @@ import initRDKit from '@/components/rdkitComponent/RDKit'
 // init SharedWorker(rdkit)
 const myWorker = new SharedWorker(new URL('./worker/sharedWorker.js', import.meta.url), { name: 'vastLabSharedWorker', type: 'module' })
 myWorker.port.postMessage(null)
-
-// eslint-disable-next-line no-restricted-globals
-self.MonacoEnvironment = {
-  getWorker() {
-    // eslint-disable-next-line new-cap
-    return new editorWorker()
-  },
-}
 
 const siteType = ref<number>(0)
 const molTags = ref<string[]>(['芳胺', '咔唑', '配体'])

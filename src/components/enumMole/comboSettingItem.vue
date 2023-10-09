@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { computed, ref, watchEffect, onMounted } from 'vue'
+import { computed, onMounted, ref, watchEffect } from 'vue'
 import { NSlider } from 'naive-ui'
 import type { enumData } from '@/components/types'
 

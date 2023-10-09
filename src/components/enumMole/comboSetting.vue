@@ -42,14 +42,14 @@ function enumMol() {
 <template>
   <div class="flex-col flex h-full">
     <div class="flex-none flex flex-nowrap justify-between m-1 mb-0  text-center" :style="{ transform: 'translate(0,2px)' }">
-      <div class="flex-none flex flex-nowrap justify-begin">
+      <div class="flex-none flex flex-nowrap justify-start">
         <div class="font-600 text-1.2em p-1 inline-block ">
           组合设置 :
         </div>
-        <div class="flex flex-nowrap justify-begin">
+        <div class="flex flex-nowrap justify-start">
           <div v-for="(item, i) in setting" :key="i">
             <div
-              class="p-1 rd-t-2 b-2 b-b-0 text-1.2em"
+              class="p-1 rd-t-2 b-2 b-b-0 text-1.2em cursor-pointer"
               :class="[settingName === item ? 'bg-slate-1 b-sky-2' : 'b-slate-2']"
               @click="settingName = item"
             >
