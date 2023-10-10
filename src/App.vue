@@ -11,14 +11,16 @@ import {
   NMenu,
   NMessageProvider,
 } from 'naive-ui'
-import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { LogoElectron } from '@vicons/ionicons5'
 import { BrandSlack, Home, Tabler3DCubeSphere } from '@vicons/tabler'
 import { Carbon, Data1, DataVis1 } from '@vicons/carbon'
 import ReloadPrompt from '@/components/ReloadPrompt.vue'
 import mlHeader from '@/components/ml/mlHeader.vue'
+import apiSet from '@/components/requestSet/apiSet.vue'
 
 const route = useRoute()
+const router = useRouter()
 const headerTabName = ref('ml')
 provide('headerTabName', headerTabName)
 const header = computed(() => route.name === 'ml' ? h(mlHeader) : null)
@@ -89,7 +91,7 @@ const menuOptions = [
   <NLayout class="font-lx-b" bordered position="absolute" style="height: 100vh" :native-scrollbar="false" @contextmenu.prevent>
     <NLayoutHeader class="h-6vh p-2px" bordered>
       <div class="flex flex-nowrap justify-start items-center h-full">
-        <div class="h-full flex-none">
+        <div class="h-full flex-none cursor-pointer" @click="router.push({ path: '/', name: 'home' })">
           <img class="w-5vh m-1" src="/favicon.ico">
         </div>
         <div class="flex-auto flex flex-nowrap justify-center items-center w-full h-full p-1">
@@ -112,13 +114,14 @@ const menuOptions = [
           :options="menuOptions"
           :collapsed="collapsed"
         />
-        <div class="w-100% text-center position-absolute bottom-0">
+        <div class="w-full position-absolute bottom-0 flex flex-col justify-center items-center box-border p-2 gap-1">
+          <apiSet class="flex-none w-full box-border" />
           <div
-            class="rd-1 ma-2 hover:(bg-violet-100 text-violet cursor-pointer duration-210 ease-in-out)"
+            class="rd-1 ma p-1 w-full box-border flex-none flex hover:(bg-slate-100 cursor-pointer duration-210 ease-in-out)"
             @click="collapsed = !collapsed"
           >
-            <div v-if="collapsed" class="i-tabler-layout-sidebar-left-expand text-3xl ma-1" />
-            <div v-else class="i-tabler-layout-sidebar-right-expand text-3xl ma-1" />
+            <div v-if="collapsed" class="i-tabler-layout-sidebar-left-expand text-3xl ma text-slate-5" />
+            <div v-else class="i-tabler-layout-sidebar-right-expand text-3xl ma text-slate-5" />
           </div>
         </div>
       </NLayoutSider>

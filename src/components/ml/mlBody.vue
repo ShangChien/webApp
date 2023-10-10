@@ -10,7 +10,6 @@ import fileSelector from '@/components/monaco/fileSelector.vue'
 
 const fileIndex = ref<number | null>(null)
 const allFiles = ref<{ name: string; contents: string }[]>([])
-const _hasFile = computed(() => allFiles.value.length > 0)
 
 watch(fileIndex, (v) => { console.log(allFiles.value[v]?.name ?? '') })
 

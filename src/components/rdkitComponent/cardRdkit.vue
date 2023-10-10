@@ -33,6 +33,8 @@ const _emit = defineEmits(['itemChecked'])
 const route = useRoute()
 const molDetail = inject<{ result: Ref<pgDataItem>; searchState: Ref<number> }>(keyMolDetail, {} as any)
 
+const apiPrefix: Ref<string> = inject('apiPrefix', ref('https://192.168.2.233:5055'))
+
 const currentEdit: Ref<{ id: number;state: number }> = inject('currentEdit')
 const enumStore = useEnumStore()
 const editState = computed(() => {
@@ -88,7 +90,7 @@ function handleDropOption(key: string) {
 function search(id: number) {
   molDetail.searchState.value = 1 // searching
   axios.post(
-    'api/molDetail',
+    `${apiPrefix}/molDetail`,
     { data: id },
   ).then(async (res: any) => {
     molDetail.result.value = res.data.data

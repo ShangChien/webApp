@@ -7,18 +7,17 @@ import { NStatistic } from 'naive-ui'
     <div class="w-40vw text-lg">
       <div class="i-fluent-emoji-thinking-face text-4xl inline-block" />
       <div class="inline">
-        I'm rethinking the R&D style of molecule on the new web world
-        just call me:
+        the R&D style of molecule on web by
       </div>
       <div class="text-2xl inline">
-        emm,
+        SUNERA
       </div>
-      <div class="inline">
-        which meaning: Exploring Molecular Magic, Efficient Molecular Mastery, Empowering Molecular Modeling...
+      <div>
+        Chemical database, Molecule generation, Task queue pipline, Auto work flow, Machine learning
       </div>
     </div>
-    <div class="flex flex-col items-center justify-center bg-fuchsia-1 w-50vw rd-2">
-      <div class="text-2xl ">
+    <div class="flex flex-col items-center justify-center bg-fuchsia-1 w-50vw rd-2 py-5">
+      <div class="text-2xl">
         Open Source Tools or Libraries used are as follows:
       </div>
       <div>

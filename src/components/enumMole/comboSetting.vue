@@ -1,5 +1,6 @@
 <script setup lang='ts'>
 import { inject, ref } from 'vue'
+import type { Ref } from 'vue'
 import { NButton } from 'naive-ui'
 import axios from 'axios'
 import comboSettingItem from '@/components/enumMole/comboSettingItem.vue'
@@ -18,11 +19,12 @@ const settingName = ref('enumAtoms')
 
 // axios请求后端
 const enumResult: any = inject('enumResult')
+const apiPrefix: Ref<string> = inject('apiPrefix', ref('https://192.168.2.233:5055'))
 function enumMol() {
   console.log('axios', props)
   // axios.get('api/todos/1').then(json => console.log(json))
   axios.post(
-    'api/enum',
+    `${apiPrefix}/enum`,
     props,
   ).then((response: any) => {
     const data = response.data.data

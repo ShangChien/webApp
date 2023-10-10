@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, h, onMounted, provide, ref, toValue, watch } from 'vue'
+import { computed, h, inject, onMounted, provide, ref, toValue, watch } from 'vue'
 import type { Ref, VNodeChild } from 'vue'
 import { computedEager, createReusableTemplate, useDebounceFn, useElementSize } from '@vueuse/core'
 import { useSortable } from '@vueuse/integrations/useSortable'
@@ -19,6 +19,8 @@ enum logicType {
   Not = 'not',
   Or = 'or',
 }
+
+const apiPrefix: Ref<string> = inject('apiPrefix', ref('https://192.168.2.233:5055'))
 
 const ketcher = { id: ref(0), showModal: ref(false), smiles: ref('') }
 provide(keyStateKetcher, ketcher)
@@ -437,7 +439,7 @@ watch(searchField, (newVal, _oldVal) => {
 function search() {
   serachProcessing.value = true
   axios.post(
-    'api/search',
+    `${apiPrefix}/search`,
     searchField.value,
   ).then(async (res: any) => {
     queryResult.value = res.data.data

@@ -17,11 +17,14 @@ myWorker.port.postMessage(null)
 const siteType = ref<number>(0)
 const molTags = ref<string[]>(['芳胺', '咔唑', '配体'])
 const currentEdit = ref<{ id: number;state: number }>({ id: 0, state: 0 })
+const apiPrefix = ref<string>('https://192.168.2.233:5055')
+
 const app = createApp(App)
 app.provide('currentEdit', currentEdit)
 app.provide('molTags', molTags)
 app.provide('siteType', siteType)
 app.provide('myWorker', readonly(myWorker))
+app.provide('apiPrefix', apiPrefix)
 const rdkit = ref<any>()
 initRDKit.then((res) => {
   rdkit.value = res

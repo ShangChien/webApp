@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { computed, toValue } from 'vue'
+import { computed, inject, toValue } from 'vue'
 import type { Ref } from 'vue'
 import { NButton } from 'naive-ui'
 import { Pane, Splitpanes } from 'splitpanes'
@@ -14,6 +14,7 @@ const props = defineProps<{
   allFiles: { name: string; contents: string }[]
   index: number | null
 }>()
+const apiPrefix = inject<Ref<string>>('apiPrefix')
 const { fileType, task, models, result, isInferencing } = useMlState()
 
 const currentFile = computed<{ name: string; contents: string }>(() => props.allFiles[props.index])
@@ -46,7 +47,7 @@ function Inference(taskInfo: dataUnimol | Ref<dataUnimol>) {
   isInferencing.value = true
   console.log(toValue(taskInfo))
   axios.post(
-    'api/unimol',
+    `${apiPrefix.value}/unimol`,
     toValue(taskInfo),
   ).then(async (res: any) => {
     result.value = res2Obj(res.data)
