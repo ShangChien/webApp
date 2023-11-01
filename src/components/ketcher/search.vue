@@ -439,7 +439,7 @@ watch(searchField, (newVal, _oldVal) => {
 function search() {
   serachProcessing.value = true
   axios.post(
-    `${apiPrefix}/search`,
+    `${apiPrefix.value}/search`,
     searchField.value,
   ).then(async (res: any) => {
     queryResult.value = res.data.data

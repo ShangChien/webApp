@@ -22,23 +22,23 @@ export default defineConfig({
       injectRegister: 'auto',
       includeAssets: ['/64.png', 'favicon.ico', 'robots.txt', '/180.png', 'favicon.svg'],
       manifest: {
-        name: 'emm',
-        short_name: 'emm',
-        description: 'emm app',
+        name: 'SUNERA App',
+        short_name: 'SUNERA',
+        description: 'sunera application',
         theme_color: '#ffffff',
         icons: [
           {
-            src: '/192.png',
+            src: '/android-chrome-192x192.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: '/512.png',
+            src: '/android-chrome-512x512.png',
             sizes: '512x512',
             type: 'image/png',
           },
           {
-            src: '/512.png',
+            src: '/android-chrome-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable',

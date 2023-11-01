@@ -7,7 +7,7 @@ import axios from 'axios'
 import nglViewer from '@/components/nglViewer.vue'
 import mlTable from '@/components/ml/mlTable.vue'
 import modelDetail from '@/components/ml/modelDetail.vue'
-import { useMlState } from '@/stores/mlState'
+import { useMlState } from '@/components/ml/mlState'
 import type { dataUnimol } from '@/components/types'
 
 const props = defineProps<{

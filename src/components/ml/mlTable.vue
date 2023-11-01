@@ -25,7 +25,7 @@ const columns: any = computed(() => {
 // ]
 
 const paginationReactive = reactive({
-  page: 2,
+  page: 1,
   pageSize: 9,
   showSizePicker: true,
   pageSizes: [5, 9, 13, 17, 21, 25, 50, 100],

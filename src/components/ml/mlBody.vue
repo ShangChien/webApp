@@ -1,12 +1,13 @@
 <!-- eslint-disable vue/attributes-order -->
 <script setup lang='ts'>
-import { computed, h, inject, onMounted, reactive, ref, watch } from 'vue'
+import { computed, h, onMounted, reactive, ref, watch } from 'vue'
 import type { VNodeChild } from 'vue'
 import { useElementSize } from '@vueuse/core'
 import { useMessage } from 'naive-ui'
 import editor from '@/components/monaco/editor.vue'
 import mlFlow from '@/components/ml/mlFlow.vue'
 import fileSelector from '@/components/monaco/fileSelector.vue'
+import { useMlState } from '@/components/ml/mlState'
 
 const fileIndex = ref<number | null>(null)
 const allFiles = ref<{ name: string; contents: string }[]>([])
@@ -17,14 +18,15 @@ const dom = ref()
 const { width: _width } = useElementSize(dom)
 const sizewidth = computed(() => `${_width.value + 12}px`)
 
-const headerTabName = inject('headerTabName', 'files') // files or ml
+const { currentTab } = useMlState()
+
 const Tabs = reactive({
   files: () => h(editor, {
     strText: allFiles.value[fileIndex.value]?.contents ?? '',
     name: allFiles.value[fileIndex.value]?.name ?? '',
     onSync: e => updateText(e),
   }, null),
-  ml: () => h(mlFlow, {
+  mlPredict: () => h(mlFlow, {
     allFiles: allFiles.value,
     index: fileIndex.value,
   }),
@@ -59,7 +61,7 @@ onMounted(() => {
     />
     <div class="flex-auto h-full sizeW relative box-border bg-white rd-1 relative">
       <KeepAlive>
-        <component :is="Tabs[headerTabName]" />
+        <component :is="Tabs[currentTab]" />
       </KeepAlive>
     </div>
   </div>

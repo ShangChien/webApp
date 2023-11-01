@@ -1,14 +1,16 @@
 <script setup lang='ts'>
-import { inject } from 'vue'
 import { NTabPane, NTabs } from 'naive-ui'
+import { useMlState } from '@/components/ml/mlState'
 
-const headerTabName = inject('headerTabName', 'files')
+const { currentTab } = useMlState()
 </script>
 
 <template>
-  <NTabs v-model:value="headerTabName" type="segment">
-    <NTabPane name="files" tab="inspect file" />
-    <NTabPane name="ml" tab="ml flow" />
+  <NTabs v-model:value="currentTab" type="segment">
+    <NTabPane name="files" tab="Inspect file" />
+    <NTabPane name="mlPredict" tab="Model predict" />
+    <NTabPane name="mlFit" tab="Model fit" />
+    <NTabPane name="visualAnalysis" tab="Visual analysis" />
   </NTabs>
 </template>
 

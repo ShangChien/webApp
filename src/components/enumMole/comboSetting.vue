@@ -24,7 +24,7 @@ function enumMol() {
   console.log('axios', props)
   // axios.get('api/todos/1').then(json => console.log(json))
   axios.post(
-    `${apiPrefix}/enum`,
+    `${apiPrefix.value}/enum`,
     props,
   ).then((response: any) => {
     const data = response.data.data

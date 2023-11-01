@@ -1,6 +1,6 @@
 <!-- eslint-disable unused-imports/no-unused-imports -->
 <script setup lang="ts">
-import { computed, h, provide, ref } from 'vue'
+import { computed, h, ref } from 'vue'
 import type { Component } from 'vue'
 import {
   NIcon,
@@ -21,8 +21,6 @@ import apiSet from '@/components/requestSet/apiSet.vue'
 
 const route = useRoute()
 const router = useRouter()
-const headerTabName = ref('ml')
-provide('headerTabName', headerTabName)
 const header = computed(() => route.name === 'ml' ? h(mlHeader) : null)
 
 const collapsed = ref(true)
