@@ -12,7 +12,6 @@ import {
   NThead,
   NTr,
 } from 'naive-ui'
-import { Delete, Edit, View } from '@vicons/carbon'
 </script>
 
 <template>
@@ -46,19 +45,19 @@ import { Delete, Edit, View } from '@vicons/carbon'
               <NButtonGroup>
                 <NButton size="small" round tertiary type="primary">
                   <template #icon>
-                    <NIcon><View /></NIcon>
+                    <NIcon><div class="i-carbon-view" /></NIcon>
                   </template>
                   查看
                 </NButton>
                 <NButton size="small" round tertiary type="info">
                   <template #icon>
-                    <NIcon><Edit /></NIcon>
+                    <NIcon><div class="i-carbon-edit" /></NIcon>
                   </template>
                   编辑
                 </NButton>
                 <NButton size="small" round tertiary type="error">
                   <template #icon>
-                    <NIcon><Delete /></NIcon>
+                    <NIcon><div class="i-carbon-trash-can" /></NIcon>
                   </template>
                   删除
                 </NButton>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, h, inject, onMounted, ref } from 'vue'
-import type { Component, Ref } from 'vue'
+import type { Ref } from 'vue'
 import {
   NButton,
   NCard,
@@ -12,8 +12,6 @@ import {
 } from 'naive-ui'
 import { useClipboard } from '@vueuse/core'
 import axios from 'axios'
-import { Dots } from '@vicons/tabler'
-import { CopyFile, Delete, Edit } from '@vicons/carbon'
 import { useRoute } from 'vue-router'
 import svgRdkit from '@/components/rdkitComponent/svgRdkit.vue'
 import { useCopy } from '@/components/rdkitComponent/composable/useCopy'
@@ -56,15 +54,13 @@ const target = ref(null)
 const { copy } = useClipboard()
 const _copytext = ref<string>(props.smiles)
 
-function renderIcon(icon: Component) {
-  return () => h(NIcon, null, {
-    default: () => h(icon),
-  })
+function renderIcon(iconClassStr: string) {
+  return () => h(NIcon, null, { default: () => h('div', { class: iconClassStr }) })
 }
 const options = [
-  { label: 'edit', key: 'edit', icon: renderIcon(Edit) },
-  { label: 'copy', key: 'copy', icon: renderIcon(CopyFile) },
-  { label: 'delete', key: 'delete', icon: renderIcon(Delete) },
+  { label: 'edit', key: 'edit', icon: renderIcon('i-carbon-edit') },
+  { label: 'copy', key: 'copy', icon: renderIcon('i-carbon-copy-file') },
+  { label: 'delete', key: 'delete', icon: renderIcon('i-carbon-trash-can') },
 ]
 function handleDropOption(key: string) {
   console.log(key)
@@ -153,7 +149,7 @@ onMounted(() => {
           >
             <NButton tertiary circle size="tiny" class="scale-90 mr-1">
               <template #icon>
-                <NIcon><Dots /></NIcon>
+                <NIcon><div class="i-tabler-dots" /></NIcon>
               </template>
             </NButton>
           </NDropdown>

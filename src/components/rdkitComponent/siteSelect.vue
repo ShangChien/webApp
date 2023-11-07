@@ -10,14 +10,6 @@ import {
   NSpace,
   NThing,
 } from 'naive-ui'
-import {
-  Carbon,
-  Close,
-  CloudSatellite,
-  ColorPalette,
-  Minimize,
-  Move,
-} from '@vicons/carbon'
 import { useClipboard, useDraggable, useElementSize, useWindowSize } from '@vueuse/core'
 import { computed, inject, onMounted, reactive, ref, watch, watchEffect } from 'vue'
 import type { Ref } from 'vue'
@@ -134,7 +126,7 @@ onMounted(() => {
         <NButton
           size="tiny" color="#FFA48D" circle
         >
-          <NIcon><Move /></NIcon>
+          <NIcon><div class="i-carbon-move" /></NIcon>
         </NButton>
         {{ id === 0 ? 'mode: add new' : `mode: update-${id}` }}
       </div>
@@ -148,7 +140,7 @@ onMounted(() => {
       >
         <template #icon>
           <NIcon :size="30">
-            <Carbon />
+            <div class="i-carbon-carbon" />
           </NIcon>
         </template>
       </NButton>
@@ -160,10 +152,10 @@ onMounted(() => {
     >
       <div ref="controlPin" class="pb-5px z-3">
         <NButton style="margin-right:5px;z-index:3" size="tiny" color="#7CBD99" circle @click="mini = !mini">
-          <NIcon><Minimize /></NIcon>
+          <NIcon><div class="i-carbon-minimize" /></NIcon>
         </NButton>
         <NButton style="z-index:3" size="tiny" color="#F39BBA" circle @click="visiualBox = false">
-          <NIcon><Close /></NIcon>
+          <NIcon><div class="i-carbon-close" /></NIcon>
         </NButton>
       </div>
       <div ref="NBG" class="absolute top-2px right-4px">
@@ -202,8 +194,9 @@ onMounted(() => {
                     <NIcon
                       color="#D66D75"
                       size="30"
-                      :component="CloudSatellite"
-                    />
+                    >
+                      <div class="i-carbon-cloud-satellite" />
+                    </NIcon>
                   </NButton>
                   <!-- modal画板区域 -->
                   <NModal v-model:show="showModal" display-directive="show">
@@ -237,7 +230,7 @@ onMounted(() => {
               </NInput>
               <NButton color="#c471ed" @click="drawMol">
                 <NIcon :size="30">
-                  <ColorPalette />
+                  <div class="i-carbon-color-palette" />
                 </NIcon>
               </NButton>
             </NInputGroup>

@@ -23,9 +23,6 @@ import {
   NSwitch,
   NThing,
 } from 'naive-ui'
-import { ColorPaletteOutline } from '@vicons/ionicons5'
-import { CloudSatellite, CopyFile } from '@vicons/carbon'
-import { BrandAppleArcade } from '@vicons/tabler'
 import { useClipboard } from '@vueuse/core'
 
 // import editableRdkit from "@/components/editableRdkit.vue";
@@ -272,11 +269,7 @@ watch(
                       quaternary
                       @click="showModal = true"
                     >
-                      <NIcon
-                        color="#D66D75"
-                        size="30"
-                        :component="CloudSatellite"
-                      />
+                      <div class="i-carbon-cloud-satellite" />
                     </NButton>
                     <!-- modal画板区域 -->
                     <NModal v-model:show="showModal" display-directive="show">
@@ -315,7 +308,7 @@ watch(
                 >
                   <template #icon>
                     <NIcon>
-                      <ColorPaletteOutline />
+                      <div class="i-ion-color-palette-outline" />
                     </NIcon>
                   </template>
                   绘制
@@ -348,7 +341,7 @@ watch(
                 >
                   <template #icon>
                     <NIcon>
-                      <CopyFile />
+                      <div class="i-carbon-copy-file" />
                     </NIcon>
                   </template>
                   <NGradientText
@@ -388,7 +381,7 @@ watch(
                   >
                     <template #icon>
                       <NIcon :size="20">
-                        <BrandAppleArcade />
+                        <div class="i-tabler-brand-apple-arcade" />
                       </NIcon>
                     </template>
                     开始枚举

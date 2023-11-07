@@ -1,7 +1,6 @@
 <!-- eslint-disable unused-imports/no-unused-imports -->
 <script setup lang="ts">
 import { computed, h, ref } from 'vue'
-import type { Component } from 'vue'
 import {
   NIcon,
   NLayout,
@@ -12,9 +11,6 @@ import {
   NMessageProvider,
 } from 'naive-ui'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
-import { LogoElectron } from '@vicons/ionicons5'
-import { BrandSlack, Home, Tabler3DCubeSphere } from '@vicons/tabler'
-import { Carbon, Data1, DataVis1 } from '@vicons/carbon'
 import ReloadPrompt from '@/components/ReloadPrompt.vue'
 import mlHeader from '@/components/ml/mlHeader.vue'
 import apiSet from '@/components/requestSet/apiSet.vue'
@@ -24,50 +20,50 @@ const router = useRouter()
 const header = computed(() => route.name === 'ml' ? h(mlHeader) : null)
 
 const collapsed = ref(true)
-function renderIcon(icon: Component) {
-  return () => h(NIcon, null, { default: () => h(icon) })
+function renderIcon(iconClassStr: string) {
+  return () => h(NIcon, null, { default: () => h('div', { class: iconClassStr }) })
 }
 const menuOptions = [
   // {
   //   label: () =>
   //     h(RouterLink, { to: { name: 'home' } }, { default: () => 'Home' }),
   //   key: 'go-back-home',
-  //   icon: renderIcon(Home),
+  //   icon: renderIcon('i-tabler-home'),
   // },
   // {
   //   label: () =>
   //     h(RouterLink, { to: { name: 'ketcher' } }, { default: () => 'Ketcher' }),
   //   key: 'view-ketcher',
-  //   icon: renderIcon(Carbon),
+  //   icon: renderIcon('i-carbon-carbon'),
   // },
   {
     label: () =>
       h(RouterLink, { to: { name: 'molStore' } }, { default: () => 'molStore' }),
     key: 'view-molStore',
-    icon: renderIcon(LogoElectron),
+    icon: renderIcon('i-ion-logo-electron'),
   },
   // {
   //   label: () => h(RouterLink, { to: { name: '3d' } }, { default: () => '3D' }),
   //   key: 'view-3D',
-  //   icon: renderIcon(Tabler3DCubeSphere),
+  //   icon: renderIcon('i-tabler-3d-cube-sphere'),
   // },
   {
     label: () =>
       h(RouterLink, { to: { name: 'task' } }, { default: () => 'Task' }),
     key: 'view-task',
-    icon: renderIcon(Data1),
+    icon: renderIcon('i-carbon-data-1'),
   },
   // {
   //   label: () =>
   //     h(RouterLink, { to: { name: 'enumMole' } }, { default: () => 'Enum Molecule' }),
   //   key: 'view-workSpcae',
-  //   icon: renderIcon(BrandSlack),
+  //   icon: renderIcon('i-tabler-brand-slack'),
   // },
   {
     label: () =>
       h(RouterLink, { to: { name: 'enum' } }, { default: () => 'Enum' }),
     key: 'view-enum',
-    icon: renderIcon(DataVis1),
+    icon: renderIcon('i-carbon-data-vis-1'),
   },
   // {
   //   label: () =>
