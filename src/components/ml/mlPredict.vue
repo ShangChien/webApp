@@ -7,7 +7,7 @@ import axios from 'axios'
 import nglViewer from '@/components/nglViewer.vue'
 import mlTable from '@/components/ml/mlTable.vue'
 import modelDetail from '@/components/ml/modelDetail.vue'
-import { useMlState } from '@/components/ml/mlState'
+import { usemlStore } from '@/components/ml/mlStore'
 import type { dataUnimol } from '@/components/types'
 
 const props = defineProps<{
@@ -15,7 +15,7 @@ const props = defineProps<{
   index: number | null
 }>()
 const apiPrefix = inject<Ref<string>>('apiPrefix')
-const { fileType, task, models, result, isInferencing } = useMlState()
+const MLStore = usemlStore()
 
 const currentFile = computed<{ name: string; contents: string }>(() => props.allFiles[props.index])
 const allFiles = computed<{ name: string; contents: string }[]>(() => props.allFiles)
@@ -24,10 +24,10 @@ const currentFileTaskInfo = computed(() => ({
   atoms: null,
   coordinates: null,
   results: null,
-  models: models.value,
+  models: MLStore.models,
   names: [currentFile.value.name],
-  smiles: fileType.value === '*.smi' ? [currentFile.value.contents] : null,
-  molBlocks: fileType.value !== '*.smi' ? [currentFile.value.contents] : null,
+  smiles: MLStore.fileType === '*.smi' ? [currentFile.value.contents] : null,
+  molBlocks: MLStore.fileType !== '*.smi' ? [currentFile.value.contents] : null,
 }))
 const multiFileTaskInfo = computed(() => {
   const contentsList = allFiles.value.map(e => e.contents)
@@ -36,25 +36,25 @@ const multiFileTaskInfo = computed(() => {
     atoms: null,
     coordinates: null,
     results: null,
-    models: models.value,
+    models: MLStore.models,
     names: nameList,
-    smiles: fileType.value === '*.smi' ? contentsList : null,
-    molBlocks: fileType.value !== '*.smi' ? contentsList : null,
+    smiles: MLStore.fileType === '*.smi' ? contentsList : null,
+    molBlocks: MLStore.fileType !== '*.smi' ? contentsList : null,
   }
 })
 
 function Inference(taskInfo: dataUnimol | Ref<dataUnimol>) {
-  isInferencing.value = true
+  MLStore.isInferencing = true
   console.log(toValue(taskInfo))
   axios.post(
     `${apiPrefix.value}/unimol`,
     toValue(taskInfo),
   ).then(async (res: any) => {
-    result.value = res2Obj(res.data)
-    isInferencing.value = false
+    MLStore.result = res2Obj(res.data)
+    MLStore.isInferencing = false
   }).catch((error) => {
     console.log(error)
-    isInferencing.value = false
+    MLStore.isInferencing = false
   })
 }
 
@@ -94,7 +94,7 @@ function res2Obj(res: dataUnimol) {
         <div class="h-full w-80% flex-auto box-border rd-1 bg-slate-1 pb-1">
           <div class="rd-1 bg-slate-2 h-full box-border flex flex-col ">
             <div class="flex-none h-38px">
-              <div v-if="!isInferencing" class="flex justify-end items-center gap-2 p-1 pb-0 ">
+              <div v-if="!MLStore.isInferencing" class="flex justify-end items-center gap-2 p-1 pb-0 ">
                 <NButton type="info" secondary class=" text-lg" @click="Inference(currentFileTaskInfo)">
                   predict current
                 </NButton>
@@ -109,7 +109,7 @@ function res2Obj(res: dataUnimol) {
             </div>
             <div class="p-1 flex-auto h-80% box-border">
               <div class="rd-1 bg-slate-1 p-2 flex-auto h-full box-border">
-                <modelDetail v-model:task="task" v-model:fileType="fileType" v-model:models="models" class="box-border" />
+                <modelDetail v-model:task="MLStore.task" v-model:fileType="MLStore.fileType" v-model:models="MLStore.models" class="box-border" />
               </div>
             </div>
           </div>
@@ -117,7 +117,7 @@ function res2Obj(res: dataUnimol) {
       </div>
     </Pane>
     <Pane max-size="70">
-      <mlTable class="flex-auto bg-slate-1 py-1 h-full" :data="result" />
+      <mlTable class="flex-auto bg-slate-1 py-1 h-full" :data="MLStore.result" />
     </Pane>
   </Splitpanes>
 </template>

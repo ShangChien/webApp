@@ -5,9 +5,10 @@ import type { VNodeChild } from 'vue'
 import { useElementSize } from '@vueuse/core'
 import { useMessage } from 'naive-ui'
 import editor from '@/components/monaco/editor.vue'
-import mlFlow from '@/components/ml/mlFlow.vue'
+import mlPredict from '@/components/ml/mlPredict.vue'
+import g2View from '@/components/visualAnalysis/g2View.vue'
 import fileSelector from '@/components/monaco/fileSelector.vue'
-import { useMlState } from '@/components/ml/mlState'
+import { usemlStore } from '@/components/ml/mlStore'
 
 const fileIndex = ref<number | null>(null)
 const allFiles = ref<{ name: string; contents: string }[]>([])
@@ -18,7 +19,7 @@ const dom = ref()
 const { width: _width } = useElementSize(dom)
 const sizewidth = computed(() => `${_width.value + 12}px`)
 
-const { currentTab } = useMlState()
+const MLStore = usemlStore()
 
 const Tabs = reactive({
   files: () => h(editor, {
@@ -26,10 +27,12 @@ const Tabs = reactive({
     name: allFiles.value[fileIndex.value]?.name ?? '',
     onSync: e => updateText(e),
   }, null),
-  mlPredict: () => h(mlFlow, {
+  mlPredict: () => h(mlPredict, {
     allFiles: allFiles.value,
     index: fileIndex.value,
   }),
+  visualAnalysis: () => h(g2View, {
+  }, null),
 })
 
 const message = useMessage()
@@ -61,7 +64,7 @@ onMounted(() => {
     />
     <div class="flex-auto h-full sizeW relative box-border bg-white rd-1 relative">
       <KeepAlive>
-        <component :is="Tabs[currentTab]" />
+        <component :is="Tabs[MLStore.currentTab]" />
       </KeepAlive>
     </div>
   </div>
