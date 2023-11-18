@@ -125,7 +125,7 @@ const menuOptions = [
         bordered
       >
         <NMessageProvider>
-          <RouterView v-slot="{ Component: comp }" class="mr-3 ">
+          <RouterView v-slot="{ Component: comp }" class="mr-3">
             <Transition name="fade" mode="out-in">
               <keep-alive>
                 <component :is="comp" />

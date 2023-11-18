@@ -5,7 +5,7 @@ import { Pane, Splitpanes } from 'splitpanes'
 import MonacoEditor from 'monaco-editor-vue3'
 import { NButton, NScrollbar } from 'naive-ui'
 
-const python = await import('@/worker/pyodide' /* @vite-ignore */)
+const python = await import('@/worker/pyodide/pyodide.mjs')
 // python setting
 const py = ref<any>()
 const codeStr = ref<string>(`

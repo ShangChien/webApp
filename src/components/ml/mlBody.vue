@@ -31,8 +31,7 @@ const Tabs = reactive({
     allFiles: allFiles.value,
     index: fileIndex.value,
   }),
-  visualAnalysis: () => h(g2View, {
-  }, null),
+  visualAnalysis: () => h(g2View, { class: 'w-full h-full box-border' }, []),
 })
 
 const message = useMessage()

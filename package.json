@@ -10,6 +10,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@antv/g-svg": "^1.10.21",
     "@antv/g2": "^5.1.7",
     "@johnsoncodehk/html2pug": "^1.0.0",
     "@jridgewell/sourcemap-codec": "^1.4.15",
