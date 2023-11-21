@@ -1,6 +1,6 @@
 <script setup lang='ts'>
-import { computed, reactive, ref } from 'vue'
-import { NButton, NCollapse, NCollapseItem, NScrollbar, NSelect } from 'naive-ui'
+import { computed, h, reactive, ref } from 'vue'
+import { NButton, NCollapse, NCollapseItem, NScrollbar, NSelect, NSlider } from 'naive-ui'
 import type { ScaleItem, ViewType, itemOption } from './types'
 import { coordOption, fig, scaleAxisType, scaleType, view } from './types'
 import { toOptionsArray } from './utils'
@@ -13,6 +13,16 @@ const fileIndex = defineModel<number | null>('index', { default: 0 })
 const config = defineModel<ViewType>('config')
 
 const fileOptions = computed(() => props.allFiles.map((el, index) => ({ label: el.name, value: index })))
+const columns = computed(() => {
+  const file = props.allFiles[fileIndex.value]
+  let cols
+  if (file.name.endsWith('csv') || file.name.endsWith('CSV')) {
+    cols = file.contents.split('\n')[0].split(',')
+  } else if (file.name.endsWith('json') || file.name.endsWith('JSON')) {
+    cols = Object.keys(JSON.parse(file.contents)[0])
+  }
+  return cols
+})
 
 const viewView = reactive({
   value: view.view,
@@ -29,18 +39,26 @@ const scaleConfig: any = Object.entries(scaleAxisType).reduce((obj, [key, _value
       options: toOptionsArray(scaleType),
     },
     range: {
-      value: null,
-      option: {
-        min: 0,
-        max: 100,
-      },
+      value: [0, 100],
+      option: (val: number[]) => h(NSlider, {
+        'range': true,
+        'step': 1,
+        'value': val,
+        'onUpdata:value': (e: any) => {
+          val = e.target.value
+        },
+      }, null),
     },
     domain: {
-      value: null,
-      option: {
-        min: 0,
-        max: 100,
-      },
+      value: [0, 100],
+      option: (val: number[]) => h(NSlider, {
+        'range': true,
+        'step': 1,
+        'value': val,
+        'onUpdata:value': (e: any) => {
+          val = e.target.value
+        },
+      }, null),
     },
     nice: {
       value: true,
@@ -54,12 +72,24 @@ const scaleConfig: any = Object.entries(scaleAxisType).reduce((obj, [key, _value
   return obj
 }, reactive({}))
 
-const XYs = ref<itemOption[]>([{
-  type: fig.point,
+const XYs = ref<any[]>([{
+  type: {
+    value: fig.point,
+    options: toOptionsArray(fig),
+  },
   encode: {
-    x: 'weight',
-    y: 'height',
-    color: 'gender',
+    x: {
+      value: columns.value[0],
+      option: columns.value,
+    },
+    y: {
+      value: columns.value[1],
+      option: columns.value,
+    },
+    color: {
+      value: columns.value[1],
+      option: columns.value,
+    },
   },
   scale: scaleConfig,
 }])

@@ -1,4 +1,4 @@
-export function _readCsv(csvText: string): object[] {
+export function readCsv(csvText: string): object[] {
   const lines = csvText.split('\n')
   const arr = []
 
