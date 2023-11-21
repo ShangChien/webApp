@@ -1,5 +1,5 @@
 export enum coordOption {
-  default = null,
+  cartesian = 'cartesian',
   theta = 'theta',
   polar = 'polar',
   radial = 'radial',
@@ -23,15 +23,22 @@ export enum fig {
 }
 
 export enum view {
-  default = 'view',
+  view = 'view',
   spaceFlex = 'spaceFlex',
   facetRect = 'facetRect',
   repeatMatrix = 'repeatMatrix',
 }
 
-export interface Coord {
-  type: coordOption
-  transform?: { type: string }[] // 转置XY轴 [{ type: 'transpose' }]
+export enum scaleType {
+  linear = 'linear',
+  time = 'time',
+  log = 'log',
+}
+
+export enum scaleAxisType {
+  x = 'x',
+  y = 'y',
+  color = 'color',
 }
 
 export interface ScaleItem {
@@ -44,13 +51,7 @@ export interface ScaleItem {
   padding?: number
 }
 
-export interface Scale {
-  x?: ScaleItem
-  y?: ScaleItem
-  color?: ScaleItem
-}
-
-export interface Option {
+export interface itemOption {
   type: fig
   data?: object[]
   encode: {
@@ -58,17 +59,35 @@ export interface Option {
     y: string | string[]
     color?: string
   }
-  scale?: Scale
+  scale?: {
+    x?: ScaleItem
+    y?: ScaleItem
+    color?: ScaleItem
+  }
   style?: any
   shape?: any // customize
   tooltip?: any // customize
-  coordinate?: Coord
+  coordinate?: {
+    type: coordOption
+    transform?: {
+      value: { type: string }[] // 转置XY轴 [{ type: 'transpose' }]
+    }
+  }
 }
 
 export interface ViewType {
   type: view
   data: object[]
-  children: Option[]
-  coordinate?: Coord
-  scale?: Scale
+  children: itemOption[]
+  coordinate?: {
+    type: coordOption
+    transform?: {
+      value: { type: string }[] // 转置XY轴 [{ type: 'transpose' }]
+    }
+  }
+  scale?: {
+    x?: ScaleItem
+    y?: ScaleItem
+    color?: ScaleItem
+  }
 }

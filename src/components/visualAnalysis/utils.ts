@@ -13,3 +13,14 @@ export function _readCsv(csvText: string): object[] {
 
   return arr
 }
+
+export function toOptionsArray(enumValue: any): { label: string; value: any }[] {
+  const options = []
+  Object.keys(enumValue).forEach((key: string) => {
+    options.push({
+      label: key,
+      value: enumValue[key],
+    })
+  })
+  return options
+}
