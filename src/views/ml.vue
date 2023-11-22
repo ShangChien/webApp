@@ -3,7 +3,7 @@ import mlBody from '@/components/ml/mlBody.vue'
 </script>
 
 <template>
-  <div class="h-90vh relative m-0 p-0 flex box-border">
+  <div class="h-90vh relative m-0 p-0 flex box-border flex-auto">
     <Suspense>
       <template #default>
         <mlBody />

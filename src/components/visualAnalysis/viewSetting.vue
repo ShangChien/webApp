@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { computed, h, reactive, ref } from 'vue'
+import { computed, h, reactive, ref, watch } from 'vue'
 import { NButton, NCollapse, NCollapseItem, NScrollbar, NSelect, NSlider } from 'naive-ui'
 import type { ScaleItem, ViewType, itemOption } from './types'
 import { coordOption, fig, scaleAxisType, scaleType, view } from './types'
@@ -16,12 +16,17 @@ const fileOptions = computed(() => props.allFiles.map((el, index) => ({ label: e
 const columns = computed(() => {
   const file = props.allFiles[fileIndex.value]
   let cols
-  if (file.name.endsWith('csv') || file.name.endsWith('CSV')) {
-    cols = file.contents.split('\n')[0].split(',')
-  } else if (file.name.endsWith('json') || file.name.endsWith('JSON')) {
-    cols = Object.keys(JSON.parse(file.contents)[0])
+  if (file === null || file === undefined || Object.keys(file).length === 0) {
+    return []
+  } else {
+    if (file.name.endsWith('csv') || file.name.endsWith('CSV')) {
+      cols = file.contents.split('\n')[0].split(',')
+    } else if (file.name.endsWith('json') || file.name.endsWith('JSON')) {
+      cols = Object.keys(JSON.parse(file.contents)[0])
+    }
+    return cols
   }
-  return cols
+  // return ['height', 'width', 'length']
 })
 
 const viewView = reactive({
@@ -40,33 +45,19 @@ const scaleConfig: any = Object.entries(scaleAxisType).reduce((obj, [key, _value
     },
     range: {
       value: [0, 100],
-      option: (val: number[]) => h(NSlider, {
-        'range': true,
-        'step': 1,
-        'value': val,
-        'onUpdata:value': (e: any) => {
-          val = e.target.value
-        },
-      }, null),
+      options: null,
     },
     domain: {
       value: [0, 100],
-      option: (val: number[]) => h(NSlider, {
-        'range': true,
-        'step': 1,
-        'value': val,
-        'onUpdata:value': (e: any) => {
-          val = e.target.value
-        },
-      }, null),
+      options: null,
     },
     nice: {
-      value: true,
-      option: [true, false],
+      value: 'True',
+      options: ['True', 'False'].map(x => ({ value: x, label: x })),
     },
     padding: {
-      value: 0.01,
-      option: [true, false],
+      value: 0,
+      options: [5, 1, 0, -1, -5].map(x => ({ value: x, label: x })),
     },
   }
   return obj
@@ -80,42 +71,64 @@ const XYs = ref<any[]>([{
   encode: {
     x: {
       value: columns.value[0],
-      option: columns.value,
+      options: columns.value.map(x => ({ value: x, label: x })),
     },
     y: {
       value: columns.value[1],
-      option: columns.value,
+      options: columns.value.map(x => ({ value: x, label: x })),
     },
     color: {
       value: columns.value[1],
-      option: columns.value,
+      options: columns.value.map(x => ({ value: x, label: x })),
     },
   },
   scale: scaleConfig,
 }])
 
-const localConfig = computed<ViewType>(() => ({
-  type: viewView.value,
-  data: JSON.parse(props.allFiles[fileIndex.value].contents),
-  coordinate: { type: viewCoord.value },
-  scales: {
-    x: { nice: true },
-    y: { nice: true },
-  },
-  children: XYs.value,
-}))
+watch(XYs, () => {
+  console.log(scaleConfig)
+}, { deep: true })
+
+function logic2component(XY: any) {
+  return h('div', { class: 'grid gap-1 box-border items-center', style: { 'grid-template-columns': '60px auto' } },
+    Object.entries(XY).map((item: any) => {
+      if ('options' in item[1]) {
+        return [
+          h('div', { class: 'bg-slate-1 rd-1 h-full w-full items-center justify-center flex' }, item[0]),
+          Array.isArray(item[1].options)
+            ? h(NSelect, {
+              'size': 'small',
+              'value': item[1].value,
+              'options': item[1].options,
+              'onUpdate:value': (value: any) => { item[1].value = value },
+            }, null)
+            : h(NSlider, {
+              'range': true,
+              'step': 1,
+              'value': item[1].value,
+              'onUpdate:value': (value: any) => { item[1].value = value },
+            }, null),
+        ]
+      } else {
+        return [h('div', { class: 'bg-slate-1 rd-1 h-full w-full items-center justify-center flex' }, item[0]), logic2component(item[1])]
+      }
+    }).flat(),
+  )
+}
 </script>
 
 <template>
-  <div>
-    <NButton type="info" secondary size="tiny" class=" text-1em float-right m-1" @click="emit('updateChart', config)">
+  <div class="flex-auto box-border h-full flex flex-col">
+    <NButton type="info" secondary size="tiny" class="flex-none text-1em m-1 ml-a " @click="emit('updateChart', config)">
       重新渲染
     </NButton>
-    <NScrollbar class="max-h-full pr-1 box-border">
-      <NCollapse class="m-1">
+    <NScrollbar class="max-h-full pr-1 box-border flex flex-auto">
+      <NCollapse>
         <NCollapseItem title="视图布局" name="1">
-          <div class="grid grid-cols-2 gap-1 box-border m-1">
-            <div>数据源：</div>
+          <div class="grid grid-cols-2 gap-1 box-border m-2" style="grid-template-columns:100px auto">
+            <div class="bg-slate-1  rd-1 h-full w-full items-center justify-center flex">
+              数据源：
+            </div>
             <NSelect
               v-model:value="fileIndex"
               size="small"
@@ -123,40 +136,20 @@ const localConfig = computed<ViewType>(() => ({
               :disabled="fileOptions.length < 1"
               :placeholder="(fileOptions.length < 1) ? 'no data' : props.allFiles[fileIndex].name"
             />
-            <div>布局类型：</div>
+            <div class="bg-slate-1  rd-1 h-full w-full items-center justify-center flex">
+              布局类型：
+            </div>
             <NSelect v-model:value="viewView.value" size="small" :options="viewView.options" />
-            <div>坐标系类型：</div>
+            <div class="bg-slate-1  rd-1 h-full w-full items-center justify-center flex">
+              坐标系类型：
+            </div>
             <NSelect v-model:value="viewCoord.value" size="small" :options="viewCoord.options" />
           </div>
-          <NCollapse>
-            <NCollapseItem title="坐标轴" name="1-1">
-              <NCollapse>
-                <NCollapseItem title="x轴" name="1-1">
-                  <div class="grid grid-cols-2 gap-1 box-border m-1">
-                    <div>类型：</div>
-                    <NSelect
-                      v-model:value="fileIndex"
-                      size="small"
-                      :options="fileOptions"
-                    />
-                    <div>布局类型：</div>
-                    <NSelect v-model:value="viewLayout" size="small" :options="viewLayoutOptions" />
-                    <div>坐标系类型：</div>
-                    <NSelect v-model:value="coordLayout" size="small" :options="coordLayoutOptions" />
-                  </div>
-                </NCollapseItem>
-                <NCollapseItem title="y轴" name="1-2">
-                  <div>快速通过</div>
-                </NCollapseItem>
-              </NCollapse>
-            </NCollapseItem>
-          </NCollapse>
         </NCollapseItem>
         <NCollapseItem title="子图设置" name="2">
-          <div>布局类型：</div>
-          <NSelect v-model:value="viewLayout" size="small" :options="viewLayoutOptions" />
-          <div>布局类型：</div>
-          <NSelect v-model:value="viewLayout" size="small" :options="viewLayoutOptions" />
+          <div v-for="(xy, key) in XYs" :key="key" class="m-2">
+            <component :is="logic2component(xy)" />
+          </div>
         </NCollapseItem>
       </NCollapse>
     </NScrollbar>
