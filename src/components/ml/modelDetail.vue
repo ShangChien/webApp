@@ -5,7 +5,7 @@ const task = defineModel<string>('task')
 const taskList = ['regression', 'classification', 'multiclass', 'multilabel_classification', 'multilabel_regression']
 
 const models = defineModel<string[]>('models')
-const modelsList = ['HOMO', 'LUMO', 'Eg', 'Repr']
+const modelsList = ['HOMO', 'LUMO', 'Eg', 'S1', 'T1', 'Repr']
 
 const fileType = defineModel<string>('fileType')
 const fileTypeList = ['*.mol', '*.smi']

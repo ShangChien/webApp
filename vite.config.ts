@@ -1,5 +1,6 @@
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
+import copy from 'rollup-plugin-copy'
 import { VitePWA } from 'vite-plugin-pwa'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -51,6 +52,12 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,pdb,sdf,wasm}'],
         navigateFallbackDenylist: [/^\/api/],
       },
+    }),
+    copy({
+      targets: [
+        { src: 'public/RDKit_minimal.wasm', dest: 'dist/assets' },
+      ],
+      hook: 'writeBundle', // 在writeBundle钩子时执行复制操作
     }),
   ],
   server: {

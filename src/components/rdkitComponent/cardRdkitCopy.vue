@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { defineAsyncComponent, h, onMounted, reactive, ref } from 'vue'
-import type { Component } from 'vue'
 import {
   NButton,
   NCard,
@@ -14,8 +13,6 @@ import {
   NSpin,
 } from 'naive-ui'
 import { useClipboard, useMouseInElement } from '@vueuse/core'
-import { Dots } from '@vicons/tabler'
-import { CopyFile, Delete, Edit } from '@vicons/carbon'
 import type { molData } from '@/components/types'
 import svgRdkit from '@/components/rdkitComponent/svgRdkit.vue'
 
@@ -66,29 +63,22 @@ function acceptMol(mol: molData) {
 const { copy } = useClipboard()
 const copytext = ref<string>(props.smiles)
 
-function renderIcon(icon: Component) {
-  return () => {
-    return h(NIcon, null, {
-      default: () => h(icon),
-    })
-  }
+function renderIcon(iconClassStr: string) {
+  return () => h(NIcon, null, { default: () => h('div', { class: iconClassStr }) })
 }
 const options = [
-  { label: 'edit', key: 'edit', icon: renderIcon(Edit) },
-  { label: 'copy', key: 'copy', icon: renderIcon(CopyFile) },
-  { label: 'delete', key: 'delete', icon: renderIcon(Delete) },
+  { label: 'edit', key: 'edit', icon: renderIcon('i-carbon-edit') },
+  { label: 'copy', key: 'copy', icon: renderIcon('i-carbon-copy-file') },
+  { label: 'delete', key: 'delete', icon: renderIcon('i-carbon-trash-can') },
 ]
 function handleDropOption(key: string) {
   if (key === 'edit') {
     showModal.value = true
-  }
-  else if (key === 'copy') {
+  } else if (key === 'copy') {
     copy(copytext.value)
-  }
-  else if (key === 'delete') {
+  } else if (key === 'delete') {
     emit('itemDeleted')
-  }
-  else if (key === 'edit') {
+  } else if (key === 'edit') {
     //
   }
 }
@@ -127,7 +117,7 @@ onMounted(() => {
             >
               <NButton tertiary circle size="tiny">
                 <template #icon>
-                  <NIcon><Dots /></NIcon>
+                  <NIcon><div class="i-tabler-dots" /></NIcon>
                 </template>
               </NButton>
             </NDropdown>

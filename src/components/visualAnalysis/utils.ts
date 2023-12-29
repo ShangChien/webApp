@@ -1,15 +1,21 @@
 export function readCsv(csvText: string): object[] {
-  const lines = csvText.split('\n')
+  const lines = csvText.trim().split('\n')
+  const cols = lines[0].split(',').map(col => col.trim())
   const arr = []
-
-  for (const line of lines) {
-    const obj = {}
+  lines.slice(1).forEach((line, i) => {
     const items = line.split(',')
-    for (const item of items) {
-      obj[item.trim()] = item.trim()
+    if (items.length === cols.length) {
+      const obj = items.reduce((obj, item, index) => {
+        const trimmedItem = item.trim()
+        const numberPattern = /^-?\d+(\.\d+)?$/
+        obj[cols[index]] = numberPattern.test(trimmedItem) ? Number.parseFloat(trimmedItem) : trimmedItem
+        return obj
+      }, {})
+      arr.push(obj)
+    } else {
+      console.error(`Line ${i + 1} does not have the same number of items as the header.`)
     }
-    arr.push(obj)
-  }
+  })
 
   return arr
 }

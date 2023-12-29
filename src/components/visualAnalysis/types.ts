@@ -7,12 +7,12 @@ export enum coordOption {
 
 export enum fig {
   interval = 'interval',
-  bin = 'bin',
   line = 'line',
   point = 'point',
   area = 'area',
   pie = 'pie',
   cell = 'cell',
+  rect = 'rect',
   rose = 'rose',
   radial = 'radial',
   radar = 'radar',
@@ -38,7 +38,7 @@ export enum scaleType {
 export enum scaleAxisType {
   x = 'x',
   y = 'y',
-  color = 'color',
+  // color = 'color',
 }
 
 export interface ScaleItem {
@@ -84,10 +84,5 @@ export interface ViewType {
     transform?: {
       value: { type: string }[] // 转置XY轴 [{ type: 'transpose' }]
     }
-  }
-  scale?: {
-    x?: ScaleItem
-    y?: ScaleItem
-    color?: ScaleItem
   }
 }

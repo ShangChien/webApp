@@ -9,7 +9,7 @@ import viewSetting from '@/components/visualAnalysis/viewSetting.vue'
 import fileSelector from '@/components/monaco/fileSelector.vue'
 import { usemlStore } from '@/components/ml/mlStore'
 
-const fileIndex = ref<number | null>(null)
+const fileIndex = ref<number>(0)
 const allFiles = ref<{ name: string; contents: string }[]>([])
 
 watch(fileIndex, (v) => { console.log(allFiles.value[v]?.name ?? '') })
