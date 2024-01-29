@@ -86,7 +86,7 @@ function handleDropOption(key: string) {
 function search(id: number) {
   molDetail.searchState.value = 1 // searching
   axios.post(
-    `${apiPrefix.value}/molDetail`,
+    `${apiPrefix.value}/db/molDetail`,
     { data: id },
   ).then(async (res: any) => {
     molDetail.result.value = res.data.data

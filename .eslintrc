@@ -10,6 +10,11 @@
     "vue/no-unused-vars": ["error", {"ignorePattern": "^_"}],
     "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
     "@typescript-eslint/brace-style": ["error", "1tbs", { "allowSingleLine": true }],
+    "vue/singleline-html-element-content-newline": ["error", {
+        "ignoreWhenNoAttributes": true,
+        "ignoreWhenEmpty": true,
+        "ignores": ["pre", "textarea", "button", "div", "span"]
+      }],
     "no-restricted-syntax": [
         "error",
         {

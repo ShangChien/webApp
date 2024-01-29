@@ -1,5 +1,5 @@
 export function readCsv(csvText: string): object[] {
-  const lines = csvText.trim().split('\n')
+  const lines = csvText.trim().split(/\r?\n/)
   const cols = lines[0].split(',').map(col => col.trim())
   const arr = []
   lines.slice(1).forEach((line, i) => {
@@ -16,8 +16,43 @@ export function readCsv(csvText: string): object[] {
       console.error(`Line ${i + 1} does not have the same number of items as the header.`)
     }
   })
-
   return arr
+}
+
+export function file2Data(file: { name: string; contents: string }): { cols: string[]; data: object[] } {
+  if (file === null || file === undefined || Object.keys(file).length === 0) {
+    console.log(`${file} is empty!`)
+    return { cols: [], data: [] }
+  } else {
+    let data: object[]
+    if (file.name.endsWith('csv') || file.name.endsWith('CSV')) {
+      data = readCsv(file.contents)
+    } else if (file.name.endsWith('json') || file.name.endsWith('JSON')) {
+      data = JSON.parse(file.contents)
+    }
+    const cols: string[] = Object.keys(data[0])
+
+    return { cols, data }
+  }
+}
+
+export function normalize(data: object[]): object[] {
+  if (data.length > 0) {
+    const cols: string[] = Object.keys(data[0])
+    cols.slice(1).forEach((col) => {
+      const col_arr = data.map(item => item[col])
+      const min = Math.min(...col_arr)
+      const max = Math.max(...col_arr)
+      data = data.map(item => ({
+        ...item,
+        [col]: (item[col] - min) / (max - min),
+      }))
+    })
+    return data
+  } else {
+    console.log(`${data} is empty!`)
+    return []
+  }
 }
 
 export function toOptionsArray(enumValue: any): { label: string; value: any }[] {
@@ -29,4 +64,8 @@ export function toOptionsArray(enumValue: any): { label: string; value: any }[] 
     })
   })
   return options
+}
+
+export function tickInfo(min: number, max: number, step = 20): number[] {
+  return Array.from({ length: Math.floor((max - min) / step) + 1 }, (_, index) => 250 + index * step)
 }

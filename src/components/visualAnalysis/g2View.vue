@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { Chart } from '@antv/g2'
 import type { ViewType } from './types'
 
@@ -25,8 +25,12 @@ function updateChart(chart: Chart, config: ViewType): Promise<void> {
 
 onMounted(() => {
   chart = initChart(container.value)
-  updateChart(chart, props.option)
-    .catch(error => console.error(props.option, error))
+  watch(() => props.option, (val) => {
+    updateChart(chart, val)
+      .catch(error => console.error(props.option, error))
+  }, {
+    immediate: true,
+  })
   // console.log(props.option)
 })
 

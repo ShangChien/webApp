@@ -13,11 +13,20 @@ import {
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import ReloadPrompt from '@/components/ReloadPrompt.vue'
 import mlHeader from '@/components/ml/mlHeader.vue'
+import dataCheckHeader from '@/components/dataCheck/dataCheckHeader.vue'
 import apiSet from '@/components/requestSet/apiSet.vue'
 
 const route = useRoute()
 const router = useRouter()
-const header = computed(() => route.name === 'ml' ? h(mlHeader) : null)
+const header = computed(() => {
+  if (route.name === 'ml') {
+    return h(mlHeader)
+  } else if (route.name === 'dataCheck') {
+    return h(dataCheckHeader)
+  } else {
+    return null
+  }
+})
 
 const collapsed = ref(true)
 function renderIcon(iconClassStr: string) {
@@ -71,6 +80,12 @@ const menuOptions = [
   //   key: 'view-python',
   //   icon: () => h(NIcon, null, { default: () => h('div', { class: 'i-tabler-brand-python' }) }),
   // },
+  {
+    label: () =>
+      h(RouterLink, { to: { name: 'dataCheck' } }, { default: () => 'dataCheck' }),
+    key: 'view-dataCheck',
+    icon: () => h('div', { class: 'i-file-icons-chartjs' }),
+  },
   {
     label: () =>
       h(RouterLink, { to: { name: 'ml' } }, { default: () => 'ml' }),

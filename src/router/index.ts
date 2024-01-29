@@ -52,6 +52,11 @@ const router = createRouter({
       name: 'ml',
       component: () => import('../views/ml.vue'),
     },
+    {
+      path: '/dataCheck',
+      name: 'dataCheck',
+      component: () => import('../views/dataCheck.vue'),
+    },
   ],
 })
 

@@ -439,7 +439,7 @@ watch(searchField, (newVal, _oldVal) => {
 function search() {
   serachProcessing.value = true
   axios.post(
-    `${apiPrefix.value}/search`,
+    `${apiPrefix.value}/db/search`,
     searchField.value,
   ).then(async (res: any) => {
     queryResult.value = res.data.data
@@ -559,9 +559,7 @@ onMounted(() => {
               tabindex="0"
             >
               <component :is="data.logic_icon" :key="data.id" />
-              <div class="p-0 m-0 text-l">
-                {{ data.logic }}
-              </div>
+              <div class="p-0 m-0 text-l">{{ data.logic }}</div>
             </div>
           </NDropdown>
         </div>

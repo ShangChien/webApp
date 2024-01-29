@@ -47,10 +47,10 @@ function Inference(taskInfo: dataUnimol | Ref<dataUnimol>) {
   MLStore.isInferencing = true
   console.log(toValue(taskInfo))
   axios.post(
-    `${apiPrefix.value}/unimol`,
+    `${apiPrefix.value}/ml/unimol`,
     toValue(taskInfo),
   ).then(async (res: any) => {
-    MLStore.result = res2Obj(res.data)
+    MLStore.result = res2Obj(res.data.data)
     MLStore.isInferencing = false
   }).catch((error) => {
     console.log(error)
