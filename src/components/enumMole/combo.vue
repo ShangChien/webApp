@@ -17,7 +17,7 @@ watch(
       Object.keys(mol.atoms ?? {}).forEach((colorIndex) => {
         // const step = (100 / mol.atoms[colorIndex].length).toFixed(2)
         Nmol.enumAtoms[colorIndex] = reactive({
-          list: mol.atoms[colorIndex],
+          array: mol.atoms[colorIndex],
           range: [0, mol.atoms[colorIndex].length],
           keepSame2Index: [],
           connect2index: [],
@@ -27,7 +27,7 @@ watch(
       Object.keys(mol.bonds ?? {}).forEach((colorIndex) => {
         // const step = (+100 / mol.bonds[colorIndex].length).toFixed(2)
         Nmol.enumBonds[colorIndex] = reactive({
-          list: mol.bonds[colorIndex],
+          array: mol.bonds[colorIndex],
           range: [0, mol.bonds[colorIndex].length],
           keepSame2Index: [],
           connect2index: [],

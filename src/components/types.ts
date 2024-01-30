@@ -27,7 +27,7 @@ export interface molData {
 }
 export interface enumData {
   [key: number]: {
-    list: number[]
+    array: number[]
     range: [number, number]
     keepSame2Index: number[]
     connect2index: number[]

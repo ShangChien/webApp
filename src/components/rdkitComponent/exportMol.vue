@@ -1,10 +1,12 @@
 <script setup lang='ts'>
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
+import type { Ref } from 'vue'
 import axios from 'axios'
 import { NInputNumber, NPopover, NScrollbar, NSwitch } from 'naive-ui'
 import type { molData } from '@/components/types'
 
 const props = defineProps<{ molList: molData[] }>()
+const apiPrefix: Ref<string> = inject('apiPrefix', ref('https://192.168.2.233:5055'))
 const cdxml4export = ref<string[]>([])
 const downloaded = ref<number[]>([])
 const cols = ref<number>(10)
@@ -37,7 +39,7 @@ function getCdxFile() {
     }
   })
   axios.post(
-    'api/cdxml',
+    `${apiPrefix.value}/enum_smiles/cdxml`,
     data.value,
   ).then((res: any) => {
     console.log('receve res')

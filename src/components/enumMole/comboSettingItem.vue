@@ -79,8 +79,8 @@ onMounted(() => {
           <span class="font-400">取代比例:</span>
           <NSlider
             v-model:value="v.range"
-            class="w-90% p-1 b-(2 rd-2 indigo-50) bg-slate-50" range :max="v.list.length"
-            :format-tooltip="(value: number) => `${(value / v.list.length) * 100}%`"
+            class="w-90% p-1 b-(2 rd-2 indigo-50) bg-slate-50" range :max="v.array.length"
+            :format-tooltip="(value: number) => `${(value / v.array.length) * 100}%`"
             :step="1"
           />
         </div>
