@@ -9,8 +9,13 @@ export const useDataCheckStore = defineStore('dataCheck', () => {
   return { currentTab, fileType, result }
 })
 
-export interface spectrumData {
+export interface Spectrum {
   name: string
-  nm: number[]
-  intensity: number[]
+  nm: number
+  intensity: number
+}
+export interface SpectrumFromDB {
+  name: string
+  raw_arr: number[][]
+  peaks_arr: number[]
 }

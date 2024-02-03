@@ -1,4 +1,4 @@
-export function readCsv(csvText: string): object[] {
+export function readCsv<T>(csvText: string): T[] {
   const lines = csvText.trim().split(/\r?\n/)
   const cols = lines[0].split(',').map(col => col.trim())
   const arr = []
@@ -19,24 +19,22 @@ export function readCsv(csvText: string): object[] {
   return arr
 }
 
-export function file2Data(file: { name: string; contents: string }): { cols: string[]; data: object[] } {
+export function file2Data<T>(file: { name: string; contents: string }): T[] {
   if (file === null || file === undefined || Object.keys(file).length === 0) {
     console.log(`${file} is empty!`)
-    return { cols: [], data: [] }
+    return []
   } else {
-    let data: object[]
+    let data: T[]
     if (file.name.endsWith('csv') || file.name.endsWith('CSV')) {
-      data = readCsv(file.contents)
+      data = readCsv<T>(file.contents)
     } else if (file.name.endsWith('json') || file.name.endsWith('JSON')) {
       data = JSON.parse(file.contents)
     }
-    const cols: string[] = Object.keys(data[0])
-
-    return { cols, data }
+    return data
   }
 }
 
-export function normalize(data: object[]): object[] {
+export function normalize<T>(data: T[]): T[] {
   if (data.length > 0) {
     const cols: string[] = Object.keys(data[0])
     cols.slice(1).forEach((col) => {

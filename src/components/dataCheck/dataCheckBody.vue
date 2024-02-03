@@ -56,7 +56,7 @@ onMounted(() => {
     />
     <div class="flex-auto h-full max-h-full relative box-border bg-white rd-1 relative flex">
       <KeepAlive>
-        <component :is="Tabs[Store.currentTab]" />
+        <component :is="Tabs[Store.currentTab]" v-if="fileIndex !== null" />
       </KeepAlive>
     </div>
   </div>
