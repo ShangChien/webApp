@@ -29,6 +29,8 @@ export function file2Data<T>(file: { name: string; contents: string }): T[] {
       data = readCsv<T>(file.contents)
     } else if (file.name.endsWith('json') || file.name.endsWith('JSON')) {
       data = JSON.parse(file.contents)
+    } else {
+      console.log(`File ${file.name} is not supported!`)
     }
     return data
   }

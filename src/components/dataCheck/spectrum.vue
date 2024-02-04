@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { computed, defineAsyncComponent, h, ref, watch } from 'vue'
-import { NButton, NSelect, NTag } from 'naive-ui'
+import { NButton, NSelect, NSplit, NTag } from 'naive-ui'
 import type { Spectrum } from './dataCheckStore'
 import { file2Data, normalize, tickInfo } from '@/components/visualAnalysis/utils'
 import figCheckOption from '@/components/dataCheck/figCheckOption.vue'
@@ -28,7 +28,7 @@ const colsOptions = computed(() => {
   const cols = dataCSV.value.cols.map((v, i) => ({ label: v, value: i, type: 'info' }))
   return cols
 })
-function renderTag({ option }) {
+function renderTag({ option }: any) {
   return h(
     NTag,
     {
@@ -74,21 +74,33 @@ const figOptions: any = computed(() => ({
 
 <template>
   <div class="h-full w-full box-border flex justify-center items-center">
-    <div class="box-border w-70% h-full flex-auto flex b-2 rd-1 b-indigo-100 b-solid">
-      <g2View v-if="dataCSV.data.length > 0" :key="updateKey" :option="figOptions" />
-    </div>
-    <div class="flex-auto flex flex-col bg-gray-50 h-full w-30%  box-border">
-      当前文件：{{ props.allFiles[props.index]?.name }}
-      <NSelect v-model:value="Xcol" :options="colsOptions" size="small" :render-tag="renderTag" />
-      <NSelect v-model:value="Ycol" :options="colsOptions" size="small" :render-tag="renderTag" />
-      <NButton type="info" secondary size="tiny" class="flex-none text-1em m-1 ml-a " @click="updateKey++">
-        重新渲染
-      </NButton>
-      <NButton type="info" secondary size="tiny" class="flex-none text-1em m-1 ml-a " @click="updateKey++">
-        检查数据
-      </NButton>
-      <!-- <figCheckOption :data4check="objArr.data" /> -->
-    </div>
+    <NSplit :default-size="0.6" :min="0.4" :max="0.8">
+      <template #1>
+        <g2View v-if="dataCSV.data.length > 0" :key="updateKey" :option="figOptions" />
+      </template>
+      <template #2>
+        <NSplit direction="vertical" :default-size="0.3" :min="0.1" :max="0.9">
+          <template #1>
+            <div class="h-full p-1 bg-gray-50 box-border">
+              <div class="grid grid-cols-[1fr_3fr_1fr_3fr] justify-center items-center text-center gap-1">
+                <span>当前文件:</span><span>{{ props.allFiles[props.index]?.name }}</span>
+                <span />
+                <NButton type="info" secondary size="tiny" class="flex-none text-1em m-1 ml-a " @click="updateKey++">
+                  重新渲染
+                </NButton>
+                <span>X轴:</span>
+                <NSelect v-model:value="Xcol" :options="colsOptions" size="small" :render-tag="renderTag" />
+                <span>Y轴:</span>
+                <NSelect v-model:value="Ycol" :options="colsOptions" size="small" :render-tag="renderTag" />
+              </div>
+            </div>
+          </template>
+          <template #2>
+            <figCheckOption v-model:data4ref="data4ref" :data4check="data4check" />
+          </template>
+        </NSplit>
+      </template>
+    </NSplit>
   </div>
 </template>
 
