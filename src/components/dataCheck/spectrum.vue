@@ -47,7 +47,7 @@ const data4show = computed(() => {
 watch([Xcol, Ycol, () => props.index], () => {
   data4check.value = dataCSV.value.data.map((i) => {
     return {
-      name: props.allFiles[props.index]?.name,
+      name: props.allFiles[props.index]?.name.split('.')[0],
       nm: i[XcolName.value],
       intensity: i[YcolName.value],
     }
@@ -79,7 +79,7 @@ const figOptions: any = computed(() => ({
         <g2View v-if="dataCSV.data.length > 0" :key="updateKey" :option="figOptions" />
       </template>
       <template #2>
-        <NSplit direction="vertical" :default-size="0.3" :min="0.1" :max="0.9">
+        <NSplit direction="vertical" :default-size="0.1" :min="0.1" :max="0.9">
           <template #1>
             <div class="h-full p-1 bg-gray-50 box-border">
               <div class="grid grid-cols-[1fr_3fr_1fr_3fr] justify-center items-center text-center gap-1">

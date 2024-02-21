@@ -5,9 +5,9 @@ import { NInput, NPopover } from 'naive-ui'
 import type { Ref } from 'vue'
 
 const apiPrefix: Ref<string> = inject('apiPrefix', ref('https://192.168.2.233:5055'))
-const apiCustom = ref<string>('192.168.2.233:5056')
+const apiCustom = ref<string>('192.168.2.233:5055')
 const debouncedUrl = refDebounced(apiCustom, 2000)
-const apiPreset = '192.168.2.233:5056'
+const apiPreset = '192.168.2.233:5055'
 
 const isTyping = computed(() => apiCustom.value !== debouncedUrl.value)
 const isChecking = ref(false)

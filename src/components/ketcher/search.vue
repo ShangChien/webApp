@@ -20,7 +20,7 @@ enum logicType {
   Or = 'or',
 }
 
-const apiPrefix: Ref<string> = inject('apiPrefix', ref('https://192.168.2.233:5055'))
+const apiPrefix: Ref<string> = inject('apiPrefix')
 
 const ketcher = { id: ref(0), showModal: ref(false), smiles: ref('') }
 provide(keyStateKetcher, ketcher)
