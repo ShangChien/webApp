@@ -53,6 +53,7 @@ function readfiles(files: any) {
   Promise.all(fileContents)
     .then((files: { name: string; contents: string }[]) => {
       allFiles.value = files
+      fileIndex.value = null
       console.log(`读取${files?.length}个文件`)
     })
     .catch(e => console.log(`error:${e}`))

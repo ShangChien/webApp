@@ -14,7 +14,7 @@ const g2View = defineAsyncComponent(() => import('@/components/visualAnalysis/g2
 
 const dataCSV = computed(() => {
   let data = file2Data<object>(props.allFiles[props.index])
-  const cols = Object.keys(data[0])
+  const cols = Object.keys(data[0] ?? {})
   data = normalize(data)
   return { data, cols }
 })
@@ -96,7 +96,7 @@ const figOptions: any = computed(() => ({
             </div>
           </template>
           <template #2>
-            <figCheckOption v-model:data4ref="data4ref" :data4check="data4check" />
+            <figCheckOption v-if="dataCSV.data.length > 0" v-model:data4ref="data4ref" :data4check="data4check" />
           </template>
         </NSplit>
       </template>
