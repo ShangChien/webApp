@@ -4,6 +4,9 @@ export function readCsv<T>(csvText: string): T[] {
   const arr = []
   lines.slice(1).forEach((line, i) => {
     const items = line.split(',')
+    if (items.every(item => item.trim() === '')) {
+      return
+    }
     if (items.length === cols.length) {
       const obj = items.reduce((obj, item, index) => {
         const trimmedItem = item.trim()
